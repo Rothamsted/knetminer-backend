@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
+  <artifactId>backend-pom</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>KnetMiner backend-pom (Top Maven Container)</name>
+  
+  <description>
+  	Top container for knetminer new backend architecture.
+  	See https://doi.org/10.1515/jib-2018-0023 for details.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+		<ondex.version>2.1.1-SNAPSHOT</ondex.version>
+		
+		<neo4j.server.version>3.4.6</neo4j.server.version>
+		<neo4j.server.boltPort>17690</neo4j.server.boltPort>
+		<neo4j.server.httpPort>17490</neo4j.server.httpPort>
+		<!-- update-sources.sh needs to override this -->
+		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>		
+  </properties>
+
+	<dependencyManagement>
+	  <dependencies>
+		  <dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>4.10</version>
+		    <scope>test</scope>
+		  </dependency>
+			<dependency>
+				<groupId>uk.ac.rothamsted.rdf.neo4j</groupId>
+				<artifactId>neo4j-utils</artifactId>
+    		<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.ondex.core</groupId>
+ 				<artifactId>memory</artifactId>
+				<version>${ondex.version}</version>
+			</dependency>		  
+			<dependency>
+				<groupId>net.sourceforge.ondex.core</groupId>
+ 				<artifactId>api</artifactId>
+				<version>${ondex.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.ondex.core</groupId>
+				<artifactId>lucene</artifactId>
+				<version>${ondex.version}</version>			
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.ondex.modules</groupId>
+				<artifactId>oxl</artifactId>
+				<version>${ondex.version}</version>			
+			</dependency>
+			<dependency>
+					<groupId>net.sourceforge.ondex.core</groupId>
+					<artifactId>workflow-api</artifactId>
+					<version>${ondex.version}</version>
+					<exclusions>
+						<exclusion>
+							<groupId>log4j</groupId>
+							<artifactId>log4j</artifactId>
+						</exclusion>
+						<exclusion>
+				      <groupId>org.slf4j</groupId>
+				      <artifactId>slf4j-log4j12</artifactId>
+						</exclusion>
+					</exclusions>
+			</dependency>
+	    <dependency>
+	      <groupId>net.sourceforge.ondex.core</groupId>
+	      <artifactId>tools</artifactId>
+	      <version>${ondex.version}</version>
+	      <scope>compile</scope>
+	      <exclusions>
+	        <exclusion>
+	          <artifactId>log4j</artifactId>
+	          <groupId>log4j</groupId>
+	        </exclusion>
+	        <exclusion>
+	          <artifactId>slf4j-log4j12</artifactId>
+	          <groupId>org.slf4j</groupId>
+	        </exclusion>
+	      </exclusions>
+	    </dependency>			
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>1.7.25</version>
+      </dependency>
+			<dependency>
+				<groupId>net.sourceforge.ondex.modules</groupId>
+				<artifactId>rdf-export-2</artifactId>
+				<version>${ondex.version}</version>			
+			</dependency>
+			<dependency>
+				<groupId>info.marcobrandizi</groupId>
+				<artifactId>rdfutils-core</artifactId>
+			  <version>2.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+			  <groupId>net.sourceforge.ondex.modules</groupId>
+			  <artifactId>rdf-common</artifactId>
+				<version>${ondex.version}</version>			
+			</dependency>
+	    <dependency>
+	      <groupId>ch.qos.logback</groupId>
+	      <artifactId>logback-classic</artifactId>
+	      <version>0.9.29</version>
+	    </dependency>
+	  </dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+			  <!-- 
+					A small plug-in that starts Neo4j. 
+					
+					1.1 is the official version that integrated our improvements at
+					at https://github.com/Rothamsted/neo4j-server-maven-plugin 
+			  -->		  
+		    <plugin>
+			    <groupId>com.github.harti2006</groupId>
+				  <artifactId>neo4j-server-maven-plugin</artifactId>
+				  <version>1.1</version>
+					<configuration>
+						<version>${neo4j.server.version}</version>
+						<port>${neo4j.server.httpPort}</port>
+						<boltPort>${neo4j.server.boltPort}</boltPort>
+						<deleteDb>${neo4j.server.deleteDb}</deleteDb><!-- Cause we populate it with our own test DB -->
+						<serverReadyAttempts>120</serverReadyAttempts>
+					</configuration>
+					<executions>
+						<execution>
+							<id>start-neo4j-server</id>
+							<goals><goal>start</goal></goals>
+						</execution>
+						<execution>
+							<id>stop-neo4j-server</id>
+							<goals><goal>stop</goal></goals>
+						</execution>
+					</executions>		        
+		    </plugin>	
+	
+				<plugin>
+		      <artifactId>maven-failsafe-plugin</artifactId>
+		      <version>3.0.0-M1</version>
+		      <configuration>
+		        <trimStackTrace>false</trimStackTrace>
+		        <systemPropertyVariables>
+		        	<!-- Integration tests needing to connect the test Neo4j might need this -->
+		          <neo4j.server.boltPort>${neo4j.server.boltPort}</neo4j.server.boltPort>
+		        </systemPropertyVariables>
+			      <properties>
+			        <property>
+			        	<!-- Prints out spaces and test name before/after every test method and automatically -->
+			          <name>listener</name>
+			          <value>uk.ac.ebi.utils.test.junit.TestOutputDecorator</value>
+			        </property>
+			       </properties>
+		      </configuration>      
+					<executions>
+	          <execution>
+	          	<id>failsafe-test</id>
+	            <goals><goal>integration-test</goal></goals>
+	          </execution>
+	          <execution>
+		      		<id>failsafe-verify</id>
+		      		<goals><goal>verify</goal></goals>
+	          </execution>
+	        </executions>	      
+				</plugin>			
+			</plugins>
+		</pluginManagement>
+		
+		<plugins>
+		
+	    <plugin>
+		    <artifactId>maven-source-plugin</artifactId>
+		    <executions>
+		      <execution>
+		        <id>attach-source</id>
+		        <goals><goal>jar</goal></goals>
+		      </execution>
+		    </executions>
+	    </plugin>
+
+		  <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-surefire-plugin</artifactId>
+		    <configuration>
+		      <properties>
+		        <property>
+		        	<!-- Prints out spaces and test name before/after every test method and automatically -->
+		          <name>listener</name>
+		          <value>uk.ac.ebi.utils.test.junit.TestOutputDecorator</value>
+		        </property>
+		       </properties>
+		    </configuration>
+			</plugin>
+
+		</plugins>
+		
+	</build>
+	
+  <modules>
+    <module>cypher-client</module>
+  </modules>
+</project>
