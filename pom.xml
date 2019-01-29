@@ -214,5 +214,6 @@
 	
   <modules>
     <module>cypher-client</module>
+    <module>test-data-server</module>
   </modules>
 </project>
