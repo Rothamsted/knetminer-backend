@@ -7,7 +7,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>KnetMiner backend-pom (Top Maven Container)</name>
+  <name>backend-pom -- Knetminer Backend, Top POM</name>
   
   <description>
   	Top container for knetminer new backend architecture.
@@ -213,7 +213,7 @@
 	</build>
 	
   <modules>
-    <module>cypher-client</module>
     <module>test-data-server</module>
+    <module>cypher-client</module>
   </modules>
 </project>
