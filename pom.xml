@@ -24,7 +24,9 @@
 		<neo4j.server.boltPort>17690</neo4j.server.boltPort>
 		<neo4j.server.httpPort>17490</neo4j.server.httpPort>
 		<!-- update-sources.sh needs to override this -->
-		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>		
+		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
+		
+		<spring.version>4.3.6.RELEASE</spring.version>			
   </properties>
 
 	<dependencyManagement>
@@ -90,7 +92,12 @@
 	          <groupId>org.slf4j</groupId>
 	        </exclusion>
 	      </exclusions>
-	    </dependency>			
+	    </dependency>
+			<dependency>
+		  	<groupId>net.sourceforge.ondex.core</groupId>
+		   	<artifactId>algorithms</artifactId>
+	      <version>${ondex.version}</version>		   	
+			</dependency>	    		
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
@@ -116,6 +123,16 @@
 	      <artifactId>logback-classic</artifactId>
 	      <version>0.9.29</version>
 	    </dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+				<dependency>
+					<groupId>uk.ac.ebi</groupId>
+					<artifactId>jutils-io</artifactId>
+					<version>7.0.1-SNAPSHOT</version>
+				</dependency>
 	  </dependencies>
 	</dependencyManagement>
 	

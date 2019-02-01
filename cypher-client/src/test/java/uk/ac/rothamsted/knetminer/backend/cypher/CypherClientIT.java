@@ -1,15 +1,16 @@
 package uk.ac.rothamsted.knetminer.backend.cypher;
 
 import static info.marcobrandizi.rdfutils.namespaces.NamespaceUtils.iri;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
@@ -17,12 +18,8 @@ import org.neo4j.driver.v1.GraphDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXEntity;
-import net.sourceforge.ondex.core.ONDEXGraph;
-import net.sourceforge.ondex.core.ONDEXRelation;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
-import net.sourceforge.ondex.parser.oxl.Parser;
+import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 
 /**
  * TODO: comment me!
@@ -33,27 +30,14 @@ import net.sourceforge.ondex.parser.oxl.Parser;
  */
 public class CypherClientIT
 {
-	private static LuceneEnv luceneMgr;
 	private static Driver neoDriver;	
 
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
-	
-	
-	@BeforeClass
-	public static void initOndex ()
-	{
-		ONDEXGraph graph = Parser.loadOXL ( "target/test-classes/ara-tiny.oxl" );
-		luceneMgr = new LuceneEnv ( "target/ara-tiny-lucene", true );
-		luceneMgr.setONDEXGraph ( graph );
-	}
-	
-	@AfterClass
-	public static void closeOndex ()
-	{
-		if ( luceneMgr == null ) return;
-		luceneMgr.closeIndex ();
-	}
-	
+
+	@ClassRule
+	public static TestGraphResource graphResource = new TestGraphResource ();
+
+		
 	@BeforeClass
 	public static void initNeo4j ()
 	{
@@ -125,47 +109,36 @@ public class CypherClientIT
 			"LIMIT 10";
 		
 		List<List<ONDEXEntity>> odxEnts = cyProvider.query ( 
-			client -> client.findPaths ( luceneMgr, query ).collect ( Collectors.toList () ) 
+			client -> client.findPaths ( graphResource.getLuceneMgr (), query ).collect ( Collectors.toList () ) 
 		);
 		
 		Assert.assertNotNull ( "Null result!", odxEnts );
 		
 		log.info ( "======== Results from findPaths() =======" );
-		
-		Function<ONDEXEntity, String> oeLabel = oe -> {
-			if ( oe instanceof ONDEXConcept) {
-				ONDEXConcept c = (ONDEXConcept) oe;
-				return c.getOfType ().getId () + ":" + c.getPID ();
-			}
-			ONDEXRelation r = (ONDEXRelation) oe;
-			return r.getOfType ().getId () + ":" + r.getId ();
-		};
-		
+				
 		int i = 0;
 		for ( List<ONDEXEntity> oes: odxEnts )
 		{
 			String pathStr = oes.stream ()
-			.map ( oeLabel )
+			.map ( ONDEXGraphUtils::getString )
 			.collect ( Collectors.joining ( ", ", "[", "]") );
 			
 			log.info ( "\t#{}: [{}]", i++, pathStr );
 		}
 		
 				
-		Assert.assertTrue ( 
+		assertTrue ( 
 			"Expected Result not found!", 
-			odxEnts.stream().filter ( pathIris -> 
+			odxEnts.stream().anyMatch ( pathIris -> 
 			{
 				BiFunction<String, Integer, Boolean> oeChecker = (label, idx) -> 
-					oeLabel.apply ( pathIris.get ( idx ) ).startsWith ( label );
+					ONDEXGraphUtils.getString ( pathIris.get ( idx ) ).startsWith ( label );
 					
-				return oeChecker.apply ( "Gene:AT1G63650;locus:2026629", 0 )
-					&& oeChecker.apply ( "h_s_s", 3 )
-					&& oeChecker.apply ( "Protein:P13027", 4 )
-					&& oeChecker.apply ( "Publication", 6 );
+				return oeChecker.apply ( "C{Gene:AT1G63650;locus:2026629", 0 )
+					&& oeChecker.apply ( "R{h_s_s", 3 )
+					&& oeChecker.apply ( "C{Protein:P13027", 4 )
+					&& oeChecker.apply ( "C{Publication", 6 );
 			})
-			.findAny ()
-			.isPresent ()
 		);
 	}	
 }

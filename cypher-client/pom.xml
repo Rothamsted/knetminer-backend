@@ -49,14 +49,26 @@
       <groupId>net.sourceforge.ondex.core</groupId>
       <artifactId>tools</artifactId>
     </dependency>
+		<dependency>
+	  	<groupId>net.sourceforge.ondex.core</groupId>
+	   	<artifactId>algorithms</artifactId>
+		</dependency>	    		
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
     </dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.ondex.modules</groupId>
 			<artifactId>oxl</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.ebi</groupId>
+			<artifactId>jutils-io</artifactId>
 		</dependency>
   </dependencies>
   
@@ -65,6 +77,25 @@
 			<plugin>
 	      <artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
-		</plugins> 
+		</plugins>
+		
+    <testResources>
+      <testResource>
+      	<directory>src/test/resources</directory>
+      	<includes>
+      		<include>**/*.cypher</include>
+      		<include>**/*.oxl</include>
+      	</includes>
+      	<filtering>false</filtering>
+      </testResource>
+      <testResource>
+      	<directory>src/test/resources</directory>
+      	<filtering>true</filtering>
+      	<excludes>
+      		<exclude>**/*.cypher</exclude>
+      		<exclude>**/*.oxl</exclude>
+      	</excludes>
+      </testResource>
+    </testResources>
   </build>
 </project>

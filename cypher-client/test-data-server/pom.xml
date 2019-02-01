@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
+    <artifactId>backend-pom</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>test-server</artifactId>
+  <name>test-server -- Data Test Server</name>
+  <description>Starts/Stop a</description>
+  
+  <build>
+  
+  	<plugins>
+  	
+			<!-- 
+				Unzip test files. This happens after neo4j-server-maven-plugin has downladed the 
+				Neo4j distribution, see below. 
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-test-resources</phase>
+						<goals><goal>run</goal></goals>
+						<configuration>
+							<tasks>
+								<!--
+									A test Neo4j database, based on ara-tiny.oxl
+									Both are created manually via update-resources.sh 
+								-->
+								<untar 
+									src = "src/test/resources/ara-tiny-neo4j.tar.bz2" 
+									dest = "target/neo4j-server/neo4j-community-${neo4j.server.version}/data/databases"
+									compression = "bzip2"
+								/>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>	
+			
+			
+		  <!-- 
+				A small plug-in that starts Neo4j. 
+				
+				1.1 is the official version that integrated our improvements at
+				at https://github.com/Rothamsted/neo4j-server-maven-plugin 
+		  -->		  
+	    <plugin>
+		    <groupId>com.github.harti2006</groupId>
+			  <artifactId>neo4j-server-maven-plugin</artifactId>
+				<executions>
+					<!-- This is just to download it before the ant/untar task above -->
+					<execution>
+						<id>neo4j-server-download</id>
+						<phase>generate-test-resources</phase>
+						<goals><goal>start</goal></goals>
+						<configuration><deleteDb>true</deleteDb></configuration>
+					</execution>
+					<!-- Was loaded, now stop, so that ant/untar can put test data in place -->
+					<execution>
+						<id>neo4j-server-stop-before-population</id>
+						<phase>generate-test-resources</phase>
+						<goals><goal>stop</goal></goals>
+					</execution>
+					<!-- Proper start/stop around integration tests are inherited from the parent POM -->
+				</executions>		        
+	    </plugin>	  	
+  
+  	</plugins>
+  
+  </build>
+</project>

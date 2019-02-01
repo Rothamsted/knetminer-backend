@@ -6,7 +6,10 @@ import static org.neo4j.driver.v1.AccessMode.WRITE;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.annotation.Resource;
+
 import org.neo4j.driver.v1.Driver;
+import org.springframework.stereotype.Component;
 
 /**
  * TODO: comment me!
@@ -15,8 +18,10 @@ import org.neo4j.driver.v1.Driver;
  * <dl><dt>Date:</dt><dd>15 Oct 2018</dd></dl>
  *
  */
+@Component
 public class CypherClientProvider
 {
+	@Resource ( name = "neoDriver" )
 	private Driver neoDriver;
 	
 	CypherClientProvider () {

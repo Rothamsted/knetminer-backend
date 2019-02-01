@@ -1,5 +1,5 @@
 cd "$(dirname $0)"
 goal="${1-verify}" 
-mvn --projects test-data-server pre-integration-test
+./resources-init.sh
 mvn --projects '!test-data-server' $goal
-mvn --projects test-data-server neo4j-server:stop
+./resources-shutdown.sh
