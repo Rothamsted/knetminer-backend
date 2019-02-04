@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.vavr.Function3;
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.StateMachineComponent;
@@ -116,26 +117,26 @@ public class CypherGraphTraverserIT
 			.map ( EvidencePathNode::getEvidencesInPositionOrder )
 			.anyMatch ( evidences -> 
 			{ 
-				// Little helper to check if evidence idx is instance of smPair[0] and has concept/relation type named
-				// smPair[1] (we need a pair since there is no 'tri-function' in Java).
+				// Little helper to check if evidence testedIdx is instance of exptEvidence and has concept/relation type named
+				// exptEvType
 				//
-				BiFunction<Pair<Class<? extends StateMachineComponent>, String>, Integer, Boolean> evidenceChecker =
-				( smPair, idx ) -> 
+				Function3<Class<? extends StateMachineComponent>, String, Integer, Boolean> evidenceChecker =
+				( exptEvidence, exptEvType, testedIdx ) -> 
 				{
-					StateMachineComponent ev = (StateMachineComponent) evidences.get ( idx );
+					StateMachineComponent ev = (StateMachineComponent) evidences.get ( testedIdx );
 					
-					if ( !smPair.getLeft ().isInstance ( ev ) ) return false;
+					if ( !exptEvidence.isInstance ( ev ) ) return false;
 					
 					MetaData evType = ev instanceof State 
 						? ((State) ev).getValidConceptClass ()
 						: ((Transition) ev).getValidRelationType ();
 					
-					return smPair.getRight ().equals ( evType.getId () );
+					return exptEvType.equals ( evType.getId () );
 				};
 				
-				return evidenceChecker.apply ( Pair.of ( Transition.class, "h_s_s" ), 3 )
-					&& evidenceChecker.apply ( Pair.of ( State.class, "Protein" ), 4 )
-					&& evidenceChecker.apply ( Pair.of ( State.class, "Publication" ), 6 );
+				return evidenceChecker.apply ( Transition.class, "h_s_s", 3 )
+					&& evidenceChecker.apply ( State.class, "Protein", 4 )
+					&& evidenceChecker.apply ( State.class, "Publication", 6 );
 			})
 		);
 	}
