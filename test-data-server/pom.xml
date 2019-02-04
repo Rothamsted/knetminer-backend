@@ -6,7 +6,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>test-data-server</artifactId>
-  <name>test-server -- Data Test Server</name>
+  <name>test-data-server -- Knetminer Data Test Server</name>
   <description>Starts/Stop a</description>
   
   <build>

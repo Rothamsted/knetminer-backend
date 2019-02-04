@@ -103,25 +103,21 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		));
 				
 		Value startIriParam = Values.parameters ( "startIri", startIri );
-		
-		List<EvidencePathNode> result = cyProvider.query ( cyClient ->
-			cypherQueries
-			.parallelStream ()
-			.flatMap ( query -> 
-			{
-				// For each configured semantic motif query, get the paths from Neo4j + indexed resourceResource
-				Stream<List<ONDEXEntity>> cypaths = cyClient.findPaths ( 
-					luceneMgr, query, startIriParam 
-				);
+
+		List<EvidencePathNode> result = cypherQueries
+		.parallelStream ()
+		.flatMap ( query -> 
+		{
+			// For each configured semantic motif query, get the paths from Neo4j + indexed resourceResource
+			Stream<List<ONDEXEntity>> cypaths = cyProvider.query (
+				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam ) 
+			);
+			// Now map the paths to the format required by the traverser
+			// We're returning a stream of paths, (each query can return more than one)
+			return cypaths.map ( path -> buildEvidencePath ( path ) );
+		})
+		.collect ( Collectors.toList () ); // And eventually we extract List<EvPathNode>
 				
-				// Now map the paths to the format required by the traverser
-				// We're returning a stream of paths, (each query can return more than one)
-				// TODO: implement this, make sure it returns empty stuff (and not null)
-				return cypaths.map ( path -> buildEvidencePath ( path ) );
-			}) // the upstream unwrapping flattens a stream of streams of EvPathNode into Stream<EvPathNode>
-			.collect ( Collectors.toList () ) // And eventually we extract List<EvPathNode>
-		);
-		
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		if ( filter != null ) result = filter.filterPaths ( result );
 		return result;

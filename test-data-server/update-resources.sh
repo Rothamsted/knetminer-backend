@@ -21,7 +21,7 @@ echo -e "\n\n\tAdding URIs to OXL Test File and putting result in place\n"
 
 
 echo -e "\n\n\tGenerating Test RDF\n"
-"$ODX2RDF_HOME/odx2rdf.sh" "$cyclient_test_dir/${sample_base}.oxl" "$tmp_dir/${sample_base}.ttl"
+"$ODX2RDF_HOME/odx2rdf.sh" "$cyclient_test_dir/${sample_base}.oxl" "$test_dir/${sample_base}.ttl"
 
 echo -e "\n\n\tGenerating Test Neo4j Database\n"
 # Default port, so that we can use the default config for rdf2neo.
@@ -29,7 +29,7 @@ echo -e "\n\n\tGenerating Test Neo4j Database\n"
 # but this script is supposed to be run by the developer on its own computer, so, this should be fine. 
 mvn neo4j-server:start -Dneo4j.server.boltPort=7687 -Dneo4j.server.deleteDb=true
 
-  "$RDF2NEO_HOME/ondex2neo.sh" "$tmp_dir/${sample_base}.ttl"
+  "$RDF2NEO_HOME/ondex2neo.sh" "$test_dir/${sample_base}.ttl"
 
 mvn neo4j-server:stop
 
