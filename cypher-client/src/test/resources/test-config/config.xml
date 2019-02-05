@@ -11,8 +11,32 @@
 		-->
     <context:component-scan base-package = "uk.ac.rothamsted.knetminer.backend" />
     
-		<util:list id = "semanticMotifsQueries" value-type = "java.lang.String">
-			<!-- This is one of the many ways to read query definitions from files -->
+    <bean name = "configDirPath" class = "java.lang.String">
+    	<constructor-arg value = "target/test-classes/test-config" />
+    </bean> 
+    
+		<!-- 
+			This is one of the many ways to read query definitions from files. 
+			All *.cypher files are read using our IOUtils. 
+		-->
+		<bean name = "semanticMotifsQueries" class = "java.util.Arrays" factory-method = "asList" >
+			<constructor-arg>
+				<bean class = "uk.ac.ebi.utils.io.IOUtils" factory-method = "readFiles">
+					<constructor-arg ref = "configDirPath" />
+					<constructor-arg>
+						<bean class = "org.apache.commons.io.filefilter.WildcardFileFilter">
+							<constructor-arg value = "*.cypher" />
+						</bean>
+					</constructor-arg>
+				</bean>
+			</constructor-arg>
+		</bean>
+		
+			<!--
+				This is another possible initialisation pattern.
+				Apache IOUtils are used to read file contents into strings. 
+			-->		
+			<!-- util:list id = "semanticMotifsQueries" value-type = "java.lang.String">
 			<bean class = "org.apache.commons.io.IOUtils" factory-method = "toString">
 				<constructor-arg 
 					value = "classpath:test-config/simple-protein-publication.cypher"
@@ -25,7 +49,7 @@
 					type = "java.io.Reader" 
 				/>
 			</bean>
-		</util:list>
+		</util:list -->
         
 		<bean id = "neoDriver" class = "org.neo4j.driver.v1.GraphDatabase" factory-method="driver">
 			<constructor-arg value = "bolt://127.0.0.1:${neo4j.server.boltPort}" />
