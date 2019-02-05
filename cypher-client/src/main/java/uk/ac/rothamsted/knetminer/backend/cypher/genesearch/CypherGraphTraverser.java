@@ -3,10 +3,7 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
-import java.io.Closeable;
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
