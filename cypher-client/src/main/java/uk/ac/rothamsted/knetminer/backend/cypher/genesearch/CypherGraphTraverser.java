@@ -66,7 +66,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				CONFIG_PATH_OPT
 			);
 			
-			springContext = new FileSystemXmlApplicationContext ( cfgPath );
+			springContext = new FileSystemXmlApplicationContext ( "file://" + cfgFile.getAbsolutePath () );
 			springContext.registerShutdownHook ();
 		}		
 	}

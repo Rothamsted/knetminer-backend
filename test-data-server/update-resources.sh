@@ -7,7 +7,7 @@ export RDF2NEO_HOME=/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-full/ond
 cd "$(dirname "$0")"
 wdir="$(pwd)"
 tmp_dir="$wdir/target"
-test_dir="$wdir/src/test/resources"
+test_dir="$wdir/src/main/resources"
 cyclient_test_dir="$wdir/../cypher-client/src/test/resources"
 mkdir -p "$tmp_dir"
 

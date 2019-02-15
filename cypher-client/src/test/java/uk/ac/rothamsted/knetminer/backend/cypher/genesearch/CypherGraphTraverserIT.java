@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,6 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.TestGraphResource;
  */
 public class CypherGraphTraverserIT
 {
-	private static AbstractGraphTraverser graphTraverser = new CypherGraphTraverser ();
+	private static AbstractGraphTraverser graphTraverser;
 	
 	@ClassRule
 	public static TestGraphResource graphResource = new TestGraphResource ();
@@ -58,8 +58,11 @@ public class CypherGraphTraverserIT
 	@BeforeClass
 	public static void initTraverser ()
 	{
-		graphTraverser.setOption ( CypherGraphTraverser.CONFIG_PATH_OPT, "target/test-classes/test-config/config.xml" );
-		graphTraverser.setOption ( "LuceneEnv", graphResource.getLuceneMgr () );
+		Map<String, Object> options = new HashMap<> ();
+		options.put ( "GraphTraverserClass", CypherGraphTraverser.class.getName () );
+		options.put ( CypherGraphTraverser.CONFIG_PATH_OPT, "target/test-classes/test-config/config.xml" );
+		options.put ( "LuceneEnv", graphResource.getLuceneMgr () );
+		graphTraverser = AbstractGraphTraverser.getInstance ( options );
 	}
 			
 	@Test

@@ -26,7 +26,9 @@
 		<!-- update-sources.sh needs to override this -->
 		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
 		
-		<spring.version>4.3.6.RELEASE</spring.version>			
+		<spring.version>4.3.6.RELEASE</spring.version>
+		<slf4j.version>1.7.25</slf4j.version>
+					
   </properties>
 
 	<dependencyManagement>
@@ -81,7 +83,6 @@
 	      <groupId>net.sourceforge.ondex.core</groupId>
 	      <artifactId>tools</artifactId>
 	      <version>${ondex.version}</version>
-	      <scope>compile</scope>
 	      <exclusions>
 	        <exclusion>
 	          <artifactId>log4j</artifactId>
@@ -101,8 +102,13 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
-        <version>1.7.25</version>
+				<version>${slf4j.version}</version>
       </dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.ondex.modules</groupId>
 				<artifactId>rdf-export-2</artifactId>
@@ -121,24 +127,24 @@
 	    <dependency>
 	      <groupId>ch.qos.logback</groupId>
 	      <artifactId>logback-classic</artifactId>
-	      <version>0.9.29</version>
+	      <version>1.2.3</version>
 	    </dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-				<dependency>
-					<groupId>uk.ac.ebi</groupId>
-					<artifactId>jutils-io</artifactId>
-					<version>7.0.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<!-- Utilities for lambdas and collections -->
-					<groupId>io.vavr</groupId>
-					<artifactId>vavr</artifactId>
-					<version>0.10.0</version>
-				</dependency>
+			<dependency>
+				<groupId>uk.ac.ebi</groupId>
+				<artifactId>jutils-io</artifactId>
+				<version>7.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<!-- Utilities for lambdas and collections -->
+				<groupId>io.vavr</groupId>
+				<artifactId>vavr</artifactId>
+				<version>0.10.0</version>
+			</dependency>
 	  </dependencies>
 	  
 	</dependencyManagement>
@@ -160,7 +166,7 @@
 						<version>${neo4j.server.version}</version>
 						<port>${neo4j.server.httpPort}</port>
 						<boltPort>${neo4j.server.boltPort}</boltPort>
-						<deleteDb>${neo4j.server.deleteDb}</deleteDb><!-- Cause we populate it with our own test DB -->
+						<deleteDb>${neo4j.server.deleteDb}</deleteDb><!-- We populate it with our own test DB -->
 						<serverReadyAttempts>120</serverReadyAttempts>
 					</configuration>
 					<executions>
@@ -239,5 +245,18 @@
   <modules>
     <module>test-data-server</module>
     <module>cypher-client</module>
+    <module>backend-utils</module>
   </modules>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.springframework</groupId>
+  		<artifactId>spring-context</artifactId>
+  		<exclusions>
+  			<exclusion>
+  				<groupId>commons-logging</groupId>
+  				<artifactId>commons-logging</artifactId>
+  			</exclusion>
+  		</exclusions>
+  	</dependency>
+  </dependencies>
 </project>
