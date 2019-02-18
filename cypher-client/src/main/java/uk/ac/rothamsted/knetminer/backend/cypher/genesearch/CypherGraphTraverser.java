@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -44,6 +46,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 {
 	public static final String CONFIG_PATH_OPT = "knetminer.backend.configPath";
 	
+	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
+	
 	private static AbstractApplicationContext springContext;
 	
 	public CypherGraphTraverser ()
@@ -66,8 +70,11 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				CONFIG_PATH_OPT
 			);
 			
-			springContext = new FileSystemXmlApplicationContext ( "file://" + cfgFile.getAbsolutePath () );
+			String furl = "file://" + cfgFile.getAbsolutePath ();
+			log.info ( "Configuring {} from <{}>", this.getClass ().getCanonicalName (), furl );
+			springContext = new FileSystemXmlApplicationContext ( furl );
 			springContext.registerShutdownHook ();
+			log.info ( "{} configured", this.getClass ().getCanonicalName () );
 		}		
 	}
 	
