@@ -16,6 +16,11 @@ sample_base="ara-tiny"
 curl --output "$tmp_dir/${sample_base}.oxl"\
      https://s3.eu-west-2.amazonaws.com/nfventures-testing.knetminer/default.oxl
 
+echo -e "\n\n\Adding some test data to the downloaded OXL\n"
+mvn test-compile exec:java -D'exec.mainClass=uk.ac.rothamsted.knetminer.backend.test.OxlTestDataCreator' \
+  	-Dexec.classpathScope=test \
+  	-Dexec.args="$tmp_dir/${sample_base}.oxl $tmp_dir/${sample_base}.oxl"
+
 echo -e "\n\n\tAdding URIs to OXL Test File and putting result in place\n"
 "$ODX2RDF_HOME/add-uris.sh" "$tmp_dir/${sample_base}.oxl" "$cyclient_test_dir/${sample_base}.oxl"
 

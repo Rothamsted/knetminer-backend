@@ -111,7 +111,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		.parallelStream ()
 		.flatMap ( query -> 
 		{
-			// For each configured semantic motif query, get the paths from Neo4j + indexed resourceResource
+			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 			Stream<List<ONDEXEntity>> cypaths = cyProvider.query (
 				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam ) 
 			);
