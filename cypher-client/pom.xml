@@ -78,10 +78,35 @@
   
   <build>
 		<plugins>
+		
+	 		<plugin>
+	 			<artifactId>maven-dependency-plugin</artifactId>	  			
+	 			<executions>
+	 				<execution>
+	 					<phase>generate-test-resources</phase>
+	 					<goals><goal>unpack</goal></goals>
+	 				</execution>
+	 			</executions>
+				<configuration>
+	       	<artifactItems>
+	       		<!-- Works with the same OXL file that is used to instantiate the neo4j server -->
+	       		<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>test-data-server</artifactId>
+							<version>${project.version}</version>
+							<includes>ara-tiny.oxl</includes>
+	       		</artifactItem>
+	       	</artifactItems>  						
+				</configuration>
+	 		</plugin>
+		  		
 			<plugin>
 	      <artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
+
 		</plugins>
+		
+		
 		
     <testResources>
       <testResource>

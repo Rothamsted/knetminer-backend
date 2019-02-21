@@ -43,14 +43,7 @@ public class OxlTestDataCreator
 		DataSource ensmblDs = gmeta.getDataSource ( "BIOGRID:ENSEMBL:TAIR" );
 		EvidenceType impdEv = gmeta.getEvidenceType ( "IMPD" );
 		AttributeName taxIdAttrName = gmeta.getAttributeName ( "TAXID" );
-		
-//		ONDEXConcept g0 = graph.
-//			getConceptsOfConceptClass ( geneCC )
-//			.parallelStream ()
-//			.filter ( g -> "AT3G13540;locus:2092820".equals ( g.getPID () ) )
-//			.findAny ()
-//			.orElseThrow ( () -> new IllegalStateException ( "Reference gene not found!" ) ); 
-				
+						
 		ONDEXConcept g1 = graph.createConcept ( 
 			"TEST-GENE-01", "", "A Test Gene, introduced by backend/test-data-server", ensmblDs, geneCC, 
 			Collections.singleton ( impdEv ) 

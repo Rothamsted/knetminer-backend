@@ -179,7 +179,7 @@ public class CypherGraphTraverserIT
 		);
 		
 		
-		// ---- 4rth start concept (like testTraverseGraph())
+		// ---- 4th start concept (like testTraverseGraph())
 		//
 		probeConcept = startConcepts.get ( 3 );
 		probePaths = pathsMap.get ( probeConcept );
@@ -192,6 +192,41 @@ public class CypherGraphTraverserIT
 				State.class, "Publication", 6 
 			)
 		);		
+	}
+	
+	/**
+	 * Tests some additions we make to the base OXL.
+	 */
+	@Test
+	@SuppressWarnings ( "rawtypes" )
+	public void testTestGene ()
+	{
+		ONDEXGraph graph = graphResource.getGraph ();
+		
+		ONDEXConcept startConcept = graph.getConcepts ()
+			.parallelStream ()
+			.filter ( c -> "TEST-GENE-01".equals ( c.getPID () ) )
+			.findAny ()
+			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
+		
+		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graph, startConcept, null );
+
+		assertTrue ( "No EvidencePath returned!", paths.size () > 0 );
+		
+		
+		log.info ( "======== Results from traverseGraph() =======" );
+		logPaths ( paths );
+		
+		
+		// ------ Let's see if we have a probe path
+		//		
+		assertTrue ( 
+			"Expected result not found (Evidence Path)!",
+			checkPathEntities ( paths,
+				"C{Gene:TEST-GENE-01", 0,
+				"R{has_test_relation", 1,
+				"C{TestCC:TEST-ENT-01", 2
+		));		
 	}
 	
 	/**

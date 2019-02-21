@@ -23,7 +23,7 @@ public class TestGraphResource extends ExternalResource
 	{
 		if ( graph != null ) return;
 		
-		graph = Parser.loadOXL ( "target/test-classes/ara-tiny.oxl" );
+		graph = Parser.loadOXL ( "target/dependency/ara-tiny.oxl" );
 		luceneMgr = new LuceneEnv ( "target/ara-tiny-lucene", true );
 		luceneMgr.setONDEXGraph ( graph );
 	}
