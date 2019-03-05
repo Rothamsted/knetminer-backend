@@ -15,6 +15,7 @@
   </description>
 
   <properties>
+  
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
@@ -30,6 +31,13 @@
 		<slf4j.version>1.7.25</slf4j.version>
 					
   </properties>
+
+
+  <modules>
+    <module>test-data-server</module>
+    <module>cypher-client</module>
+    <module>backend-utils</module>
+  </modules>
 
 	<dependencyManagement>
 	  <dependencies>
@@ -241,12 +249,7 @@
 		</plugins>
 		
 	</build>
-	
-  <modules>
-    <module>test-data-server</module>
-    <module>cypher-client</module>
-    <module>backend-utils</module>
-  </modules>
+	    
   <dependencies>
   	<dependency>
   		<groupId>org.springframework</groupId>
@@ -259,4 +262,28 @@
   		</exclusions>
   	</dependency>
   </dependencies>
+  
+	<distributionManagement>
+	  <repository>
+			<id>ondex-releases</id>
+			<name>Internal Releases</name>
+			<url>http://ondex.rothamsted.ac.uk/nexus/content/repositories/releases</url>
+	  </repository>
+	  <snapshotRepository>
+			<id>ondex-snapshots</id>
+			<name>Internal Snapshots</name>
+			<url>http://ondex.rothamsted.ac.uk/nexus/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	</distributionManagement>	
+  
+  <repositories>
+
+  	<!-- jutils -->
+		<repository>
+		  <id>EBIBioSamples-GH-repo</id>
+		  <url>https://raw.githubusercontent.com/EBIBioSamples/EBIBioSamples.github.io/maven-repo</url>
+		  <snapshots><enabled>true</enabled></snapshots>
+		</repository>
+
+  </repositories>
 </project>
