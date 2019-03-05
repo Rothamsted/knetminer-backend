@@ -4,12 +4,12 @@ jdk:
   - oraclejdk8
 
 before_script:
-  - echo -e "\n\n\tInitialising the data server\n"
+  - echo -e "\n\n\tInitialising test resources (data server etc)\n"
   - ./resources-init.sh
       
 script: 
   - mvn deploy --settings settings.xml
 
 after_script:
-  - echo -e "\n\n\tTerminating the data server\n"
+  - echo -e "\n\n\tTerminating test resources\n"
   - ./resources-shutdown.sh
