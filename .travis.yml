@@ -1,5 +1,15 @@
 language: java
+
 jdk:
-  - oraclejdk8  
+  - oraclejdk8
+
+before_script:
+  - echo -e "\n\n\tInitialising the data server\n"
+  - ./resources-init.sh
+      
 script: 
   - mvn deploy --settings settings.xml
+
+after_script:
+  - echo -e "\n\n\tTerminating the data server\n"
+  - ./resources-shutdown.sh
