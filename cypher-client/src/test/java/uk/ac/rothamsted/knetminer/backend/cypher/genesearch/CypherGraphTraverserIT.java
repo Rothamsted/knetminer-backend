@@ -38,8 +38,6 @@ import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.TestGraphResource;
 
 /**
- * TODO: comment me!
- *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>30 Jan 2019</dd></dl>
  *
