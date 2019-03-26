@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>io.vavr</groupId>
 			<artifactId>vavr</artifactId>
-		</dependency>		
+		</dependency>
   </dependencies>
   
   <build>

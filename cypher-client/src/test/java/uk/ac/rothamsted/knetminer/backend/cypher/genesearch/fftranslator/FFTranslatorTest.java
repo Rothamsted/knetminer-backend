@@ -1,6 +1,7 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.fftranslator;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,24 +21,24 @@ public class FFTranslatorTest
 	@Test
 	public void testTranslate ()
 	{
-		StateMachine2CyTranslator translator = new StateMachine2CyTranslator (
-			"target/test-classes/test-state-machine.txt"
-		);
-		List<String> queries = translator.getCypherQueries ();
-		
-		log.info ( "Found {} queries:", queries.size () );
-		queries.forEach ( q -> log.info ( "\n\nQUERY: {}\n", q ) );
+		Map<String, String> queries = convert ( "target/test-classes/test-state-machine.txt" );
+		// TODO: verify
 	}
 
 	@Test
 	public void testLoop ()
 	{
-		StateMachine2CyTranslator translator = new StateMachine2CyTranslator (
-			"target/test-classes/test-state-machine-loop.txt"
-		);
-		List<String> queries = translator.getCypherQueries ();
+		Map<String, String> queries = convert ( "target/test-classes/test-state-machine-loop.txt" );
+		// TODO: verify
+	}
+	
+	private Map<String, String> convert ( String smPath )
+	{
+		StateMachine2CyTranslator translator = new StateMachine2CyTranslator ( smPath );
+		Map<String, String> queries = translator.getCypherQueries ();
 		
 		log.info ( "Found {} queries:", queries.size () );
-		queries.forEach ( q -> log.info ( "\n\nQUERY: {}\n", q ) );
+		queries.forEach ( (name,q) -> log.info ( "\n\nQUERY '{}': {}\n", name, q ) );
+		return queries;
 	}
 }

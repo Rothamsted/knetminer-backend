@@ -1,5 +1,6 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.fftranslator;
 
+import static java.lang.String.format;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.BufferedReader;
@@ -9,10 +10,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.BiMap;
 
@@ -151,15 +154,15 @@ public class StateMachine2CyTranslator
 		this.stateIndex = stateIndex;
 	}
 	
-	public List<String> getCypherQueries ()
+	public Map<String, String> getCypherQueries ()
 	{
-		List<String> result = new ArrayList<> ();
-		getCypherQueries ( stateMachine.getStart (), null, result, new HashSet<> (), -1 );
+		Map<String, String> result = new HashMap<> ();
+		traverseStateMachine ( stateMachine.getStart (), null, result, new HashSet<> (), -1 );
 		return result;
 	}
 	
-	private void getCypherQueries ( 
-		State s, String partialQuery, List<String> result, Set<Transition> visited, int distance )
+	private void traverseStateMachine ( 
+		State s, String partialQuery, Map<String, String> result, Set<Transition> visited, int distance )
 	{
 		String nodeMatchStr = enumerate ( s ) + ":" + s.getValidConceptClass ().getId ();
 		
@@ -173,15 +176,17 @@ public class StateMachine2CyTranslator
 					
 		try
 		{
-			if ( stateMachine.isFinish ( s ) ) {
-				result.add ( "MATCH path = " + partialQuery + "\nRETURN path" );
+			if ( stateMachine.isFinish ( s ) ) 
+			{
+				String qname = format ( "%03d_L%02d_%s", result.size () + 1, distance + 1, enumerate ( s ) );
+				result.put ( qname, "MATCH path = " + partialQuery + "\nRETURN path" );
 				return;
 			}
 			
 			final String partialQueryFinal = partialQuery;
 			final int newDistance = distance + 1;
 			stateMachine.getOutgoingTransitions ( s ).forEach ( 
-				t -> getCypherQueries ( t, partialQueryFinal, result, visited, newDistance )
+				t -> traverseStateMachine ( t, partialQueryFinal, result, visited, newDistance )
 			);
 		}
 		catch ( StateMachineInvalidException ex )
@@ -195,8 +200,8 @@ public class StateMachine2CyTranslator
 		}
 	}
 
-	private void getCypherQueries ( 
-		Transition t, String partialQuery, List<String> result, Set<Transition> visited, int distance )
+	private void traverseStateMachine ( 
+		Transition t, String partialQuery, Map<String, String> result, Set<Transition> visited, int distance )
 	{
 		if ( visited.contains ( t ) ) return;
 		visited.add ( t );
@@ -234,15 +239,15 @@ public class StateMachine2CyTranslator
 			relMatchStr += lenConstrStr;
 		
 		partialQuery += "\n  - [" + relMatchStr + "] -> ";
-		getCypherQueries ( stateMachine.getTransitionTarget ( t ), partialQuery, result, visited, distance + 1 );
+		traverseStateMachine ( stateMachine.getTransitionTarget ( t ), partialQuery, result, visited, distance + 1 );
 	}
 
 	private String enumerate ( State s )
 	{
 		int idx = this.stateIndex.inverse ().get ( s );
 		String cc = s.getValidConceptClass ().getId ();
-		
-		return cc.toLowerCase () + "_" + idx;
+				
+		return StringUtils.uncapitalize ( cc ) + "_" + idx;
 	}
 	
 	private String enumerate ( Transition t )

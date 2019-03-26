@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,21 +38,19 @@ public class Motif2CypherCLI
 		}
 		
 		StateMachine2CyTranslator converter = new StateMachine2CyTranslator ( motifPath, metaGraph );
-		List<String> queries = converter.getCypherQueries ();
+		Map<String, String> queries = converter.getCypherQueries ();
 		
 		File outDir = new File ( outPath );
 		if ( !outDir.exists () ) outDir.mkdirs ();
 		
-		for ( int i = 0; i < queries.size (); i++ )
+		for ( String name: queries.keySet () )
 		{
-			String outName = "semantic-motif-" + (i + 1) + ".cypher";
+			String query = queries.get ( name );
+			String outName = "semantic-motif-" + name + ".cypher";
 			
 			log.info ( "Writing {}", outName );
 			
-			Files.write ( 
-				Paths.get ( outPath, outName ), 
-				queries.get ( i ).getBytes ( "UTF-8" ) 
-			);
+			Files.write ( Paths.get ( outPath, outName ),  query.getBytes ( "UTF-8" )	);
 		}
 		
 		log.info ( "The End." );
