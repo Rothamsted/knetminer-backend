@@ -10,6 +10,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.MutableGraph;
+import net.sourceforge.ondex.algorithm.graphquery.flatfile.StateMachineDotExporter;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import net.sourceforge.ondex.parser.oxl.Parser;
 
@@ -61,6 +65,19 @@ public class Motif2CypherCLI
 			
 			Files.write ( Paths.get ( outPath, outName ),  query.getBytes ( "UTF-8" )	);
 		}
+		
+		if ( metaGraph == null )
+			log.warn ( "This version cannot write DOT rendering without loading a metadata OXL graph" );
+		else
+		{
+			log.info ( "Writing DOT graph" );
+			StateMachineDotExporter dotx = new StateMachineDotExporter ( motifPath, metaGraph );
+			MutableGraph dotGraph = dotx.getGraph ();
+			Graphviz gviz = Graphviz.fromGraph ( dotGraph ).width ( 1000 );
+			gviz.render ( Format.XDOT ).toFile ( new File ( outPath + "/state-machine.dot" ) );
+			gviz.render ( Format.SVG ).toFile ( new File ( outPath + "/state-machine.svg" ) );
+		}
+		
 		
 		log.info ( "The End." );
 	}

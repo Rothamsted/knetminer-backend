@@ -44,9 +44,7 @@ import uk.ac.ebi.utils.io.IOUtils;
 public class StateMachine2CyTranslator
 {
 	private StateMachine stateMachine;
-
   private BiMap<Integer, State> stateIndex;
-  	  
   
   public StateMachine2CyTranslator ( String smPath )
   {
