@@ -55,7 +55,7 @@ public class FFTranslatorTest
 		
 		assertEquals ( "Wrong no. of results!", 5, queries.size () );
 		
-		Stream.of ( "L04_path_4", "L06_publication_6", "L04_path_5" ).forEach ( name ->
+		Stream.of ( "L04_path_4", "L06_publication_6", "L06_path_5" ).forEach ( name ->
 			assertTrue ( 
 				name + " name not found!", 
 				queries.keySet ().stream ().anyMatch ( n -> n.contains ( name ) ) 
