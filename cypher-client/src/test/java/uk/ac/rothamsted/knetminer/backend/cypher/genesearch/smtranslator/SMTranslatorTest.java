@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.fftranslator;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.smtranslator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.smtranslator.StateMachine2CyTranslator;
+
 /**
  * Tests {@link StateMachine2CyTranslator}. Tests are based on dummy SM files in src/test/resources, open them
  * to get an idea of their structure. 
@@ -18,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * <dl><dt>Date:</dt><dd>26 Mar 2019</dd></dl>
  *
  */
-public class FFTranslatorTest
+public class SMTranslatorTest
 {
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 	

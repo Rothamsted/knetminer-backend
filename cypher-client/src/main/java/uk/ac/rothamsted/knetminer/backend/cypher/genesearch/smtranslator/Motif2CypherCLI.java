@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.fftranslator;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.smtranslator;
 
 import java.io.File;
 import java.io.IOException;
