@@ -180,7 +180,7 @@ public class StateMachine2CyTranslator
 	public Map<String, String> getCypherQueries ()
 	{
 		Map<String, String> result = new HashMap<> ();
-		traverseStateMachine ( stateMachine.getStart (), "", result, 0, false );
+		traverseStateMachine ( stateMachine.getStart (), "", result, 1, false );
 		return result;
 	}
 	
@@ -195,40 +195,41 @@ public class StateMachine2CyTranslator
 	 * @see #getCypherQueries to get an idea on how parameters are initialised upon first call. 
 	 */
 	private void traverseStateMachine ( 
-		State s, String partialQuery, Map<String, String> result, final int distance, boolean isLoopMode 
+		State state, String partialQuery, Map<String, String> result, final int distance, boolean isLoopMode 
 	)
 	{
 		try
 		{
 			// First, let's add the node match
-			partialQuery += buildNodeMatch ( s );
+			partialQuery += buildNodeMatch ( state );
 
 			// Recursion ends here
-			if ( stateMachine.isFinish ( s ) ) 
+			if ( stateMachine.isFinish ( state ) ) 
 			{
 				// A new path, choose a name and build the final query by wrapping the clauses collected so far from
 				// upstream nodes.
-				String qname = format ( "%03d_L%02d_%s", result.size () + 1, distance, buildNodeId ( s ) );
+				String qname = format ( "%03d_L%02d_%s", result.size () + 1, distance, buildNodeId ( state ) );
 				result.put ( qname, "MATCH path = " + partialQuery + "\nRETURN path" );
 				return;
 			}
 
-			Set<Transition> transitions = this.stateMachine.getOutgoingTransitions ( s );
+			Set<Transition> transitions = this.stateMachine.getOutgoingTransitions ( state );
 
 			// We need to create different departures for different states and/or different constraint lengths
-			
+			// So, this will contain: (destination state d, maxRepeats) -> (state->d transitions)
 			Map<Pair<State, Integer>, List<Transition>> byLenTrns = 
-				transitions.stream ().collect ( Collectors.groupingBy ( 
-				t -> Pair.of ( this.stateMachine.getTransitionTarget ( t ), t.getMaxLength () )
+				transitions.stream ().collect ( 
+					Collectors.groupingBy ( t ->
+						Pair.of ( this.stateMachine.getTransitionTarget ( t ), getMaxRelRepeats ( t, distance ) )
 			));
-			
+						
 			// If we have a loop, we need to make an iteration that creates a hop with the loop only, and then
 			// let the recursion to continue from the loop node, as if it were another node at the loop's end.
 			//
 			Map.Entry<Pair<State, Integer>, List<Transition>> loops = byLenTrns
 				.entrySet ()
 				.stream ()
-				.filter ( e -> s.equals ( e.getKey ().getLeft () ) )
+				.filter ( e -> state.equals ( e.getKey ().getLeft () ) )
 				.findAny ()
 				.orElse ( null );
 			
@@ -251,7 +252,7 @@ public class StateMachine2CyTranslator
 			{
 				// If you look at the above logics, this shouldn't happen, let's report a warning
 				if ( isLoopMode ) log.warn ( 
-					"wrong state: no loop in loop mode for state {}", s.getValidConceptClass ().getId ()
+					"wrong state: no loop in loop mode for state {}", state.getValidConceptClass ().getId ()
 				);
 				isLoopMode = false;
 			}
@@ -259,11 +260,26 @@ public class StateMachine2CyTranslator
 			final String partialQueryFinal = partialQuery;
 			final boolean nextLoopMode = isLoopMode;
 			
+			// Loops don't contribute to the computation of the max path length
+			final int nextDistance = nextLoopMode ? distance : distance + 2;
+
 			byLenTrns.forEach ( (grp, trnsGroup) -> 
 			{
-				String nextPartialQuery = partialQueryFinal + "\n  " + buildRelationMatch ( trnsGroup, distance );
+				// Path constraint that cannot be fulfilled, so let's skip it
+				int maxTrnsRepeats = grp.getRight ();
+				if ( maxTrnsRepeats <= 0 ) return;
+					
+				// the method already adds + 1 to consider the transitions
+				String relMatch = buildRelMatch ( trnsGroup, maxTrnsRepeats );
+				
+				// We cannot match a path length constraint, so let's continue without any result;
+				if ( relMatch == null )	return;
+				
 				State target = grp.getLeft ();
-				traverseStateMachine ( target, nextPartialQuery, result, distance + 1, nextLoopMode );
+				String nextPartialQuery = partialQueryFinal + "\n  " + relMatch;
+						
+				// We must include the transition and the target in the new distance
+				traverseStateMachine ( target, nextPartialQuery, result, nextDistance, nextLoopMode );
 			});
 		}
 		catch ( StateMachineInvalidException ex )
@@ -293,7 +309,7 @@ public class StateMachine2CyTranslator
 	}
 	
 	
-	private String buildRelationMatch ( List<Transition> transitions, int distance )
+	private String buildRelMatch ( List<Transition> transitions, int maxRelRepeats )
 	{
 		// It all begins with something like rel_xxx:
 		String relMatchStr = buildRelId ( transitions ) + ":";
@@ -312,24 +328,27 @@ public class StateMachine2CyTranslator
 		// Now let's consider a possible path length constraint.
 		// 
 		
-		// In the SM files length constraints specified in terms of total path length up to the current transition (where
-		// first node has distance = 1, nodes and edges count as 1 each), so we need to convert this constraints to no. of
-		// max repetitions allowed for the current transition/relation
-		//
-		int maxRelRepeats = -1;
-		// Remember we're assuming all have the same len constraint, so this will do
-		int len = transitions.iterator ().next ().getMaxLength ();
-		if ( len < Integer.MAX_VALUE ) {
-			// We cannot match the len constraint, report null
-			if ( distance + 1 > len ) return null;
-			maxRelRepeats = len - distance;
-		}
+		// min len isn't suppoted by the SM syntax, but 0 is needed for loop transitions
+		int minLenConstraint = 1;
+		
+		Transition anyTrans = transitions.iterator ().next ();
+		State src = this.stateMachine.getTransitionSource ( anyTrans );
+		State dst = this.stateMachine.getTransitionTarget ( anyTrans );
 
+		if ( src.equals ( dst ) ) minLenConstraint = 0; 
 		
-		// If some len constraint is defined, it needs to become rel_xxx:RR*1..MAX
-		// (where RR is either a single relation or a '|' OR of multiple relations
-		if ( maxRelRepeats != -1 && maxRelRepeats != 1 ) relMatchStr += "*1.." + maxRelRepeats;
-		
+		// min    max    	Cypher format
+		//  1      -      r:R
+		//  1      n      r:R*1..n (but R only if n == 1)
+		//  0      -      r:R*0..
+		//  0      n      r:R*0..n
+		String lenConstrStr = "";
+		if ( minLenConstraint == 0 || maxRelRepeats != Integer.MAX_VALUE )
+			lenConstrStr += "*" + minLenConstraint + "..";
+		if ( maxRelRepeats != Integer.MAX_VALUE ) lenConstrStr += maxRelRepeats;
+		if ( ! ( lenConstrStr.length () == 0 || "*1..1".equals ( lenConstrStr ) ) ) 
+			relMatchStr += lenConstrStr;		
+
 		return "- [" + relMatchStr + "] ->";
 	}
 	
@@ -359,5 +378,25 @@ public class StateMachine2CyTranslator
 		String prefix = transitions.size () == 1 ? t.getValidRelationType ().getId ().toLowerCase () : "rel";
 	
 		return prefix + "_" + srcIdx + "_" + dstIdx;
+	}
+	
+	private int getMaxRelRepeats ( Transition t, int distance )
+	{
+		// In the SM files length constraints specified in terms of total path length up to the current transition (where
+		// first node has distance = 1, nodes and edges count as 1 each), so we need to convert this constraints to no. of
+		// max repetitions allowed for the current transition/relation
+		//
+		
+		int maxRelRepeats;
+
+		int len = t.getMaxLength ();
+		if ( len == Integer.MAX_VALUE ) return Integer.MAX_VALUE; 
+
+		// In the computation of the the path length, both nodes and edges count 1 each, so
+		// a given distance is made up of node+relation pairs
+		maxRelRepeats =  (len - distance) / 2;
+
+		// This can be <= 0 and you should consider this case;
+		return maxRelRepeats;
 	}
 }

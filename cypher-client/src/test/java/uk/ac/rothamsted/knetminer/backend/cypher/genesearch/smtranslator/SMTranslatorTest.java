@@ -77,6 +77,33 @@ public class SMTranslatorTest
 		));
 	}
 	
+	@Test
+	public void testLenConstraints ()
+	{
+		Map<String, String> queries = convert ( "target/test-classes/test-state-machine-len-constraints.txt" );
+		
+		assertEquals ( "Wrong no. of results!", 5, queries.size () );
+		
+		Stream.of ( "L04_path_4", "L06_publication_6", "L06_path_5" ).forEach ( name ->
+			assertTrue ( 
+				name + " name not found!", 
+				queries.keySet ().stream ().anyMatch ( n -> n.contains ( name ) ) 
+		));
+
+		Stream.of ( 
+			"gene_1:Gene{ iri: $startIri }",
+			"(bioProc_3:BioProc)",
+			"- [part_of_3_5:part_of] -> (path_5:Path)",
+			"asso_wi_7_8:asso_wi*1..2",
+			"part_of_3_3:part_of*0..2"
+		)
+		.forEach ( qfrag ->
+			assertTrue ( 
+				"Cypher fragment: " + qfrag + " not found!", 
+				queries.values ().stream ().anyMatch ( q -> q.contains ( qfrag ) ) 
+		));
+	}	
+	
 	/**
 	 * Basic code to load a SM file, translate it to queries and log its output. 
 	 */
