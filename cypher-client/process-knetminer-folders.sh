@@ -24,9 +24,9 @@ do
   
   cy_out="$out_dir/$base_name/neo4j/semantic-motif-queries"
   mkdir --parent "$cy_out"
-  rm -f "$cy_out/sm-*.cypher"
+  rm -f "$cy_out/sm-"*.cypher
   
 	./motif2cypher.sh "$sm_file" "$cy_out" src/test/resources/wheat-metadata.xml
-
+	
   # ln -s $out_dir/$n/state-machine.svg $out_dir/$n-sm.svg
 done

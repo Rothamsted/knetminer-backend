@@ -10,7 +10,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,10 @@ public class StateMachine2CyTranslator
   
   private Logger log = LoggerFactory.getLogger ( this.getClass () );
   
+  /** Used in a couple of point to assign a deterministic order to transition lists **/
+  private static Comparator<Transition> transitionComparator = 
+  	(t1, t2) -> t1.getValidRelationType ().getId ().compareTo ( t2.getValidRelationType ().getId () );		
+ 
   
   public StateMachine2CyTranslator ( String smPath )
   {
@@ -206,7 +212,7 @@ public class StateMachine2CyTranslator
 		try
 		{
 			// First, let's add the node match
-			partialQuery += buildNodeMatch ( state );
+			partialQuery += buildNodeMatch ( state, isLoopMode );
 
 			// Recursion ends here
 			if ( stateMachine.isFinish ( state ) ) 
@@ -250,7 +256,7 @@ public class StateMachine2CyTranslator
 					nextLoopMode = true;
 				}
 				else {
-					// Or, if we come up to this same situation the second time, we continue with the regular
+					// Or, if we come up to this same situation a second time, we continue with the regular
 					// transitions only (ie, from the "second node" of the loop)
 					//
 					byLenTrns.entrySet ().removeAll ( loops.entrySet () );
@@ -271,26 +277,35 @@ public class StateMachine2CyTranslator
 				nextLoopMode = false;
 			}
 			
-			final String partialQueryFinal = partialQuery; // Just because lamdas want final vars
+			final String partialQueryFinal = partialQuery; // Just because lambdas want final vars
 			
 			// Loops don't contribute to the computation of the max path length, since their transition might
-			// be skept. Else, we must include the transition and the target in the new distance.
+			// be skipped. Else, we must include the transition and the target in the new distance.
 			final int nextDistance = nextLoopMode ? distance : distance + 2;
 
-			byLenTrns.forEach ( (grp, trnsGroup) -> 
+			// We want them in a given order, it helps with generating multiple versions, which need to be committed
+			// into git.
+			List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortedByLenTrns = 
+				this.sortTransitionGroups ( byLenTrns );
+			
+			sortedByLenTrns.forEach ( e -> 
 			{
+				Pair<State, Integer> grp = e.getKey ();
+				List<Transition> trnsGroup = e.getValue ();
+				
 				int maxTrnsRepeats = grp.getRight ();
 				State target = grp.getLeft ();
 
 				// Path constraint that cannot be fulfilled, so let's skip it
 				if ( maxTrnsRepeats <= 0 ) {
+					BiMap<State, Integer> states2Indexes = this.stateIndex.inverse ();
 					log.warn ( 
 						"The transition {}({}) - [{}] -> {}({}) that doesn't match its length constraints",
 						state.getValidConceptClass ().getId (),
-						this.stateIndex.inverse ().get ( state ),
+						states2Indexes.get ( state ),
 						trnsGroup.iterator ().next ().getValidRelationType ().getId (),
 						target.getValidConceptClass ().getId (),
-						this.stateIndex.inverse ().get ( target )						
+						states2Indexes.get ( target )						
 					);
 					return;
 				}
@@ -313,11 +328,19 @@ public class StateMachine2CyTranslator
 		}
 	}
 
-	/** Builds a Cypher construct like: (protein_12:Protein) that matches the given state */
-	private String buildNodeMatch ( State s )
+	/** 
+	 * Builds a Cypher construct like: (protein_12:Protein) that matches the given state.
+	 *  
+	 * Nodes in a loop participates in matches of type protein_12 -> protein_12b, so the 'b'
+	 * tail is added when the isLoopMode flag is set.
+	 * 
+	 */
+	private String buildNodeMatch ( State s, boolean isLoopMode )
 	{		
 		// eg, (gene_1:Gene). The number is the node index in the original SM.
-		String nodeMatchStr = buildNodeId ( s ) + ":" + s.getValidConceptClass ().getId ();
+		String nodeMatchStr = buildNodeId ( s );
+		if ( isLoopMode ) nodeMatchStr += "b";
+		nodeMatchStr += ":" + s.getValidConceptClass ().getId ();
 		
 		if ( stateMachine.getStart ().equals ( s ) ) {
 			// for the first state, the form is (gene_1:Gene{ iri: $startIri}), where the placeholder
@@ -328,30 +351,28 @@ public class StateMachine2CyTranslator
 		return "(" + nodeMatchStr + ")";
 	}
 	
+	
 	/** 
 	 * Builds a Cypher clause like: - [gene_1_protein_2:encode] ->, which matches a transition.
 	 */
 	private String buildRelMatch ( List<Transition> transitions, int maxRelRepeats )
 	{
 		// It all begins with something like rel_xxx:
-		String relMatchStr = buildRelId ( transitions ) + ":";
+		String relVarId = buildRelId ( transitions );
 
 		// Then it becomes rel_xxx:R or rel_xxx:R1|R2...Rn
+		//
+		
+		// R1|R2 etc are written in order, useful for tests that compare resulting strings
+		Collections.sort ( transitions, transitionComparator );
+
 		String relTypesStr = null;
-		
-		// R1|R2 etc are written in order, useful for tests that compare resulting strings 
-		Collections.sort ( 
-			transitions, 
-			(t1, t2) -> t1.getValidRelationType ().getId ().compareTo ( t2.getValidRelationType ().getId () ) 
-		);
-		
 		for ( Transition t: transitions )
 		{
 			if ( relTypesStr == null ) relTypesStr = "";
 			else relTypesStr += "|";
 			relTypesStr += t.getValidRelationType ().getId ();
 		}
-		relMatchStr += relTypesStr;
 		
 		
 		// Now let's consider a possible path length constraint.
@@ -375,8 +396,16 @@ public class StateMachine2CyTranslator
 		if ( minLenConstraint == 0 || maxRelRepeats != Integer.MAX_VALUE )
 			lenConstrStr += "*" + minLenConstraint + "..";
 		if ( maxRelRepeats != Integer.MAX_VALUE ) lenConstrStr += maxRelRepeats;
-		if ( ! ( lenConstrStr.length () == 0 || "*1..1".equals ( lenConstrStr ) ) ) 
-			relMatchStr += lenConstrStr;		
+		if ( lenConstrStr.length () == 0 || "*1..1".equals ( lenConstrStr ) )
+			lenConstrStr = "";
+		
+		if ( maxRelRepeats != Integer.MAX_VALUE && maxRelRepeats > 1 )
+			// relation variable becomes rel_n1_n2_repeats
+			// that's because we might have different relations between the same nodes, with different repeats and
+			// they must have independent variables
+			relVarId += "_" + maxRelRepeats;
+			
+		String relMatchStr = relVarId + ":" + relTypesStr + lenConstrStr;		
 
 		return "- [" + relMatchStr + "] -> ";
 	}
@@ -414,6 +443,7 @@ public class StateMachine2CyTranslator
 		return prefix + "_" + srcIdx + "_" + dstIdx;
 	}
 	
+	
 	/**
 	 * Translates path length constraints for a transition in the SM (which are based on the distance from the initial 
 	 * node) into max relation repeats, which are used for Cypher relation clauses.
@@ -437,5 +467,57 @@ public class StateMachine2CyTranslator
 
 		// This can be <= 0 and you should consider this case;
 		return maxRelRepeats;
+	}
+	
+	/**
+	 * Sorts transitions grouped by departing state and max transition repeats. These are computed by
+	 * {@link #traverseStateMachine(State, String, Map, int, boolean)} and we order them, in order to ensure
+	 * some determinism in the creation of numbered query names and the paths associated to them. 
+	 * 
+	 */
+	private List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortTransitionGroups (
+		Map<Pair<State, Integer>, List<Transition>> byLenTrns
+	)
+	{
+		List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortedByLenTrns = 
+			new ArrayList<> ( byLenTrns.entrySet () );
+		
+		Collections.sort 
+		(
+			sortedByLenTrns, 
+			(e1, e2) -> 
+			{
+				Pair<State, Integer> k1 = e1.getKey (), k2 = e2.getKey ();
+				
+				// Compare the keys
+				//
+				String c1 = k1.getLeft ().getValidConceptClass ().getId ();
+				String c2 = k2.getLeft ().getValidConceptClass ().getId ();
+				int cmp = c1.compareTo ( c2 ); if ( cmp != 0 ) return cmp;
+
+				if ( ( cmp = Integer.compare ( k1.getRight (), k2.getRight () ) ) != 0 ) return cmp;
+
+				// If they're not enough, use the transitions too
+				//
+				List<Transition> trnsGrp1 = e1.getValue (), trnsGrp2 = e2.getValue ();
+									
+				Collections.sort ( trnsGrp1, transitionComparator );
+				Collections.sort ( trnsGrp2, transitionComparator );
+				
+				// It's not efficient to not stopping at the first that don't match, but they're not very long, 
+				// so this approach is simpler.
+				//
+				String trnsStr1 = e1.getValue ().stream ()
+					.map ( t -> t.getValidRelationType ().getId () )
+					.collect ( Collectors.joining () );
+				
+				String trnsStr2 = e1.getValue ().stream ()
+					.map ( t -> t.getValidRelationType ().getId () )
+					.collect ( Collectors.joining () );
+				
+				return trnsStr1.compareTo ( trnsStr2 );
+			}	
+		);
+		return sortedByLenTrns;
 	}
 }

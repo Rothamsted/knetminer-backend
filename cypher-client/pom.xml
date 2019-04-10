@@ -95,6 +95,16 @@
 							<version>${project.version}</version>
 							<includes>ara-tiny.oxl</includes>
 	       		</artifactItem>
+	       		<!-- Used by the SM/Cypher translator -->
+           	<artifactItem>
+				      <groupId>net.sourceforge.ondex</groupId>
+							<artifactId>datadir</artifactId>
+				      <version>${ondex.version}</version>
+				      <type>zip</type>
+				      <classifier>data</classifier>
+             	<includes>data/xml/ondex_metadata.xml</includes>
+             	<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+           	</artifactItem>
 	       	</artifactItems>  						
 				</configuration>
 	 		</plugin>
@@ -102,31 +112,6 @@
 			<plugin>
 	      <artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
-			
-  		<plugin>
-  			<artifactId>maven-dependency-plugin</artifactId>	  			
-  			<executions>
-  				<execution>
-  					<phase>generate-test-resources</phase>
-  					<goals>
-  						<goal>unpack</goal>
-  					</goals>
-  					<configuration>
-	          	<artifactItems>
-	            	<artifactItem>
-						      <groupId>net.sourceforge.ondex</groupId>
-									<artifactId>datadir</artifactId>
-						      <version>${ondex.version}</version>
-						      <type>zip</type>
-						      <classifier>data</classifier>
-	               	<includes>data/xml/ondex_metadata.xml</includes>
-	               	<outputDirectory>${project.build.outputDirectory}</outputDirectory>
-	             	</artifactItem>
-	          	</artifactItems>  						
-  					</configuration>
-  				</execution>
-  			</executions>
-  		</plugin>		
 
 		</plugins>
 		
