@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guru.nidi.graphviz.engine.Engine;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -59,9 +61,10 @@ public class Motif2CypherCLI
 		for ( String name: queries.keySet () )
 		{
 			String query = queries.get ( name );
-			String outName = "semantic-motif-" + name + ".cypher";
+			String outName = "sm-" + name + ".cypher";
+			Path outFilePath = Paths.get ( outPath, outName );
 			
-			log.info ( "Writing {}", outName );
+			log.info ( "Writing {}", outFilePath.toAbsolutePath ().toString () );
 			
 			Files.write ( Paths.get ( outPath, outName ),  query.getBytes ( "UTF-8" )	);
 		}
