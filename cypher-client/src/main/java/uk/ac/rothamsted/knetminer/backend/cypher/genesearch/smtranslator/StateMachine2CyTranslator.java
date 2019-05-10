@@ -234,10 +234,8 @@ public class StateMachine2CyTranslator
 					Collectors.groupingBy ( t ->
 						Pair.of ( this.stateMachine.getTransitionTarget ( t ), getMaxRelRepeats ( t, distance ) )
 			));
-						
-			// If we have loops, we need to make a recursion step that creates a hop with the loops only, and then
-			// let the recursion to continue from the loop node, as if it were another node at the loop's end.
-			//
+				
+			// See if the node has any looping edges.
 			Map<Pair<State, Integer>, List<Transition>> loops = byLenTrns
 				.entrySet ()
 				.stream ()
@@ -246,11 +244,13 @@ public class StateMachine2CyTranslator
 			
 			final boolean nextLoopMode;
 			
-			// So, we do have loops
+			// If we have node loops, we need to make a recursion step that creates a hop with the loops only, and then
+			// let the recursion to continue from the loop node, as if it were another node at the loop's end.
+			//
 			if ( !loops.isEmpty () )
 			{
 				if ( !isLoopMode ) {
-					// First time we meet a loop on this node, we make a step with the loop transitions only 
+					// First time we meet a loop on this node, we make a step with the looping transitions only 
 					// (as if the single involving  node were two different ones) and loop mode on
 					byLenTrns = loops;
 					nextLoopMode = true;
@@ -266,7 +266,7 @@ public class StateMachine2CyTranslator
 			else 
 			{
 				// No loop met for this node. If you look at the above logics, loop mode should be always off here, 
-				// let's fail, we cannot risk that this unexpected state goes unnoticed
+				// so, if that's not the case, let's fail, we cannot risk that this unexpected state goes unnoticed
 				if ( isLoopMode ) ExceptionUtils.throwEx 
 				( 
 					IllegalStateException.class, 
@@ -505,7 +505,7 @@ public class StateMachine2CyTranslator
 				Collections.sort ( trnsGrp2, transitionComparator );
 				
 				// It's not efficient to not stopping at the first that don't match, but they're not very long, 
-				// so this approach is simpler.
+				// so this approach simpler approach will do.
 				//
 				String trnsStr1 = e1.getValue ().stream ()
 					.map ( t -> t.getValidRelationType ().getId () )
