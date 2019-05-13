@@ -33,10 +33,22 @@ import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
+import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
 
 /**
- * TODO: comment me!
+ * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
+ * storing a BioKNO-based model of an Ondex/Knetminer graph. Currently the backend datbase is based on Neo4j.</p>
+ * 
+ * <p>This traverser expects certain initialisaiton parameters:
+ * <ul>
+ * 	<li>{@link #CONFIG_PATH_OPT} set to a proper Spring config file.</li>
+ * 	<li>{@code LuceneEnv}, which must be a proper {@link LuceneEnv} instance, corresponding to the {@code graph} parameter
+ * 	received by {@link #traverseGraph(ONDEXGraph, ONDEXConcept, FilterPaths)}</li>
+ * </ul>
+ * 
+ * Usually the above params are properly set by {@code rres.knetminer.datasource.ondexlocal.OndexServiceProvider}. 
+ * </p>
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>30 Jan 2019</dd></dl>
@@ -44,16 +56,23 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  */
 public class CypherGraphTraverser extends AbstractGraphTraverser
 {
+	/**
+	 * <p>We use a Spring-based configuration file to read Neo4j configuration, which also has to declare the list or the
+	 * folder where .cypher query files are stored.</p> 
+	 * 
+	 * <p>Each query select a path departing from a gene passed as parameter, as it is specified by {@link CypherClient}.</p>
+	 * 
+	 * <p>See tests for examples of the kind of file expected here. Default value for this option is {@code "backend/config.xml"}.</p>
+	 * 
+	 */
 	public static final String CONFIG_PATH_OPT = "knetminer.backend.configPath";
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	private static AbstractApplicationContext springContext;
 	
-	public CypherGraphTraverser ()
-	{
-	}
-
+	public CypherGraphTraverser () {}
+	
 	private void init ()
 	{
 		synchronized ( GraphTraverser.class )
@@ -78,7 +97,23 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		}		
 	}
 	
-	
+	/**
+	 * Uses queries in the {@link #springContext} bean named {@code semanticMotifsQueries}. Each query must fulfil certain 
+	 * requirement:
+	 * 
+	 * <ul>
+	 * 	<li>The query must return a path as first projected result (see {@link CypherClient#findPathIris(String, Value)}</li>
+	 * 	<li>Every returned path must match an Ondex gene concept as first node, followed by Cypher entities corresponding
+	 * to Ondex concept/relation pairs</li>
+	 * 	<li>The first matching node of each query must receive a {@code startQuery} parameter: 
+	 * {@code MATCH path = (g1:Gene{ iri: $startIri }) ...}. See the tests in this hereby project for details.</li>
+	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.
+	 *  The parameter OXL graph must also match the {@link LuceneEnv Lucene index} set by {@link #init()}, via the 
+	 *  {@code LuceneEnv} {@link #getOption(String) option}.
+	 *  </li>
+	 * </ul>
+	 * 
+	 */
 	@Override
 	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	public List<EvidencePathNode> traverseGraph ( 
@@ -96,6 +131,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		List<String> cypherQueries = (List<String>) springContext.getBean ( "semanticMotifsQueries" );
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
+		// So, let's get the starting IRI from the concept parameter.
 		String startIri = Optional
 			.ofNullable ( ONDEXGraphUtils.getAttribute ( graph, concept, "iri" ) )
 			.map ( attr -> (String) attr.getValue () )
@@ -105,8 +141,10 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				ONDEXGraphUtils.getString ( concept ) 
 		));
 				
+		// And let's hand it to Cypher
 		Value startIriParam = Values.parameters ( "startIri", startIri );
 
+		// Query and convert the results to the appropriate format.
 		List<EvidencePathNode> result = cypherQueries
 		.parallelStream ()
 		.flatMap ( query -> 
@@ -126,7 +164,11 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		return result;
 	}
 
-	
+	/**
+	 * Utility to convert a list of {@link ONDEXEntity}ies, interpreted as a chain of concept/relation pairs, to an
+	 * {@link EvidencePathNode evidence path}, as defined by the {@link AbstractGraphTraverser graph traverser interface}.
+	 * 
+	 */
 	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	private EvidencePathNode buildEvidencePath ( List<ONDEXEntity> ondexEntities )
 	{

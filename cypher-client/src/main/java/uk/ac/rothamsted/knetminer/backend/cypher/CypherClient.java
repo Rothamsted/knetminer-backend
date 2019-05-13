@@ -24,7 +24,8 @@ import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 
 /**
- * TODO: comment me!
+ * A facade for Cypher/Neo4j clients, allowing  for simplified transaction management and specific Knetminer functions.
+ * A client instance is associated to a Neo4j {@link Session}, this is either passed to the constructor, or set  
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>11 Oct 2018</dd></dl>
@@ -35,12 +36,27 @@ public class CypherClient implements AutoCloseable
 	private Session neoSession;
 	private Transaction tx;
 	
+	/**
+	 * Visibility is protected cause you're not supposed to instantiate me directly, you should use the
+	 * {@link CypherClientProvider provider} instead. 
+	 */
 	protected CypherClient ( Session neoSession )
 	{
 		super ();
 		this.neoSession = neoSession;
 	}
 
+	/**
+	 * <p>Runs a Cypher {@code query} using this client and gets Ondex entities corresponding to the URIs returned 
+	 * by the query. More precisely, it is assumed that the underlining graph database is aligned to the memory Ondex graph
+	 * which has been indexed into {@code luceneManager} (ie, the graph database was created via the neo4j-export).</p>
+	 *  
+	 * <p>It is also assumed that the query returns a list of nodes/relations, from which the {@code iri} property is 
+	 * extracted.</p>
+	 * 
+	 * <p>if params is non-null, it is used to instantiate the query, via {@link #queryToStream(String, Value)}.</p>
+	 * 
+	 */
 	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query, Value params )
 	{
 		Stream<List<String>> rawResults = findPathIris ( query, params );
@@ -49,7 +65,8 @@ public class CypherClient implements AutoCloseable
 			iris -> { 
 				int[] pathIdx = new int [] { -1 };
 				return iris.stream ()
-					.map ( iri -> { 
+					.map ( iri ->
+					{ 
 						ONDEXEntity oe = ++pathIdx[ 0 ] % 2 == 0 
 						  ? luceneMgr.getConceptByIRI ( iri ) 
 						  : luceneMgr.getRelationByIRI ( iri );
@@ -61,11 +78,19 @@ public class CypherClient implements AutoCloseable
 			});
 	}
 
+	/**
+	 * Wrapper without query parameters.
+	 */
 	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query ) {
 		return findPaths ( luceneMgr, query, null );
 	}
 
-	
+	/**
+	 * Uses the Neo4j client to issue the query, wrapping it into facilities like transaction auto-opening, and then
+	 * wraps the resulting records into a stream, in a dynamic/lazy way, that is, a {@link StatementResult} is 
+	 * iterated only when the corresponding {@link Stream} methods are invoked.
+	 * 
+	 */
 	protected Stream<Record> queryToStream ( String query, Value params )
 	{
 		this.checkOpen ();
@@ -78,6 +103,14 @@ public class CypherClient implements AutoCloseable
 		return StreamSupport.stream ( splitr, false );		
 	}
   
+	/**
+	 * Runs the query via {@link #queryToStream(String, Value)} and, for each Cypher node/relation returned, 
+	 * extracts the {@code iri} property and eventually returns a stream of iri lists, one list per path.
+	 * This assumes the query returns a path ({@code MATCH p = .... RETURN p}) as first projection. The IRIs are used
+	 * by methods like {@link #findPaths(LuceneEnv, String, Value)}, to convert IRIs to Ondex entities, which assumes 
+	 * the Neo4j database corresponds to the in-memory Ondex graph (i.e., was created using the neo4j export tool, using
+	 * the in-memory OXL).
+	 */
   public Stream<List<String>> findPathIris ( String query, Value params )
   {
   	Stream<Record> qresult = queryToStream ( query, params );
@@ -103,21 +136,23 @@ public class CypherClient implements AutoCloseable
   	});
   }	
 	
+  /**
+   * Wrapper without Cypher parameters.
+   */
   public Stream<List<String>> findPathIris ( String query ) {
   	return findPathIris ( query, null );
   }
 
   /**
-   * Begins a new transaction.
-   * 
-   * TODO: maybe session demarcation doesn't need to be public.
+   * Begins a new transaction in the session this client is based upon, using the 
+   * {@link Session#beginTransaction() corresponding Neo4j method}.
    */
 	public synchronized void begin () {
 		tx = neoSession.beginTransaction ();
 	}
 
 	/**
-	 * Ends/commits a transaction.
+	 * Ends/commits a transaction, using {@link Transaction#close() Neo4j method}.
 	 */
 	public synchronized void end ()
 	{
@@ -144,6 +179,11 @@ public class CypherClient implements AutoCloseable
 			if ( !this.isTxOpen () ) this.begin ();
 	}
 	
+	/**
+	 * Runs an action that is supposed to deal with this client/Neo4j under a transaction demarked by 
+	 * {@link #begin()} and {@link #end()}.
+	 *  
+	 */
 	public <T> T runTx ( Supplier<T> action )
 	{
 		this.checkOpen ();
@@ -155,10 +195,16 @@ public class CypherClient implements AutoCloseable
 		}
 	}  
 
+	/**
+	 * Wrapper without parameters.
+	 */
 	public Void runTx ( Runnable action ) {
 		return runTx ( () -> { action.run (); return null; } );
 	}
 	
+	/**
+	 * Closes the underlining Neo4j {@link Session}.
+	 */
 	@Override
 	public synchronized void close ()
 	{
