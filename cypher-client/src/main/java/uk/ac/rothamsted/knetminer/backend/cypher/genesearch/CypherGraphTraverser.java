@@ -1,14 +1,24 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
@@ -33,6 +43,7 @@ import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
+import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
 
@@ -71,7 +82,74 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	private static AbstractApplicationContext springContext;
 	
+	private static class QueryPerformanceTracker 
+	{
+		private Map<String, Long> query2Times = Collections.synchronizedMap ( new HashMap<> () );
+		private Map<String, Integer> query2Results = Collections.synchronizedMap ( new HashMap<> () );
+		private Map<String, Long> query2PathLen = Collections.synchronizedMap ( new HashMap<> () );
+		private AtomicInteger invocations = new AtomicInteger ( 0 );
+		
+		private final Logger log = LoggerFactory.getLogger ( this.getClass () );
+		
+		/**
+		 * A wrapper that tracks the performance of multiple queries, during the execution of the 
+		 * {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
+		 */
+		public QueryPerformanceTracker () {}
+
+		public Stream<List<ONDEXEntity>> track (
+			Function<String, Stream<List<ONDEXEntity>>> queryAction,
+			String query
+		)
+		{
+			@SuppressWarnings ( "unchecked" )
+			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ]; 
+			long time = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
+			result [ 0 ] = result [ 0 ].peek ( pathEls -> {
+				query2Times.compute ( query, (q,t) -> t == null ? time : t + time );
+				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
+				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
+			});
+			invocations.incrementAndGet ();
+			return result [ 0 ];
+		}
+		
+		public void logStats ()
+		{
+			log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------" );
+			
+			final int nqueries = invocations.get ();
+			log.info ( "Total queries issued: {}", nqueries );
+			if ( nqueries == 0 ) return;
+			
+			log.info ( "Query\tTot Results\tAvg Time(ms)\tAvg #Result\tAvg Path Len\t" );
+			
+			SortedSet<String> queries = new TreeSet<> ( (s1, s2) -> s1.length () - s2.length () );
+			queries.addAll ( query2Times.keySet () );
+			for ( String query: queries )
+			{
+				int nresults = query2Results.get ( query );
+				log.info ( String.format (
+					"\"%s\"\t%d\t%#6.2f\t%#6.2f\t%#6.2f", 
+					escapeJava ( query ),
+					nresults,
+					1d * query2Times.get ( query ) / nqueries,
+					1d * nresults / nqueries,
+					nresults == 0 ? 0d : 1d * query2PathLen.get ( query ) / nresults
+				));
+			}
+			log.info ( "  -------------- /end: Cypher Graph Traverser, Query Stats --------------\n" );
+		}
+	}
+	
+	/**
+	 * Has to be initialised by {@link AbstractGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, FilterPaths)}.
+	 */
+	private QueryPerformanceTracker performanceTracker = null;
+	
+	
 	public CypherGraphTraverser () {}
+	
 	
 	private void init ()
 	{
@@ -141,7 +219,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				ONDEXGraphUtils.getString ( concept ) 
 		));
 				
-		// And let's hand it to Cypher
+		// And now let's hand it to Cypher
+		//
+		
 		Value startIriParam = Values.parameters ( "startIri", startIri );
 
 		// Query and convert the results to the appropriate format.
@@ -150,9 +230,15 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		.flatMap ( query -> 
 		{
 			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-			Stream<List<ONDEXEntity>> cypaths = cyProvider.query (
-				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam ) 
+			Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.query (
+				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam )
 			);
+
+			// Possibly wrap it into the performance tracker
+			Stream<List<ONDEXEntity>> cypaths = this.performanceTracker == null  
+				? queryAction.apply ( query )
+				: this.performanceTracker.track ( queryAction, query );
+					
 			// Now map the paths to the format required by the traverser
 			// We're returning a stream of paths, (each query can return more than one)
 			return cypaths.map ( path -> buildEvidencePath ( path ) );
@@ -206,4 +292,23 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		);
 		return result;
 	}
+
+	
+	/**
+	 * Wraps the default implementation to enable to track query performance, via {@link QueryPerformanceTracker}. 
+	 */
+	@Override
+	@SuppressWarnings ( "rawtypes" )
+	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( ONDEXGraph graph, Set<ONDEXConcept> concepts,
+			FilterPaths<EvidencePathNode> filter )
+	{
+		this.performanceTracker = new QueryPerformanceTracker ();
+		try {
+			return super.traverseGraph ( graph, concepts, filter );
+		}
+		finally {
+			this.performanceTracker.logStats ();
+		}
+	}
+		
 }

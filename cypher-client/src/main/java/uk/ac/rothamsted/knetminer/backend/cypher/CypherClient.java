@@ -71,7 +71,9 @@ public class CypherClient implements AutoCloseable
 						  ? luceneMgr.getConceptByIRI ( iri ) 
 						  : luceneMgr.getRelationByIRI ( iri );
 						if ( oe == null ) ExceptionUtils.throwEx (
-							IllegalStateException.class, "Cannot find any Ondex concept/relation for URI '%s'", iri 
+							IllegalStateException.class, 
+							"Cannot find any Ondex %s for URI '%s'. Cypher Query is: %s. Index fetched from it is %d.",
+							pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, query, pathIdx[ 0 ]
 						);
 						return oe;
 					}).collect ( Collectors.toList () );
