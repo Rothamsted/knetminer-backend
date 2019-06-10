@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ import com.google.common.collect.BiMap;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
+import io.vavr.Value;
 import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.StateMachine;
@@ -197,7 +198,7 @@ public class StateMachine2CyTranslator
 	public Map<String, String> getCypherQueries ()
 	{
 		Map<String, String> result = new HashMap<> ();
-		traverseStateMachine ( stateMachine.getStart (), "", result, 1, false );
+		traverseStateMachine ( stateMachine.getStart (), "", result, new MutableInt ( 0 ), 1, false );
 		return result;
 	}
 	
@@ -215,7 +216,7 @@ public class StateMachine2CyTranslator
 	 * @see #getCypherQueries to get an idea on how parameters are initialised upon first call. 
 	 */
 	private void traverseStateMachine ( 
-		final State state, String partialQuery, Map<String, String> result, final int distance, final boolean isLoopMode 
+		final State state, String partialQuery, Map<String, String> result, MutableInt resultsCount, final int distance, final boolean isLoopMode 
 	)
 	{
 		try
@@ -228,7 +229,7 @@ public class StateMachine2CyTranslator
 			{
 				// A new path, choose a name and build the final query by wrapping the clauses collected so far from
 				// upstream nodes.
-				String qname = format ( "%03d_L%02d_%s", result.size () + 1, distance, buildNodeId ( state ) );
+				String qname = format ( "%03d_L%02d_%s", resultsCount.incrementAndGet (), distance, buildNodeId ( state ) );
 				result.put ( qname, "MATCH path = " + partialQuery + "\nRETURN path" );
 				return;
 			}
@@ -324,14 +325,11 @@ public class StateMachine2CyTranslator
 					return;
 				}
 				
-				// TODO: continue from here requires isDirected ( t ) and direction in buildRelMatch()
-				//
-				
 				String relMatch = buildRelMatch ( trnsGroup, maxTrnsRepeats );
 				String nextPartialQuery = partialQueryFinal + "\n  " + relMatch;
 						
 				// Yeah! Let's recurse!
-				traverseStateMachine ( target, nextPartialQuery, result, nextDistance, nextLoopMode );
+				traverseStateMachine ( target, nextPartialQuery, result, resultsCount, nextDistance, nextLoopMode );
 			});
 		}
 		catch ( StateMachineInvalidException ex )

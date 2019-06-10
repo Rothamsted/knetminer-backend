@@ -233,6 +233,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		.parallelStream ()
 		.flatMap ( query -> 
 		{
+			// DEBUG log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startIri, query );
+			
 			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 			Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.query (
 				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam )
@@ -243,6 +245,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				? queryAction.apply ( query )
 				: this.performanceTracker.track ( queryAction, query );
 					
+			// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
+				
 			// Now map the paths to the format required by the traverser
 			// We're returning a stream of paths, (each query can return more than one)
 			return cypaths.map ( path -> buildEvidencePath ( path ) );
@@ -251,6 +255,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		if ( filter != null ) result = filter.filterPaths ( result );
+
 		return result;
 	}
 
