@@ -5,24 +5,26 @@
 species_dir="$1" # $1, the dir to process
 out_dir=${2:-$species_dir} # $2, where to save Cypher files, same as $1 if null
 
-
 # Just a reminder to myself
 #species_dir=/Users/brandizi/Documents/Work/RRes/ondex_git/knetminer/species
 
-for i in "$species_dir/"*
+for i in "$species_dir/"* "$species_dir/fungi/"*
 do
   [ -d "$i" ] || continue;
   base_name=$(basename $i)
   
   echo -e "\n\n\t$base_name\n"
   
-	sm_file="$i/SemanticMotifs.txt"
+	sm_file="$i/ws/SemanticMotifs.txt"
 	if [ ! -e "$sm_file" ]; then
 		echo -e "No semantic motif file, skipping"
 		continue;
 	fi
-  
-  cy_out="$out_dir/$base_name/neo4j/semantic-motif-queries"
+
+  # Consider the species in sub-directories
+  out_base=$(echo "$i" | sed "s|^$species_dir/||")
+  cy_out="$out_dir/$out_base/ws/neo4j/state-machine-queries"
+    
   mkdir --parent "$cy_out"
   rm -f "$cy_out/sm-"*.cypher
   
