@@ -5,6 +5,8 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
@@ -116,29 +117,32 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		
 		public void logStats ()
 		{
-			log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------" );
+			StringWriter statsSW = new StringWriter ();
+			PrintWriter out = new PrintWriter ( statsSW );
 			
 			final int nqueries = invocations.get ();
-			log.info ( "Total queries issued: {}", nqueries );
+			out.printf ( "\n\nTotal queries issued: %s\n", nqueries );
 			if ( nqueries == 0 ) return;
 			
-			log.info ( "Query\tTot Results\tAvg Time(ms)\tAvg #Result\tAvg Path Len\t" );
+			out.printf ( "\nQuery\tTot Results\tAvg Time(ms)\tAvg #Result\tAvg Path Len\t\n" );
 			
 			SortedSet<String> queries = new TreeSet<> ( (s1, s2) -> s1.length () - s2.length () );
 			queries.addAll ( query2Times.keySet () );
 			for ( String query: queries )
 			{
 				int nresults = query2Results.get ( query );
-				log.info ( String.format (
+				out.printf (
 					"\"%s\"\t%d\t%#6.2f\t%#6.2f\t%#6.2f", 
 					escapeJava ( query ),
 					nresults,
 					1d * query2Times.get ( query ) / nqueries,
 					1d * nresults / nqueries,
 					nresults == 0 ? 0d : 1d * query2PathLen.get ( query ) / nresults
-				));
+				);
 			}
-			log.info ( "  -------------- /end: Cypher Graph Traverser, Query Stats --------------\n" );
+			out.println ( "" );
+
+			log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", statsSW.toString () );
 		}
 	}
 	
