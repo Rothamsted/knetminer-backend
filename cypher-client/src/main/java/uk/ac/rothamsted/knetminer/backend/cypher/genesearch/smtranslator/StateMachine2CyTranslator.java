@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,9 +27,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.BiMap;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple3;
+import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.StateMachine;
 import net.sourceforge.ondex.algorithm.graphquery.Transition;
+import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition.EdgeTreatment;
 import net.sourceforge.ondex.algorithm.graphquery.exceptions.InvalidFileException;
 import net.sourceforge.ondex.algorithm.graphquery.exceptions.StateMachineInvalidException;
 import net.sourceforge.ondex.algorithm.graphquery.flatfile.StateMachineFlatFileParser2;
@@ -58,7 +63,11 @@ public class StateMachine2CyTranslator
   
   /** Used in a couple of point to assign a deterministic order to transition lists **/
   private static Comparator<Transition> transitionComparator = 
-  	(t1, t2) -> t1.getValidRelationType ().getId ().compareTo ( t2.getValidRelationType ().getId () );		
+  	(t1, t2) -> {
+  		int cmp = t1.getValidRelationType ().getId ().compareTo ( t2.getValidRelationType ().getId () );
+  		if ( cmp != 0 ) return cmp;
+  		return Boolean.compare ( isDirectedTransition ( t1 ), isDirectedTransition ( t2 ) );
+  };
  
   
   public StateMachine2CyTranslator ( String smPath )
@@ -227,19 +236,24 @@ public class StateMachine2CyTranslator
 			// Now, let's recurse over the transitions
 			Set<Transition> transitions = this.stateMachine.getOutgoingTransitions ( state );
 
+			
 			// We need to create different departures for different states and/or different constraint lengths
 			// So, this will contain: (destination state d, maxRepeats) -> [state->d transitions]
-			Map<Pair<State, Integer>, List<Transition>> byLenTrns = 
+			Map<Tuple3<State, Boolean, Integer>, List<Transition>> byLenTrns = 
 				transitions.stream ().collect ( 
 					Collectors.groupingBy ( t ->
-						Pair.of ( this.stateMachine.getTransitionTarget ( t ), getMaxRelRepeats ( t, distance ) )
-			));
+						Tuple.of ( 
+							this.stateMachine.getTransitionTarget ( t ),
+							isDirectedTransition ( t ),
+							getMaxRelRepeats ( t, distance ) 
+			)));
 				
+			
 			// See if the node has any looping edges.
-			Map<Pair<State, Integer>, List<Transition>> loops = byLenTrns
+			Map<Tuple3<State, Boolean, Integer>, List<Transition>> loops = byLenTrns
 				.entrySet ()
 				.stream ()
-				.filter ( e -> state.equals ( e.getKey ().getLeft () ) )
+				.filter ( e -> state.equals ( e.getKey ()._1 () ) )
 				.collect ( Collectors.toMap ( Map.Entry::getKey, Map.Entry::getValue ) );
 			
 			final boolean nextLoopMode;
@@ -285,16 +299,16 @@ public class StateMachine2CyTranslator
 
 			// We want them in a given order, it helps with generating multiple versions, which need to be committed
 			// into git.
-			List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortedByLenTrns = 
-				this.sortTransitionGroups ( byLenTrns );
+			List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
+				sortTransitionGroups ( byLenTrns );
 			
 			sortedByLenTrns.forEach ( e -> 
 			{
-				Pair<State, Integer> grp = e.getKey ();
+				Tuple3<State, Boolean, Integer> grp = e.getKey ();
 				List<Transition> trnsGroup = e.getValue ();
 				
-				int maxTrnsRepeats = grp.getRight ();
-				State target = grp.getLeft ();
+				int maxTrnsRepeats = grp._3 ();
+				State target = grp._1 ();
 
 				// Path constraint that cannot be fulfilled, so let's skip it
 				if ( maxTrnsRepeats <= 0 ) {
@@ -309,7 +323,10 @@ public class StateMachine2CyTranslator
 					);
 					return;
 				}
-					
+				
+				// TODO: continue from here requires isDirected ( t ) and direction in buildRelMatch()
+				//
+				
 				String relMatch = buildRelMatch ( trnsGroup, maxTrnsRepeats );
 				String nextPartialQuery = partialQueryFinal + "\n  " + relMatch;
 						
@@ -406,8 +423,10 @@ public class StateMachine2CyTranslator
 			relVarId += "_" + maxRelRepeats;
 			
 		String relMatchStr = relVarId + ":" + relTypesStr + lenConstrStr;		
-
-		return "- [" + relMatchStr + "] -> ";
+		String arrowStr = isDirectedTransition ( anyTrans ) ? ">" : "";
+		
+		
+		return "- [" + relMatchStr + "] -" + arrowStr + " ";
 	}
 	
 	
@@ -440,7 +459,33 @@ public class StateMachine2CyTranslator
 		// We use the relation name when there is only 1, else, a generic prefix
 		String prefix = transitions.size () == 1 ? t.getValidRelationType ().getId ().toLowerCase () : "rel";
 	
-		return prefix + "_" + srcIdx + "_" + dstIdx;
+		String directedStr = isDirectedTransition ( t ) ? "_d" : "";
+		
+		return prefix + "_" + srcIdx + "_" + dstIdx + directedStr;
+	}
+	
+	
+	/**
+	 * Tells whether a transition is forward-directed or not. We don't support backward transitions (yet), since
+	 * we haven't SM files having them.
+	 * 
+	 */
+	private static boolean isDirectedTransition ( Transition t )
+	{
+		return Optional.of ( t )
+		.filter ( ti -> ti instanceof DirectedEdgeTransition )
+		.map ( ti -> (DirectedEdgeTransition) ti )
+		.map ( ti -> {
+			EdgeTreatment dir = ti.getTreatment ();
+			if ( EdgeTreatment.FORWARD.equals ( dir ) ) return true;
+			throw ExceptionUtils.buildEx 
+			( 
+				UnsupportedOperationException.class, 
+				"Backward StateMachine transitions are not supported, node: transition: %s",
+				ti.getValidRelationType ().getId ()
+			);
+		})
+		.orElse ( false );
 	}
 	
 	
@@ -475,11 +520,11 @@ public class StateMachine2CyTranslator
 	 * some determinism in the creation of numbered query names and the paths associated to them. 
 	 * 
 	 */
-	private List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortTransitionGroups (
-		Map<Pair<State, Integer>, List<Transition>> byLenTrns
+	private static List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortTransitionGroups (
+		Map<Tuple3<State, Boolean, Integer>, List<Transition>> byLenTrns
 	)
 	{
-		List<Map.Entry<Pair<State, Integer>, List<Transition>>> sortedByLenTrns = 
+		List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
 			new ArrayList<> ( byLenTrns.entrySet () );
 		
 		Collections.sort 
@@ -487,17 +532,20 @@ public class StateMachine2CyTranslator
 			sortedByLenTrns, 
 			(e1, e2) -> 
 			{
-				Pair<State, Integer> k1 = e1.getKey (), k2 = e2.getKey ();
+				Tuple3<State, Boolean, Integer> k1 = e1.getKey (), k2 = e2.getKey ();
 				
 				// Compare the keys
-				//
-				String c1 = k1.getLeft ().getValidConceptClass ().getId ();
-				String c2 = k2.getLeft ().getValidConceptClass ().getId ();
+				String c1 = k1._1 ().getValidConceptClass ().getId ();
+				String c2 = k2._1 ().getValidConceptClass ().getId ();
 				int cmp = c1.compareTo ( c2 ); if ( cmp != 0 ) return cmp;
 
-				if ( ( cmp = Integer.compare ( k1.getRight (), k2.getRight () ) ) != 0 ) return cmp;
+				// If it's not enough, compare the transition lengths
+				if ( ( cmp = Integer.compare ( k1._3 (), k2._3 () ) ) != 0 ) return cmp;
+				
+				// For same key/length, distinguish between directionality
+				if ( ( cmp = Boolean.compare ( k1._2 (), k2._2 () ) ) != 0 ) return cmp; 
 
-				// If they're not enough, use the transitions too
+				// Eventually, fall back to the transitions
 				//
 				List<Transition> trnsGrp1 = e1.getValue (), trnsGrp2 = e2.getValue ();
 									
@@ -505,7 +553,7 @@ public class StateMachine2CyTranslator
 				Collections.sort ( trnsGrp2, transitionComparator );
 				
 				// It's not efficient to not stopping at the first that don't match, but they're not very long, 
-				// so this approach simpler approach will do.
+				// so this simpler approach will do.
 				//
 				String trnsStr1 = e1.getValue ().stream ()
 					.map ( t -> t.getValidRelationType ().getId () )

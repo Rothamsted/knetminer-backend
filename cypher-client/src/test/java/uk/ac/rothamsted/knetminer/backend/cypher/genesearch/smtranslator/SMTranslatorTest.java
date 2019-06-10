@@ -37,17 +37,36 @@ public class SMTranslatorTest
 	public void testBasics ()
 	{
 		convert ( 
-			"test-state-machine",
+			"basic-sm",
 			5,
 			new String [] { "L05_path_4", "L05_enzyme_8", "L05_path_5" },
 			new String [] {	
 				"gene_1:Gene{ iri: $startIri }",
 				"(bioProc_3:BioProc)",
-				"- [part_of_3_5:part_of] -> (path_5:Path)"
+				"- [part_of_3_5:part_of] - (path_5:Path)"
 			}
 		);
 	}
 
+	
+	/**
+	 * Like {@link #testBasics()}, but with directed transitions.
+	 */
+	@Test
+	public void testDirectedEdge ()
+	{
+		convert ( 
+			"directed-edge-sm",
+			5,
+			new String [] { "L05_path_4", "L05_enzyme_8", "L05_path_5" },
+			new String [] {	
+				"gene_1:Gene{ iri: $startIri }",
+				"(bioProc_3:BioProc)",
+				"- [part_of_3_5:part_of] - (path_5:Path)",
+				"- [regulates_1_7_d:regulates] -> (tO_7:TO)"
+			}
+		);
+	}	
 	
 	/**
 	 * Has a loop and a few len constraints
@@ -56,7 +75,7 @@ public class SMTranslatorTest
 	public void testLoop ()
 	{
 		convert ( 
-			"test-state-machine-loop",
+			"loop-sm",
 			5,
 			new String [] { 
 				"L05_path_4",
@@ -67,9 +86,9 @@ public class SMTranslatorTest
 			},
 			new String [] {	
 				"gene_1:Gene{ iri: $startIri }",
-				"- [part_of_3_3:part_of*0..1] -> (bioProc_3b:BioProc)",
-				"- [asso_wi_7_9_2:asso_wi*1..2] -> (molFunc_9:MolFunc)",
-				"- [asso_wi_7_8:asso_wi] -> (enzyme_8:Enzyme)"
+				"- [part_of_3_3:part_of*0..1] - (bioProc_3b:BioProc)",
+				"- [asso_wi_7_9_2:asso_wi*1..2] - (molFunc_9:MolFunc)",
+				"- [asso_wi_7_8:asso_wi] - (enzyme_8:Enzyme)"
 			}
 		);
 	}
@@ -83,17 +102,17 @@ public class SMTranslatorTest
 	public void testLenConstraints ()
 	{
 		convert ( 
-			"test-state-machine-len-constraints",
+			"len-constraints-sm",
 			4,
 			new String [] { "L05_path_5", "L05_tO_7" },
 			new String [] {	
 				"gene_1:Gene{ iri: $startIri }",
 				"(bioProc_3:BioProc)",
 				// I must split transitions between the same nodes into two, since they have different length constraints
-				"- [is_part_of_3_5_2:is_part_of*1..2] -> (path_5:Path)",
-				"- [part_of_3_5_3:part_of*1..3] -> (path_5:Path)",
+				"- [is_part_of_3_5_2:is_part_of*1..2] - (path_5:Path)",
+				"- [part_of_3_5_3:part_of*1..3] - (path_5:Path)",
 				// These instead have the same constraint, so there must be a single multi-type relation clause
-				"- [rel_1_6_2:asso_wi|pub_in*1..2] -> (publication_6:Publication)"
+				"- [rel_1_6_2:asso_wi|pub_in*1..2] - (publication_6:Publication)"
 			}
 		);
 	}	
@@ -105,7 +124,7 @@ public class SMTranslatorTest
 	public void testArabidopsis ()
 	{
 		convert ( 
-			"ara-state-machine",
+			"ara-sm",
 			"wheat-metadata.xml",
 			35, 
 			new String [] {
@@ -116,13 +135,13 @@ public class SMTranslatorTest
 				"L09_path_14"
 			}, 
 			new String [] {
-				"- [rel_10_10_2:genetic|physical*0..2] -> (protein_10b:Protein)",
-				"- [rel_10_10:h_s_s|ortho|xref*0..1] -> (protein_10b:Protein)",
-				"(protein_10b:Protein)\n  - [rel_10_7:h_s_s|ortho|xref] -> (protein_7:Protein)",
-				"(protein_10b:Protein)\n  - [rel_10_7_2:genetic|physical*1..2] -> (protein_7:Protein)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [rel_1_9:genetic|physical] -> (gene_9:Gene)\n  - [cooc_wi_9_16:cooc_wi] -> (trait_16:Trait)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [has_variation_1_15:has_variation] -> (sNP_15:SNP)\n  - [associated_with_15_16:associated_with] -> (trait_16:Trait)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [cooc_wi_1_16:cooc_wi] -> (trait_16:Trait)"
+				"- [rel_10_10_d_2:genetic|physical*0..2] -> (protein_10b:Protein)",
+				"- [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein)",
+				"(protein_10b:Protein)\n  - [rel_10_7:h_s_s|ortho|xref] - (protein_7:Protein)",
+				"(protein_10b:Protein)\n  - [rel_10_7_d_2:genetic|physical*1..2] -> (protein_7:Protein)",
+				"(gene_1:Gene{ iri: $startIri })\n  - [rel_1_9:genetic|physical] - (gene_9:Gene)\n  - [cooc_wi_9_16:cooc_wi] - (trait_16:Trait)",
+				"(gene_1:Gene{ iri: $startIri })\n  - [has_variation_1_15:has_variation] - (sNP_15:SNP)\n  - [associated_with_15_16:associated_with] - (trait_16:Trait)",
+				"(gene_1:Gene{ iri: $startIri })\n  - [cooc_wi_1_16:cooc_wi] - (trait_16:Trait)"
 			} 
 		);
 	}
@@ -161,8 +180,9 @@ public class SMTranslatorTest
 			}
 		}
 		
-		StateMachine2CyTranslator translator = 
-			new StateMachine2CyTranslator ( "target/test-classes/" + smName + ".txt", metaGraph );
+		StateMachine2CyTranslator translator = new StateMachine2CyTranslator (
+			"target/test-classes/statemachine2cypher-trns/" + smName + ".txt", metaGraph
+		);
 		Map<String, String> queries = translator.getCypherQueries ();
 		
 		log.info ( "Found {} queries:", queries.size () );
