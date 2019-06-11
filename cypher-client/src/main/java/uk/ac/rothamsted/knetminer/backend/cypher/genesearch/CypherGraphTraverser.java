@@ -85,9 +85,19 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	private static class QueryPerformanceTracker 
 	{
-		private Map<String, Long> query2Times = Collections.synchronizedMap ( new HashMap<> () );
+		/** Times to send the query and get a first reply **/
+		private Map<String, Long> query2StartTimes = Collections.synchronizedMap ( new HashMap<> () );
+		/** Times to fetch all the results **/
+		private Map<String, Long> query2FetchTimes = Collections.synchronizedMap ( new HashMap<> () );
+		/** No of results (pahts) returned by each query **/
 		private Map<String, Integer> query2Results = Collections.synchronizedMap ( new HashMap<> () );
+
+		/** No of query invocations ({@code #invocations = #queries x #genes}) **/
+		private Map<String, Integer> query2Invocations = Collections.synchronizedMap ( new HashMap<> () );
+		/** Sums of returned path lengths for the each query **/
 		private Map<String, Long> query2PathLen = Collections.synchronizedMap ( new HashMap<> () );
+		
+		/** Total no. of invocations, ie #queries x #genes **/ 
 		private AtomicInteger invocations = new AtomicInteger ( 0 );
 		
 		private final Logger log = LoggerFactory.getLogger ( this.getClass () );
@@ -104,14 +114,27 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		)
 		{
 			@SuppressWarnings ( "unchecked" )
-			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ]; 
+			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ];
+			
 			long time = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
+			XStopWatch fetchTimer = new XStopWatch ();
+			
 			result [ 0 ] = result [ 0 ].peek ( pathEls -> {
-				query2Times.compute ( query, (q,t) -> t == null ? time : t + time );
+				fetchTimer.resumeOrStart ();
+				query2StartTimes.compute ( query, (q,t) -> t == null ? time : t + time );
 				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
 				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
-			});
+			})
+			.onClose ( () ->  
+				// Track what is presumably the fetch time
+				query2FetchTimes.compute (
+					query, 
+					(q,t) -> !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () + ( t == null ? 0 : t ) )
+			);
+			
+			query2Invocations.compute ( query, (q,n) -> n == null ? 0 : n + 1 );
 			invocations.incrementAndGet ();
+			
 			return result [ 0 ];
 		}
 		
@@ -120,24 +143,30 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			StringWriter statsSW = new StringWriter ();
 			PrintWriter out = new PrintWriter ( statsSW );
 			
-			final int nqueries = invocations.get ();
-			out.printf ( "\n\nTotal queries issued: %s\n", nqueries );
-			if ( nqueries == 0 ) return;
+			final int nTotQueries = invocations.get ();
+			out.printf ( "\n\nTotal queries issued: %s\n", nTotQueries );
+			if ( nTotQueries == 0 ) return;
 			
-			out.printf ( "\nQuery\tTot Results\tAvg Time(ms)\tAvg #Result\tAvg Path Len\t\n" );
+			out.println (   
+				"Query\tTot Invocations\tTot Returned Paths\tAvg Ret #Paths\tAvg Start Time(ms)\tAvg Fetch Time(ms)\tAvg Path Len" 
+			);
 			
 			SortedSet<String> queries = new TreeSet<> ( (s1, s2) -> s1.length () - s2.length () );
-			queries.addAll ( query2Times.keySet () );
+			queries.addAll ( query2Invocations.keySet () );
 			for ( String query: queries )
 			{
-				int nresults = query2Results.get ( query );
+				int nresults = query2Results.getOrDefault ( query, 0 );
+				int nqueries = query2Invocations.get ( query );
+				
 				out.printf (
-					"\"%s\"\t%d\t%#6.2f\t%#6.2f\t%#6.2f", 
+					"\"%s\"\t%d\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
 					escapeJava ( query ),
+					nqueries,
 					nresults,
-					1d * query2Times.get ( query ) / nqueries,
-					1d * nresults / nqueries,
-					nresults == 0 ? 0d : 1d * query2PathLen.get ( query ) / nresults
+					nqueries == 0 ? 0d : 1d * nresults / nqueries,
+					nqueries == 0 ? 0d : 1d * query2StartTimes.getOrDefault ( query, 0l ) / nqueries,
+					nqueries == 0 ? 0d : 1d * query2FetchTimes.getOrDefault ( query, 0l ) / nqueries,
+					nresults == 0 ? 0d : 1d * query2PathLen.getOrDefault ( query, 0l ) / nresults
 				);
 			}
 			out.println ( "" );
@@ -244,7 +273,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			Stream<List<ONDEXEntity>> cypaths = this.performanceTracker == null  
 				? queryAction.apply ( query )
 				: this.performanceTracker.track ( queryAction, query );
-					
+									
 			// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
 				
 			// Now map the paths to the format required by the traverser
@@ -252,7 +281,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			return cypaths.map ( path -> buildEvidencePath ( path ) );
 		})
 		.collect ( Collectors.toList () ); // And eventually we extract List<EvPathNode>
-				
+					
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		if ( filter != null ) result = filter.filterPaths ( result );
 
@@ -311,13 +340,14 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( ONDEXGraph graph, Set<ONDEXConcept> concepts,
 			FilterPaths<EvidencePathNode> filter )
 	{
-		this.performanceTracker = new QueryPerformanceTracker ();
+		if ( this.getOption ( "isPerformanceTrackingEnabled", false ) )
+			this.performanceTracker = new QueryPerformanceTracker ();
+		
 		try {
 			return super.traverseGraph ( graph, concepts, filter );
 		}
 		finally {
-			this.performanceTracker.logStats ();
+			if ( this.performanceTracker != null ) this.performanceTracker.logStats ();
 		}
 	}
-		
 }

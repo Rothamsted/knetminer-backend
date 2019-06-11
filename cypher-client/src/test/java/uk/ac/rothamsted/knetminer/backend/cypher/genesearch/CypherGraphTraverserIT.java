@@ -127,6 +127,8 @@ public class CypherGraphTraverserIT
 	@SuppressWarnings ( "rawtypes" )
 	public void testMultipleStartConcepts ()
 	{
+		graphTraverser.setOption ( "isPerformanceTrackingEnabled", true );
+
 		Stream<String> conceptIris = Stream.of ( 
 			iri ( "bkr:gene_at4g26080_locus_2005488"	),
 			iri ( "bkr:gene_at5g35550_locus_2169538"	),
@@ -283,7 +285,7 @@ public class CypherGraphTraverserIT
 				return exptEvType.equals ( evType.getId () );
 			};
 			
-			// A path is valis if all the probed positions are as expected.
+			// A path is valid if all the probed positions are as expected.
 			for ( int i = 0; i < testedParams.length; )
 				if ( !evidenceChecker.apply (
 				  (Class<Transition>) testedParams [ i++ ],

@@ -7,7 +7,7 @@ import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import net.sourceforge.ondex.parser.oxl.Parser;
 
 /**
- * TODO: comment me!
+ * An {@link ExternalResource} that initialiases an {@link ONDEXGraph} and its {@link LuceneEnv index manager}.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>31 Jan 2019</dd></dl>
