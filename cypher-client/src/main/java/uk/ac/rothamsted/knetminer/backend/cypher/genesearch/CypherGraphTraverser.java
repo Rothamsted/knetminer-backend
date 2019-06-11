@@ -148,7 +148,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			if ( nTotQueries == 0 ) return;
 			
 			out.println (   
-				"Query\tTot Invocations\tTot Returned Paths\tAvg Ret #Paths\tAvg Start Time(ms)\tAvg Fetch Time(ms)\tAvg Path Len" 
+				"Query\tTot Invocations\tTot Returned Paths\tAvg Ret Paths\tAvg Start Time(ms)\tAvg Fetch Time(ms)\tAvg Path Len" 
 			);
 			
 			SortedSet<String> queries = new TreeSet<> ( (s1, s2) -> s1.length () - s2.length () );
