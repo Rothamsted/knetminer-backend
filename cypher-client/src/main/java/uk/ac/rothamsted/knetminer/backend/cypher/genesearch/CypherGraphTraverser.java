@@ -119,14 +119,18 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			long time = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
 			XStopWatch fetchTimer = new XStopWatch ();
 			
-			result [ 0 ] = result [ 0 ].peek ( pathEls -> {
-				fetchTimer.resumeOrStart ();
+			result [ 0 ] = result [ 0 ].peek ( pathEls -> 
+			{
+				// stats timing the first time/path it's invoked, then onClose() will get the total time elapsed
+				// after all the stream has been consumed
+				fetchTimer.resumeOrStart (); 
 				query2StartTimes.compute ( query, (q,t) -> t == null ? time : t + time );
 				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
 				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
 			})
 			.onClose ( () ->  
-				// Track what is presumably the fetch time
+				// Track what is presumably the fetch time 
+			  // (we come here after all the paths in the stream have been consumed) 
 				query2FetchTimes.compute (
 					query, 
 					(q,t) -> !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () + ( t == null ? 0 : t ) )
