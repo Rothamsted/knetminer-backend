@@ -36,6 +36,7 @@ public class CypherClient implements AutoCloseable
 	private Session neoSession;
 	private Transaction tx;
 	
+	
 	/**
 	 * Visibility is protected cause you're not supposed to instantiate me directly, you should use the
 	 * {@link CypherClientProvider provider} instead. 

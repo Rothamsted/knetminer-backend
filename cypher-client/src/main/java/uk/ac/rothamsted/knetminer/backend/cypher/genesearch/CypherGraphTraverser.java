@@ -116,15 +116,17 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			@SuppressWarnings ( "unchecked" )
 			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ];
 			
-			long time = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
+			long startTime = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
+			query2StartTimes.compute ( query, (q,t) -> t == null ? startTime : t + startTime );
+			
 			XStopWatch fetchTimer = new XStopWatch ();
 			
-			result [ 0 ] = result [ 0 ].peek ( pathEls -> 
+			result [ 0 ] = result [ 0 ]
+			.peek ( pathEls -> 
 			{
 				// stats timing the first time/path it's invoked, then onClose() will get the total time elapsed
 				// after all the stream has been consumed
 				fetchTimer.resumeOrStart (); 
-				query2StartTimes.compute ( query, (q,t) -> t == null ? time : t + time );
 				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
 				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
 			})
