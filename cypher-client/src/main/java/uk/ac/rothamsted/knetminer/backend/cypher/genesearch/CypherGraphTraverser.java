@@ -343,8 +343,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 */
 	@Override
 	@SuppressWarnings ( "rawtypes" )
-	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( ONDEXGraph graph, Set<ONDEXConcept> concepts,
-			FilterPaths<EvidencePathNode> filter )
+	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( 
+		ONDEXGraph graph, Set<ONDEXConcept> concepts, FilterPaths<EvidencePathNode> filter )
 	{
 		if ( this.getOption ( "isPerformanceTrackingEnabled", false ) )
 			this.performanceTracker = new QueryPerformanceTracker ();
