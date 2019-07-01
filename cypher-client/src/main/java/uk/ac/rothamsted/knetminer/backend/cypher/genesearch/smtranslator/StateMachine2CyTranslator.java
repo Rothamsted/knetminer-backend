@@ -29,7 +29,6 @@ import com.google.common.collect.BiMap;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
-import io.vavr.Value;
 import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.StateMachine;

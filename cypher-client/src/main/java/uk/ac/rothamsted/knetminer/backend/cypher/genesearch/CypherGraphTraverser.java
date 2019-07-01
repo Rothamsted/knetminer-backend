@@ -130,7 +130,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
 				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
 			})
-			.onClose ( () ->  
+			.onClose ( () ->
 				// Track what is presumably the fetch time 
 			  // (we come here after all the paths in the stream have been consumed) 
 				query2FetchTimes.compute (
@@ -192,6 +192,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	private void init ()
 	{
+		// Double-check lazy init (https://www.geeksforgeeks.org/java-singleton-design-pattern-practices-examples/)
+		if ( springContext != null ) return;
+		
 		synchronized ( GraphTraverser.class )
 		{
 			if ( springContext != null ) return;
