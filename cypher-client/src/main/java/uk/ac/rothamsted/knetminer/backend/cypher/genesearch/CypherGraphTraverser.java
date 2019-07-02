@@ -350,7 +350,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CONFIG_CY_PAGE_SIZE, 25000 );
+		return this.getOption ( CONFIG_CY_PAGE_SIZE, 5000 );
 	}
 
 	public void setPageSize ( long pageSize ) {
@@ -376,6 +376,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		}
 	}
 	
+	/**
+	 * This uses {@link CypherClient#findPaths(LuceneEnv, String, Value)} to get the paths for a gene
+	 * that are reachable from the query parameter. Additionally, this method query the Neo4j server 
+	 * in a paginated fashion, by fetching {@link #getPageSize()} paths per query.
+	 *  
+	 */
 	protected Stream<List<ONDEXEntity>> findPathsWithPaging ( 
 		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider 	cyProvider
 	)
@@ -384,12 +390,18 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 		long pageSize = this.getPageSize ();
 
-		// Special iterator that does the paging trick
+		// We need this special iterator to do the paging trick. 
+		// Its hasNext() method asks the underlining stream if it has more items. When not, it issues another
+		// query with a new offset value and returns false when the latter does.
+		//
 		Iterator<List<ONDEXEntity>> pathsItr = new Iterator<List<ONDEXEntity>>()
 		{
 			private long offset = -pageSize;
 			private Iterator<List<ONDEXEntity>> currentPage = null;
 
+			/**
+			 * Issue the query with the current offset.
+			 */
 			private void doPaging ()
 			{
 				offset += pageSize;
@@ -412,26 +424,31 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				this.currentPage = cypaths.iterator ();
 			}
 			
-			
+			/**
+			 * Behaves as explained above
+			 */
 			@Override
 			public boolean hasNext ()
 			{
 				// do it the first time
 				if ( currentPage == null ) this.doPaging ();
-				// or whenever the current page is over
+				// and whenever the current page is over
 				else if ( !currentPage.hasNext () ) doPaging ();
 				
+				// if false the first time => no result. Else, it becomes false for the first offset that is empty
 				return currentPage.hasNext ();
 			}
 
 			@Override
 			public List<ONDEXEntity> next ()
 			{
+				// If you call it at the appropriate time, it was prepared by the hasNext() method above
 				return currentPage.next ();
 			}
 		}; // iterator
 		
-		
+		// So, the iterator above goes through multiple streams (one per query page), let's turn it back to
+		// a stream, as expected by the nethod invoker
 		return StreamSupport.stream ( 
 			spliteratorUnknownSize ( pathsItr,	IMMUTABLE	| NONNULL	), 
 			false 
