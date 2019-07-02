@@ -16,6 +16,7 @@ import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Entity;
 import org.neo4j.driver.v1.types.Path;
 
@@ -101,7 +102,7 @@ public class CypherClient implements AutoCloseable
 			? this.tx.run ( query )
 			: this.tx.run ( query, params )				
 		;
-		
+						
 		Spliterator<Record> splitr = spliteratorUnknownSize ( cursor, Spliterator.IMMUTABLE );
 		return StreamSupport.stream ( splitr, false );		
 	}
@@ -149,6 +150,9 @@ public class CypherClient implements AutoCloseable
   /**
    * Begins a new transaction in the session this client is based upon, using the 
    * {@link Session#beginTransaction() corresponding Neo4j method}.
+   * 
+   * Multiple transactions can be opened during a given session, 
+	 * but sequentially.
    */
 	public synchronized void begin () {
 		tx = neoSession.beginTransaction ();
@@ -163,16 +167,26 @@ public class CypherClient implements AutoCloseable
 		tx = null;
 	}
 		
+	/**
+	 * Tells if the session for this client is open. Sessions are opened upon client creation and 
+	 * closed via {@link #close()}. Once a session is closed, it cannot be re-opened.
+	 * 
+	 */
 	public synchronized boolean isOpen () {
 		return this.neoSession.isOpen ();
 	}
 	
+	/**
+	 * Tells if there is an ongoing transaction.
+	 */
 	public synchronized boolean isTxOpen () {
 		return this.tx != null;
 	}
 	
 	/**
-	 * Throws an error if no transaction was opened with {@link #begin()}.
+	 * Uses {@link #begin()} to open a transaction, if not already done.
+	 * 
+	 * @throws IllegalStateException, if !{@link #isOpen()}
 	 */
 	public void checkOpen () 
 	{
@@ -207,6 +221,7 @@ public class CypherClient implements AutoCloseable
 	
 	/**
 	 * Closes the underlining Neo4j {@link Session}.
+	 * After this, {@link #isOpen()} will always be false and the client cannot be used anymore.
 	 */
 	@Override
 	public synchronized void close ()

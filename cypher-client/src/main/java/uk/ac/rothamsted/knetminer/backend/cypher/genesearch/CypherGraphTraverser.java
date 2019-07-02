@@ -1,5 +1,8 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
+import static java.util.Spliterator.IMMUTABLE;
+import static java.util.Spliterator.NONNULL;
+import static java.util.Spliterators.spliteratorUnknownSize;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
@@ -9,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
@@ -52,7 +57,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
  * storing a BioKNO-based model of an Ondex/Knetminer graph. Currently the backend datbase is based on Neo4j.</p>
  * 
- * <p>This traverser expects certain initialisaiton parameters:
+ * <p>This traverser expects certain initialisation parameters:
  * <ul>
  * 	<li>{@link #CONFIG_PATH_OPT} set to a proper Spring config file.</li>
  * 	<li>{@code LuceneEnv}, which must be a proper {@link LuceneEnv} instance, corresponding to the {@code graph} parameter
@@ -78,8 +83,13 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public static final String CONFIG_PATH_OPT = "knetminer.backend.configPath";
+
+	/**
+	 * This allows for changing {@link #getPageSize()} via {@link #setOption(String, Object)}.
+	 */
+	public static final String CONFIG_CY_PAGE_SIZE = "knetminer.backend.cypher.pageSize";
 	
-	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
+	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	private static AbstractApplicationContext springContext;
 	
@@ -184,7 +194,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	/**
 	 * Has to be initialised by {@link AbstractGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, FilterPaths)}.
 	 */
-	private QueryPerformanceTracker performanceTracker = null;
+	protected QueryPerformanceTracker performanceTracker = null;
 	
 	
 	public CypherGraphTraverser () {}
@@ -252,7 +262,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
 		// So, let's get the starting IRI from the concept parameter.
-		String startIri = Optional
+		String startGeneIri = Optional
 			.ofNullable ( ONDEXGraphUtils.getAttribute ( graph, concept, "iri" ) )
 			.map ( attr -> (String) attr.getValue () )
 			.orElseThrow ( () -> ExceptionUtils.buildEx (
@@ -264,8 +274,6 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		// And now let's hand it to Cypher
 		//
 		
-		Value startIriParam = Values.parameters ( "startIri", startIri );
-
 		// Query and convert the results to the appropriate format.
 		List<EvidencePathNode> result = cypherQueries
 		.parallelStream ()
@@ -274,14 +282,10 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			// DEBUG log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startIri, query );
 			
 			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-			Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.query (
-				cyClient -> cyClient.findPaths ( luceneMgr, query, startIriParam )
-			);
 
-			// Possibly wrap it into the performance tracker
-			Stream<List<ONDEXEntity>> cypaths = this.performanceTracker == null  
-				? queryAction.apply ( query )
-				: this.performanceTracker.track ( queryAction, query );
+			Stream<List<ONDEXEntity>> cypaths = this.findPathsWithPaging ( 
+				query, startGeneIri, luceneMgr, cyProvider 
+			);
 									
 			// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
 				
@@ -339,7 +343,19 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		);
 		return result;
 	}
+	
+	/**
+	 * The page size used with Cypher queries. {@link #findPathsWithPaging(LuceneEnv, String, String)} is the method where
+	 * this is used. This value can be set via {@link #setOption(String, Object)}, using {@link #CONFIG_CY_PAGE_SIZE}.
+	 * 
+	 */
+	public long getPageSize () {
+		return this.getOption ( CONFIG_CY_PAGE_SIZE, 25000 );
+	}
 
+	public void setPageSize ( long pageSize ) {
+		this.setOption ( CONFIG_CY_PAGE_SIZE, pageSize );
+	}
 	
 	/**
 	 * Wraps the default implementation to enable to track query performance, via {@link QueryPerformanceTracker}. 
@@ -359,4 +375,67 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			if ( this.performanceTracker != null ) this.performanceTracker.logStats ();
 		}
 	}
+	
+	protected Stream<List<ONDEXEntity>> findPathsWithPaging ( 
+		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider 	cyProvider
+	)
+	{
+		String pagedQuery = query + "\nSKIP $offset LIMIT $pageSize";
+
+		long pageSize = this.getPageSize ();
+
+		// Special iterator that does the paging trick
+		Iterator<List<ONDEXEntity>> pathsItr = new Iterator<List<ONDEXEntity>>()
+		{
+			private long offset = -pageSize;
+			private Iterator<List<ONDEXEntity>> currentPage = null;
+
+			private void doPaging ()
+			{
+				offset += pageSize;
+				log.trace ( "offset: {} for query: {}", offset, query );
+				
+				Value params = Values.parameters ( 
+					"startIri", startGeneIri,
+					"offset", offset,
+					"pageSize", pageSize
+				); 
+				
+				Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.query (
+					cyClient -> cyClient.findPaths ( luceneMgr, q, params )
+				);
+				
+				Stream<List<ONDEXEntity>> cypaths = performanceTracker == null 
+					? queryAction.apply ( pagedQuery )
+					: performanceTracker.track ( queryAction, pagedQuery );
+					
+				this.currentPage = cypaths.iterator ();
+			}
+			
+			
+			@Override
+			public boolean hasNext ()
+			{
+				// do it the first time
+				if ( currentPage == null ) this.doPaging ();
+				// or whenever the current page is over
+				else if ( !currentPage.hasNext () ) doPaging ();
+				
+				return currentPage.hasNext ();
+			}
+
+			@Override
+			public List<ONDEXEntity> next ()
+			{
+				return currentPage.next ();
+			}
+		}; // iterator
+		
+		
+		return StreamSupport.stream ( 
+			spliteratorUnknownSize ( pathsItr,	IMMUTABLE	| NONNULL	), 
+			false 
+		);		
+	}
+	
 }

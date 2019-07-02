@@ -75,6 +75,7 @@ public class CypherGraphTraverserIT
 			.findAny ()
 			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
 		
+		graphTraverser.setOption ( CypherGraphTraverser.CONFIG_CY_PAGE_SIZE, 5 );
 		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graphResource.getGraph (), startConcept, null );
 
 		assertTrue ( "No EvidencePath returned!", paths.size () > 0 );
@@ -199,7 +200,7 @@ public class CypherGraphTraverserIT
 	 */
 	@Test
 	@SuppressWarnings ( "rawtypes" )
-	public void testTestGene ()
+	public void testProbeGene ()
 	{
 		ONDEXGraph graph = graphResource.getGraph ();
 		
