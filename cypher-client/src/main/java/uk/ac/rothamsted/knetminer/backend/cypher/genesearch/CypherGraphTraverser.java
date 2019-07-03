@@ -21,16 +21,20 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
+import org.neo4j.driver.v1.exceptions.Neo4jException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+import com.google.common.util.concurrent.TimeLimiter;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -52,6 +56,7 @@ import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
+import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
@@ -350,7 +355,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CONFIG_CY_PAGE_SIZE, 5000 );
+		return this.getOption ( CONFIG_CY_PAGE_SIZE, 2500 );
 	}
 
 	public void setPageSize ( long pageSize ) {
@@ -430,20 +435,39 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			@Override
 			public boolean hasNext ()
 			{
-				// do it the first time
-				if ( currentPage == null ) this.doPaging ();
-				// and whenever the current page is over
-				else if ( !currentPage.hasNext () ) doPaging ();
-				
-				// if false the first time => no result. Else, it becomes false for the first offset that is empty
-				return currentPage.hasNext ();
+				return wrapException ( () -> 
+				{
+					// do it the first time
+					if ( currentPage == null ) this.doPaging ();
+					// and whenever the current page is over
+					else if ( !currentPage.hasNext () ) doPaging ();
+					
+					// if false the first time => no result. Else, it becomes false for the first offset that is empty
+					return currentPage.hasNext ();
+				});
 			}
 
 			@Override
 			public List<ONDEXEntity> next ()
 			{
 				// If you call it at the appropriate time, it was prepared by the hasNext() method above
-				return currentPage.next ();
+				return wrapException ( () -> currentPage.next () );
+			}
+			
+			/** In case of exception, re-throws Neo4jException with the query that caused it */
+			private <T> T wrapException ( Supplier<T> action ) 
+			{
+				try {
+					return action.get ();
+				}
+				catch ( RuntimeException ex ) 
+				{
+					throw buildEx ( 
+						GenericNeo4jException.class, ex, 
+						"Error: %s. While finding paths for <%s>, using the query: %s", 
+						ex.getMessage (), startGeneIri, query 
+					);
+				}
 			}
 		}; // iterator
 		
