@@ -5,12 +5,15 @@ import static org.neo4j.driver.v1.AccessMode.WRITE;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Session;
 import org.springframework.stereotype.Component;
+
+import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 
 /**
  * <p>An interface to the Neo4j client. This can be used in two ways:
@@ -85,6 +88,30 @@ public class CypherClientProvider
 		return query ( action, false );
 	}
 
+	/**
+	 * This is similar to {@link #query(Function)}, but handles query code that is supposed to issue
+	 * read-only operations and return a stream depending on the query: it gives the action 
+	 * a transaction under which to work and appends a {@link CypherClient#close() client closing action} (ie, both the 
+	 * query transaction and session are closed)  to the resulting stream, by using {@link Stream#onClose(Runnable)}.
+	 * This means <b>you might need to close the returned stream {@link Stream#close()}</b>. 
+	 * 
+	 */
+	public <T> Stream<T> queryToStream ( Function<CypherClient, Stream<T>> action )
+	{
+		CypherClient client = this.newClient ();
+		try {
+			client.begin ();
+			return action
+				.apply ( client )
+				.onClose ( () -> { if ( client.isOpen () ) client.close (); } );
+		}
+		catch ( RuntimeException ex ) {
+			if ( client != null && client.isOpen () ) client.close ();
+			throw ex;
+		}
+	}
+	
+	
 	/**
 	 * A wrapper of {@link #query(Function, boolean, boolean)} to be used for actions that don't need to 
 	 * return anything back. 

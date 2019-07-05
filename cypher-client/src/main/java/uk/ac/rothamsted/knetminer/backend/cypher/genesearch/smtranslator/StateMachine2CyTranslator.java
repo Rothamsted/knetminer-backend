@@ -314,7 +314,7 @@ public class StateMachine2CyTranslator
 				if ( maxTrnsRepeats <= 0 ) {
 					BiMap<State, Integer> states2Indexes = this.stateIndex.inverse ();
 					log.warn ( 
-						"The transition {}({}) - [{}] -> {}({}) that doesn't match its length constraints",
+						"The transition {}({}) - [{}] -> {}({}) doesn't match its length constraints",
 						state.getValidConceptClass ().getId (),
 						states2Indexes.get ( state ),
 						trnsGroup.iterator ().next ().getValidRelationType ().getId (),
@@ -403,7 +403,7 @@ public class StateMachine2CyTranslator
 		
 		// min    max    	Cypher format
 		//  1      -      r:R
-		//  1      n      r:R*1..n (but R only if n == 1)
+		//  1      n      r:R*1..n (r:R if n == 1)
 		//  0      -      r:R*0..
 		//  0      n      r:R*0..n
 		String lenConstrStr = "";

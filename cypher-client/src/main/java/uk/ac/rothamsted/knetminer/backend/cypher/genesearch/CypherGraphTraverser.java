@@ -355,7 +355,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CONFIG_CY_PAGE_SIZE, 2500 );
+		return this.getOption ( CONFIG_CY_PAGE_SIZE, 500 );
 	}
 
 	public void setPageSize ( long pageSize ) {
@@ -402,13 +402,17 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		Iterator<List<ONDEXEntity>> pathsItr = new Iterator<List<ONDEXEntity>>()
 		{
 			private long offset = -pageSize;
-			private Iterator<List<ONDEXEntity>> currentPage = null;
+			private Stream<List<ONDEXEntity>> currentPageStream = null;
+			private Iterator<List<ONDEXEntity>> currentPageIterator = null;
 
 			/**
 			 * Issue the query with the current offset.
 			 */
 			private void doPaging ()
 			{
+				// Close the stream that is going to be disposed
+				if ( this.currentPageStream != null ) this.currentPageStream.close ();
+					
 				offset += pageSize;
 				log.trace ( "offset: {} for query: {}", offset, query );
 				
@@ -418,15 +422,15 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					"pageSize", pageSize
 				); 
 				
-				Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.query (
+				Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.queryToStream (
 					cyClient -> cyClient.findPaths ( luceneMgr, q, params )
 				);
 				
-				Stream<List<ONDEXEntity>> cypaths = performanceTracker == null 
+				this.currentPageStream = performanceTracker == null 
 					? queryAction.apply ( pagedQuery )
 					: performanceTracker.track ( queryAction, pagedQuery );
 					
-				this.currentPage = cypaths.iterator ();
+				this.currentPageIterator = currentPageStream.iterator ();
 			}
 			
 			/**
@@ -438,12 +442,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				return wrapException ( () -> 
 				{
 					// do it the first time
-					if ( currentPage == null ) this.doPaging ();
+					if ( currentPageIterator == null ) this.doPaging ();
 					// and whenever the current page is over
-					else if ( !currentPage.hasNext () ) doPaging ();
+					else if ( !currentPageIterator.hasNext () ) doPaging ();
 					
 					// if false the first time => no result. Else, it becomes false for the first offset that is empty
-					return currentPage.hasNext ();
+					return currentPageIterator.hasNext ();
 				});
 			}
 
@@ -451,7 +455,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			public List<ONDEXEntity> next ()
 			{
 				// If you call it at the appropriate time, it was prepared by the hasNext() method above
-				return wrapException ( () -> currentPage.next () );
+				return wrapException ( () -> currentPageIterator.next () );
 			}
 			
 			/** In case of exception, re-throws Neo4jException with the query that caused it */

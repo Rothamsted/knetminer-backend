@@ -90,6 +90,8 @@ public class CypherClient implements AutoCloseable
 	}
 
 	/**
+	 * Low-level Neo4j quering.
+	 * 
 	 * Uses the Neo4j client to issue the query, wrapping it into facilities like transaction auto-opening, and then
 	 * wraps the resulting records into a stream, in a dynamic/lazy way, that is, a {@link StatementResult} is 
 	 * iterated only when the corresponding {@link Stream} methods are invoked.
@@ -106,6 +108,7 @@ public class CypherClient implements AutoCloseable
 		Spliterator<Record> splitr = spliteratorUnknownSize ( cursor, Spliterator.IMMUTABLE );
 		return StreamSupport.stream ( splitr, false );		
 	}
+	
   
 	/**
 	 * Runs the query via {@link #queryToStream(String, Value)} and, for each Cypher node/relation returned, 
