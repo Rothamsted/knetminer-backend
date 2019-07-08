@@ -28,13 +28,10 @@ import java.util.stream.StreamSupport;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
-import org.neo4j.driver.v1.exceptions.Neo4jException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-
-import com.google.common.util.concurrent.TimeLimiter;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -274,31 +271,37 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				IllegalStateException.class, 
 				"No attribute 'iri' defined for the concept %s, Cypher backend needs OXL files with IRI/URI attributes", 
 				ONDEXGraphUtils.getString ( concept ) 
-		));
+			));
 				
-		// And now let's hand it to Cypher
-		//
+		// And now let's hand it to Cypher.
+		List<EvidencePathNode> result;
 		
-		// Query and convert the results to the appropriate format.
-		List<EvidencePathNode> result = cypherQueries
-		.parallelStream ()
-		.flatMap ( query -> 
-		{
-			// DEBUG log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startIri, query );
-			
-			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
+		// By wrapping the stream in a a try/with, close() is triggered at the end that closes 
+		// the underlining Cypher transactions
+		//
+		try ( 
+			// We're returning a stream of paths per query (each query can return more than one)
+			// which need to be flat-mapped to the outside (the stream of stream of paths becomes a single stream of paths)
+			Stream<EvidencePathNode> resultStrm = cypherQueries
+				.parallelStream ()
+				.flatMap ( query -> 
+				{
+					// DEBUG log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startIri, query );
 
-			Stream<List<ONDEXEntity>> cypaths = this.findPathsWithPaging ( 
-				query, startGeneIri, luceneMgr, cyProvider 
-			);
-									
-			// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
-				
-			// Now map the paths to the format required by the traverser
-			// We're returning a stream of paths, (each query can return more than one)
-			return cypaths.map ( path -> buildEvidencePath ( path ) );
-		})
-		.collect ( Collectors.toList () ); // And eventually we extract List<EvPathNode>
+					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
+					Stream<List<ONDEXEntity>> cypaths = this.findPathsWithPaging ( 
+						query, startGeneIri, luceneMgr, cyProvider 
+					);
+					// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
+						
+					// Now map the paths to the format required by the traverser (see above)
+					return cypaths.map ( path -> buildEvidencePath ( path ) );
+				})
+		) // try-with
+		{
+			// Now further convert into a collection, the format required as return value.
+			result = resultStrm.collect ( Collectors.toList () );
+		}
 					
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		if ( filter != null ) result = filter.filterPaths ( result );
@@ -408,7 +411,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			/**
 			 * Issue the query with the current offset.
 			 */
-			private void doPaging ()
+			private void nextPage ()
 			{
 				// Close the stream that is going to be disposed
 				if ( this.currentPageStream != null ) this.currentPageStream.close ();
@@ -431,6 +434,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					: performanceTracker.track ( queryAction, pagedQuery );
 					
 				this.currentPageIterator = currentPageStream.iterator ();
+				
+				// Force the closure of the last empty query
+				if ( !this.currentPageIterator.hasNext () ) this.currentPageStream.close ();
 			}
 			
 			/**
@@ -442,9 +448,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				return wrapException ( () -> 
 				{
 					// do it the first time
-					if ( currentPageIterator == null ) this.doPaging ();
+					if ( currentPageIterator == null ) this.nextPage ();
 					// and whenever the current page is over
-					else if ( !currentPageIterator.hasNext () ) doPaging ();
+					else if ( !currentPageIterator.hasNext () ) nextPage ();
 					
 					// if false the first time => no result. Else, it becomes false for the first offset that is empty
 					return currentPageIterator.hasNext ();

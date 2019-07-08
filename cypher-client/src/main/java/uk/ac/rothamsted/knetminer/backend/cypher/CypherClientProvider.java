@@ -87,7 +87,7 @@ public class CypherClientProvider
 	public <T> T query ( Function<CypherClient, T> action ) {
 		return query ( action, false );
 	}
-
+	
 	/**
 	 * This is similar to {@link #query(Function)}, but handles query code that is supposed to issue
 	 * read-only operations and return a stream depending on the query: it gives the action 

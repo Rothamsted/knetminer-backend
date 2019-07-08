@@ -5,6 +5,7 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Spliterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Entity;
 import org.neo4j.driver.v1.types.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.searchable.LuceneEnv;
@@ -37,6 +40,11 @@ public class CypherClient implements AutoCloseable
 	private Session neoSession;
 	private Transaction tx;
 	
+  // Allows for some sanity check and diagnostics.
+	private AtomicInteger openTxsCount = new AtomicInteger ( 0 );
+	
+	
+	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	/**
 	 * Visibility is protected cause you're not supposed to instantiate me directly, you should use the
@@ -104,7 +112,7 @@ public class CypherClient implements AutoCloseable
 			? this.tx.run ( query )
 			: this.tx.run ( query, params )				
 		;
-						
+				
 		Spliterator<Record> splitr = spliteratorUnknownSize ( cursor, Spliterator.IMMUTABLE );
 		return StreamSupport.stream ( splitr, false );		
 	}
@@ -149,7 +157,7 @@ public class CypherClient implements AutoCloseable
   public Stream<List<String>> findPathIris ( String query ) {
   	return findPathIris ( query, null );
   }
-
+  
   /**
    * Begins a new transaction in the session this client is based upon, using the 
    * {@link Session#beginTransaction() corresponding Neo4j method}.
@@ -157,8 +165,16 @@ public class CypherClient implements AutoCloseable
    * Multiple transactions can be opened during a given session, 
 	 * but sequentially.
    */
-	public synchronized void begin () {
+	public synchronized void begin () 
+	{
 		tx = neoSession.beginTransaction ();
+
+		// There are more opened transactions than the expected degree of parallelism.
+		// This shouldn't happen, this limits are expected when using of ForkJoinPool. 
+		if ( openTxsCount.incrementAndGet () > 256 || openTxsCount.get () > Runtime.getRuntime ().availableProcessors () )
+			log.error ( 
+				"====> It seems there are too many Cypher transactions opened ({}), could be a bug", openTxsCount.get () 
+			);
 	}
 
 	/**
@@ -168,6 +184,7 @@ public class CypherClient implements AutoCloseable
 	{
 		tx.close ();
 		tx = null;
+		openTxsCount.decrementAndGet ();
 	}
 		
 	/**
