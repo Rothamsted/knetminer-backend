@@ -26,12 +26,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -50,6 +52,7 @@ import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
+import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
@@ -91,9 +94,15 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 */
 	public static final String CONFIG_CY_PAGE_SIZE = "knetminer.backend.cypher.pageSize";
 	
-	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
+	protected static AbstractApplicationContext springContext;
 	
-	private static AbstractApplicationContext springContext;
+	protected final static String PAGINATION_TRAIL = "\nSKIP $offset LIMIT $pageSize";
+
+	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
+
+	/** Tracks how many queries x genes have been completed so far */
+	private PercentProgressLogger queryProgressLogger = null;
+	
 	
 	private static class QueryPerformanceTracker 
 	{
@@ -118,18 +127,32 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		 * A wrapper that tracks the performance of multiple queries, during the execution of the 
 		 * {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
 		 */
-		public QueryPerformanceTracker () {}
+		public QueryPerformanceTracker () 
+		{
+			getCypherQueries().forEach ( q -> {
+				this.query2StartTimes.put ( q, 0l );
+				this.query2FetchTimes.put ( q, 0l );
+				this.query2Invocations.put ( q, 0 );
+				this.query2PathLen.put ( q, 0l );
+				this.query2Results.put ( q, 0 );
+			});
+		}
 
 		public Stream<List<ONDEXEntity>> track (
 			Function<String, Stream<List<ONDEXEntity>>> queryAction,
 			String query
 		)
 		{
+			// We keep them without the pagination tail
+			final String queryNrm = StringUtils.removeEnd ( query, PAGINATION_TRAIL );
+			
 			@SuppressWarnings ( "unchecked" )
 			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ];
 			
 			long startTime = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
-			query2StartTimes.compute ( query, (q,t) -> t == null ? startTime : t + startTime );
+			
+			
+			query2StartTimes.compute ( queryNrm, (q,t) -> t + startTime );
 			
 			XStopWatch fetchTimer = new XStopWatch ();
 			
@@ -139,20 +162,23 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				// stats timing the first time/path it's invoked, then onClose() will get the total time elapsed
 				// after all the stream has been consumed
 				fetchTimer.resumeOrStart (); 
-				query2Results.compute ( query, (q,nr) -> nr == null ? 1 : nr + 1 );
-				query2PathLen.compute ( query, (q,pl) -> pl == null ? pathEls.size () : pl + pathEls.size () );
+				query2Results.compute ( queryNrm, (q,nr) -> nr + 1 );
+				query2PathLen.compute ( queryNrm, (q,pl) -> pl + pathEls.size () );
 			})
-			.onClose ( () ->
+			.onClose ( () -> {
 				// Track what is presumably the fetch time 
 			  // (we come here after all the paths in the stream have been consumed) 
 				query2FetchTimes.compute (
-					query, 
-					(q,t) -> !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () + ( t == null ? 0 : t ) )
-			);
+					queryNrm, 
+					(q,t) -> ( !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () ) + t
+				);
+				// DEBUG
+				if ( invocations.get () % 1000 == 0 ) logStats (); 
+			});
 			
-			query2Invocations.compute ( query, (q,n) -> n == null ? 0 : n + 1 );
+			query2Invocations.compute ( queryNrm, (q,n) -> n + 1 );
 			invocations.incrementAndGet ();
-			
+						
 			return result [ 0 ];
 		}
 		
@@ -175,7 +201,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			{
 				int nresults = query2Results.getOrDefault ( query, 0 );
 				int nqueries = query2Invocations.get ( query );
-				
+								
 				out.printf (
 					"\"%s\"\t%d\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
 					escapeJava ( query ),
@@ -247,7 +273,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	@Override
-	@SuppressWarnings ( { "rawtypes", "unchecked" } )
+	@SuppressWarnings ( { "rawtypes" } )
 	public List<EvidencePathNode> traverseGraph ( 
 		ONDEXGraph graph, ONDEXConcept concept, FilterPaths<EvidencePathNode> filter
 	)
@@ -260,7 +286,6 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
  		
-		List<String> cypherQueries = (List<String>) springContext.getBean ( "semanticMotifsQueries" );
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
 		// So, let's get the starting IRI from the concept parameter.
@@ -282,20 +307,25 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		try ( 
 			// We're returning a stream of paths per query (each query can return more than one)
 			// which need to be flat-mapped to the outside (the stream of stream of paths becomes a single stream of paths)
-			Stream<EvidencePathNode> resultStrm = cypherQueries
+			Stream<EvidencePathNode> resultStrm = getCypherQueries ()
 				.parallelStream ()
 				.flatMap ( query -> 
 				{
-					// DEBUG log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startIri, query );
+					//log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startGeneIri, query );
 
 					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 					Stream<List<ONDEXEntity>> cypaths = this.findPathsWithPaging ( 
 						query, startGeneIri, luceneMgr, cyProvider 
 					);
-					// DEBUG log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startIri, query );
 						
 					// Now map the paths to the format required by the traverser (see above)
-					return cypaths.map ( path -> buildEvidencePath ( path ) );
+					return cypaths
+						.map ( path -> buildEvidencePath ( path ) )
+						.onClose ( () -> 
+						{ 
+							if ( queryProgressLogger != null ) queryProgressLogger.updateWithIncrement ();
+							//log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startGeneIri, query ) ;
+						});
 				})
 		) // try-with
 		{
@@ -375,12 +405,20 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		if ( this.getOption ( "isPerformanceTrackingEnabled", false ) )
 			this.performanceTracker = new QueryPerformanceTracker ();
+				
+		this.queryProgressLogger = new PercentProgressLogger ( 
+			"{}% of traversal queries processed",
+			concepts.size () * getCypherQueries ().size () 
+		);
 		
 		try {
 			return super.traverseGraph ( graph, concepts, filter );
 		}
-		finally {
+		finally 
+		{
 			if ( this.performanceTracker != null ) this.performanceTracker.logStats ();
+			this.performanceTracker = null;
+			this.queryProgressLogger = null;
 		}
 	}
 	
@@ -394,7 +432,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider 	cyProvider
 	)
 	{
-		String pagedQuery = query + "\nSKIP $offset LIMIT $pageSize";
+		String pagedQuery = query + PAGINATION_TRAIL;
 
 		long pageSize = this.getPageSize ();
 
@@ -428,7 +466,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.queryToStream (
 					cyClient -> cyClient.findPaths ( luceneMgr, q, params )
 				);
-				
+								
 				this.currentPageStream = performanceTracker == null 
 					? queryAction.apply ( pagedQuery )
 					: performanceTracker.track ( queryAction, pagedQuery );
@@ -487,6 +525,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			spliteratorUnknownSize ( pathsItr,	IMMUTABLE	| NONNULL	), 
 			false 
 		);		
+	}
+	
+	@SuppressWarnings ( "unchecked" )
+	protected static List<String> getCypherQueries ()
+	{
+		return (List<String>) springContext.getBean ( "semanticMotifsQueries" );
 	}
 	
 }
