@@ -80,7 +80,6 @@ class CyTraverserPerformanceTracker
 		
 		long startTime = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
 		
-		
 		query2StartTimes.compute ( queryNrm, (q,t) -> t + startTime );
 		
 		XStopWatch fetchTimer = new XStopWatch ();

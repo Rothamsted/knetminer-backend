@@ -8,21 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -44,7 +37,6 @@ import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
-import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
@@ -101,9 +93,6 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * Has to be initialised by {@link AbstractGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, FilterPaths)}.
 	 */
 	protected CyTraverserPerformanceTracker performanceTracker = null;
-
-	/** Used in {@link #queryWithTimeout(String, String, LuceneEnv, CypherClientProvider, long)} */
-	private TimeLimiter timeLimiter = new SimpleTimeLimiter ();
 
 	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
@@ -198,11 +187,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					//log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startGeneIri, query );
 
 					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-					// But we also need to wrap it into a timeout trigger
-					Stream<List<ONDEXEntity>> cypaths = this.queryWithTimeout ( 
-						query, startGeneIri, luceneMgr, cyProvider, queryTimeout 
+					// This will also deal with timeouts and their tracking on the performanceTracker
+					Stream<List<ONDEXEntity>> cypaths = PagedCyPathFinder.findPathsWithPaging ( 
+						startGeneIri, query, getPageSize (), luceneMgr, cyProvider,
+						performanceTracker, queryTimeout
 					);
-											
+																		
 					// Now map the paths to the format required by the traverser (see above)
 					return cypaths
 						.map ( path -> buildEvidencePath ( path ) )
@@ -273,7 +263,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CONFIG_CY_PAGE_SIZE, 500 );
+		return this.getOption ( CONFIG_CY_PAGE_SIZE, 2500 );
 	}
 
 	public void setPageSize ( long pageSize ) {
@@ -308,44 +298,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			this.queryProgressLogger = null;
 		}
 	}
-	
-	
-	private Stream<List<ONDEXEntity>> queryWithTimeout ( 
-		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider cyProvider,
-		long timeoutMs
-	)
-	{
-		Callable<Stream<List<ONDEXEntity>>> queryAction = () -> PagedCyPathFinder.findPathsWithPaging ( 
-			startGeneIri, query, this.getPageSize (), luceneMgr, cyProvider, performanceTracker
-		);
 
-		try
-		{
-			// No timeout wanted
-			if ( timeoutMs == -1 ) return queryAction.call ();
-			
-			return this.timeLimiter.callWithTimeout ( 
-				queryAction, timeoutMs, TimeUnit.MILLISECONDS, true 
-			);
-		}
-		catch ( UncheckedTimeoutException ex ) 
-		{
-			if ( this.performanceTracker != null )
-				// TODO: log once when the tracker is disabled
-				this.performanceTracker.trackTimeout ( query );
-			return Stream.empty ();
-		}
-		catch ( Exception ex )
-		{
-			throw ExceptionUtils.buildEx ( 
-				GenericNeo4jException.class, 
-				"Error while traversing Neo4j gene graph: {}. Gene IRI is: <{}>. Query is: \"{}\"",
-				ex.getMessage (),
-				startGeneIri,
-				StringEscapeUtils.escapeJava ( query )
-			);
-		}	
-	}
 	
 	@SuppressWarnings ( "unchecked" )
 	protected static List<String> getCypherQueries ()
