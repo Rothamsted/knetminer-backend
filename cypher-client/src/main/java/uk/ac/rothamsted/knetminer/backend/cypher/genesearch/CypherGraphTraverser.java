@@ -1,39 +1,28 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
-import static java.util.Spliterator.IMMUTABLE;
-import static java.util.Spliterator.NONNULL;
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
-import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -53,7 +42,6 @@ import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
-import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
 import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
@@ -93,137 +81,31 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * This allows for changing {@link #getPageSize()} via {@link #setOption(String, Object)}.
 	 */
 	public static final String CONFIG_CY_PAGE_SIZE = "knetminer.backend.cypher.pageSize";
+
+	/**
+	 * This allows for stopping queries when they don't complete within a given time.
+	 * We use a pretty low default (usually 1s) if you don't specify it. 
+	 * -1 means the queries aren't timed out on the client side, but the Neo4j server might still be 
+	 * enforcing limits.
+	 */
+	public static final String CONFIG_CY_QUERY_TIMEOUT = "knetminer.backend.cypher.queryTimeoutMs";
+
 	
 	protected static AbstractApplicationContext springContext;
 	
-	protected final static String PAGINATION_TRAIL = "\nSKIP $offset LIMIT $pageSize";
-
-	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	/** Tracks how many queries x genes have been completed so far */
 	private PercentProgressLogger queryProgressLogger = null;
 	
-	
-	private static class QueryPerformanceTracker 
-	{
-		/** Times to send the query and get a first reply **/
-		private Map<String, Long> query2StartTimes = Collections.synchronizedMap ( new HashMap<> () );
-		/** Times to fetch all the results **/
-		private Map<String, Long> query2FetchTimes = Collections.synchronizedMap ( new HashMap<> () );
-		/** No of results (pahts) returned by each query **/
-		private Map<String, Integer> query2Results = Collections.synchronizedMap ( new HashMap<> () );
-
-		/** No of query invocations ({@code #invocations = #queries x #genes}) **/
-		private Map<String, Integer> query2Invocations = Collections.synchronizedMap ( new HashMap<> () );
-		/** Sums of returned path lengths for the each query **/
-		private Map<String, Long> query2PathLen = Collections.synchronizedMap ( new HashMap<> () );
-		
-		/** Total no. of invocations, ie #queries x #genes **/ 
-		private AtomicInteger invocations = new AtomicInteger ( 0 );
-		
-		private final Logger log = LoggerFactory.getLogger ( this.getClass () );
-		
-		/**
-		 * A wrapper that tracks the performance of multiple queries, during the execution of the 
-		 * {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
-		 */
-		public QueryPerformanceTracker () 
-		{
-			getCypherQueries().forEach ( q -> {
-				this.query2StartTimes.put ( q, 0l );
-				this.query2FetchTimes.put ( q, 0l );
-				this.query2Invocations.put ( q, 0 );
-				this.query2PathLen.put ( q, 0l );
-				this.query2Results.put ( q, 0 );
-			});
-		}
-
-		public Stream<List<ONDEXEntity>> track (
-			Function<String, Stream<List<ONDEXEntity>>> queryAction,
-			String query
-		)
-		{
-			// We keep them without the pagination tail
-			final String queryNrm = StringUtils.removeEnd ( query, PAGINATION_TRAIL );
-			
-			@SuppressWarnings ( "unchecked" )
-			Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ];
-			
-			long startTime = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
-			
-			
-			query2StartTimes.compute ( queryNrm, (q,t) -> t + startTime );
-			
-			XStopWatch fetchTimer = new XStopWatch ();
-			
-			result [ 0 ] = result [ 0 ]
-			.peek ( pathEls -> 
-			{
-				// stats timing the first time/path it's invoked, then onClose() will get the total time elapsed
-				// after all the stream has been consumed
-				fetchTimer.resumeOrStart (); 
-				query2Results.compute ( queryNrm, (q,nr) -> nr + 1 );
-				query2PathLen.compute ( queryNrm, (q,pl) -> pl + pathEls.size () );
-			})
-			.onClose ( () -> {
-				// Track what is presumably the fetch time 
-			  // (we come here after all the paths in the stream have been consumed) 
-				query2FetchTimes.compute (
-					queryNrm, 
-					(q,t) -> ( !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () ) + t
-				);
-				// DEBUG
-				if ( invocations.get () % 1000 == 0 ) logStats (); 
-			});
-			
-			query2Invocations.compute ( queryNrm, (q,n) -> n + 1 );
-			invocations.incrementAndGet ();
-						
-			return result [ 0 ];
-		}
-		
-		public void logStats ()
-		{
-			StringWriter statsSW = new StringWriter ();
-			PrintWriter out = new PrintWriter ( statsSW );
-			
-			final int nTotQueries = invocations.get ();
-			out.printf ( "\n\nTotal queries issued: %s\n", nTotQueries );
-			if ( nTotQueries == 0 ) return;
-			
-			out.println (   
-				"Query\tTot Invocations\tTot Returned Paths\tAvg Ret Paths\tAvg Start Time(ms)\tAvg Fetch Time(ms)\tAvg Path Len" 
-			);
-			
-			SortedSet<String> queries = new TreeSet<> ( (s1, s2) -> s1.length () - s2.length () );
-			queries.addAll ( query2Invocations.keySet () );
-			for ( String query: queries )
-			{
-				int nresults = query2Results.getOrDefault ( query, 0 );
-				int nqueries = query2Invocations.get ( query );
-								
-				out.printf (
-					"\"%s\"\t%d\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
-					escapeJava ( query ),
-					nqueries,
-					nresults,
-					nqueries == 0 ? 0d : 1d * nresults / nqueries,
-					nqueries == 0 ? 0d : 1d * query2StartTimes.getOrDefault ( query, 0l ) / nqueries,
-					nqueries == 0 ? 0d : 1d * query2FetchTimes.getOrDefault ( query, 0l ) / nqueries,
-					nresults == 0 ? 0d : 1d * query2PathLen.getOrDefault ( query, 0l ) / nresults
-				);
-			}
-			out.println ( "" );
-
-			log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", statsSW.toString () );
-		}
-	}
-	
 	/**
 	 * Has to be initialised by {@link AbstractGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, FilterPaths)}.
 	 */
-	protected QueryPerformanceTracker performanceTracker = null;
-	
+	protected CyTraverserPerformanceTracker performanceTracker = null;
+
+	/** Used in {@link #queryWithTimeout(String, String, LuceneEnv, CypherClientProvider, long)} */
+	private TimeLimiter timeLimiter = new SimpleTimeLimiter ();
+
+	protected final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public CypherGraphTraverser () {}
 	
@@ -285,6 +167,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   			"Cannot initialise the Cypher resourceResource traverser: "
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
+  	
+  	long queryTimeout = this.getOption ( CONFIG_CY_QUERY_TIMEOUT, 1000 );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
@@ -314,10 +198,11 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					//log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startGeneIri, query );
 
 					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-					Stream<List<ONDEXEntity>> cypaths = this.findPathsWithPaging ( 
-						query, startGeneIri, luceneMgr, cyProvider 
+					// But we also need to wrap it into a timeout trigger
+					Stream<List<ONDEXEntity>> cypaths = this.queryWithTimeout ( 
+						query, startGeneIri, luceneMgr, cyProvider, queryTimeout 
 					);
-						
+											
 					// Now map the paths to the format required by the traverser (see above)
 					return cypaths
 						.map ( path -> buildEvidencePath ( path ) )
@@ -396,18 +281,20 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	}
 	
 	/**
-	 * Wraps the default implementation to enable to track query performance, via {@link QueryPerformanceTracker}. 
+	 * Wraps the default implementation to enable to track query performance, via {@link CyTraverserPerformanceTracker}. 
 	 */
 	@Override
 	@SuppressWarnings ( "rawtypes" )
 	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( 
 		ONDEXGraph graph, Set<ONDEXConcept> concepts, FilterPaths<EvidencePathNode> filter )
 	{
+		init ();
+		
 		if ( this.getOption ( "isPerformanceTrackingEnabled", false ) )
-			this.performanceTracker = new QueryPerformanceTracker ();
+			this.performanceTracker = new CyTraverserPerformanceTracker ();
 				
 		this.queryProgressLogger = new PercentProgressLogger ( 
-			"{}% of traversal queries processed",
+			"{}% of graph traversing queries processed",
 			concepts.size () * getCypherQueries ().size () 
 		);
 		
@@ -422,109 +309,42 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		}
 	}
 	
-	/**
-	 * This uses {@link CypherClient#findPaths(LuceneEnv, String, Value)} to get the paths for a gene
-	 * that are reachable from the query parameter. Additionally, this method query the Neo4j server 
-	 * in a paginated fashion, by fetching {@link #getPageSize()} paths per query.
-	 *  
-	 */
-	protected Stream<List<ONDEXEntity>> findPathsWithPaging ( 
-		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider 	cyProvider
+	
+	private Stream<List<ONDEXEntity>> queryWithTimeout ( 
+		String query, String startGeneIri, LuceneEnv luceneMgr, CypherClientProvider cyProvider,
+		long timeoutMs
 	)
 	{
-		String pagedQuery = query + PAGINATION_TRAIL;
+		Callable<Stream<List<ONDEXEntity>>> queryAction = () -> PagedCyPathFinder.findPathsWithPaging ( 
+			startGeneIri, query, this.getPageSize (), luceneMgr, cyProvider, performanceTracker
+		);
 
-		long pageSize = this.getPageSize ();
-
-		// We need this special iterator to do the paging trick. 
-		// Its hasNext() method asks the underlining stream if it has more items. When not, it issues another
-		// query with a new offset value and returns false when the latter does.
-		//
-		Iterator<List<ONDEXEntity>> pathsItr = new Iterator<List<ONDEXEntity>>()
+		try
 		{
-			private long offset = -pageSize;
-			private Stream<List<ONDEXEntity>> currentPageStream = null;
-			private Iterator<List<ONDEXEntity>> currentPageIterator = null;
-
-			/**
-			 * Issue the query with the current offset.
-			 */
-			private void nextPage ()
-			{
-				// Close the stream that is going to be disposed
-				if ( this.currentPageStream != null ) this.currentPageStream.close ();
-					
-				offset += pageSize;
-				log.trace ( "offset: {} for query: {}", offset, query );
-				
-				Value params = Values.parameters ( 
-					"startIri", startGeneIri,
-					"offset", offset,
-					"pageSize", pageSize
-				); 
-				
-				Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.queryToStream (
-					cyClient -> cyClient.findPaths ( luceneMgr, q, params )
-				);
-								
-				this.currentPageStream = performanceTracker == null 
-					? queryAction.apply ( pagedQuery )
-					: performanceTracker.track ( queryAction, pagedQuery );
-					
-				this.currentPageIterator = currentPageStream.iterator ();
-				
-				// Force the closure of the last empty query
-				if ( !this.currentPageIterator.hasNext () ) this.currentPageStream.close ();
-			}
+			// No timeout wanted
+			if ( timeoutMs == -1 ) return queryAction.call ();
 			
-			/**
-			 * Behaves as explained above
-			 */
-			@Override
-			public boolean hasNext ()
-			{
-				return wrapException ( () -> 
-				{
-					// do it the first time
-					if ( currentPageIterator == null ) this.nextPage ();
-					// and whenever the current page is over
-					else if ( !currentPageIterator.hasNext () ) nextPage ();
-					
-					// if false the first time => no result. Else, it becomes false for the first offset that is empty
-					return currentPageIterator.hasNext ();
-				});
-			}
-
-			@Override
-			public List<ONDEXEntity> next ()
-			{
-				// If you call it at the appropriate time, it was prepared by the hasNext() method above
-				return wrapException ( () -> currentPageIterator.next () );
-			}
-			
-			/** In case of exception, re-throws Neo4jException with the query that caused it */
-			private <T> T wrapException ( Supplier<T> action ) 
-			{
-				try {
-					return action.get ();
-				}
-				catch ( RuntimeException ex ) 
-				{
-					throw buildEx ( 
-						GenericNeo4jException.class, ex, 
-						"Error: %s. While finding paths for <%s>, using the query: %s", 
-						ex.getMessage (), startGeneIri, query 
-					);
-				}
-			}
-		}; // iterator
-		
-		// So, the iterator above goes through multiple streams (one per query page), let's turn it back to
-		// a stream, as expected by the nethod invoker
-		return StreamSupport.stream ( 
-			spliteratorUnknownSize ( pathsItr,	IMMUTABLE	| NONNULL	), 
-			false 
-		);		
+			return this.timeLimiter.callWithTimeout ( 
+				queryAction, timeoutMs, TimeUnit.MILLISECONDS, true 
+			);
+		}
+		catch ( UncheckedTimeoutException ex ) 
+		{
+			if ( this.performanceTracker != null )
+				// TODO: log once when the tracker is disabled
+				this.performanceTracker.trackTimeout ( query );
+			return Stream.empty ();
+		}
+		catch ( Exception ex )
+		{
+			throw ExceptionUtils.buildEx ( 
+				GenericNeo4jException.class, 
+				"Error while traversing Neo4j gene graph: {}. Gene IRI is: <{}>. Query is: \"{}\"",
+				ex.getMessage (),
+				startGeneIri,
+				StringEscapeUtils.escapeJava ( query )
+			);
+		}	
 	}
 	
 	@SuppressWarnings ( "unchecked" )

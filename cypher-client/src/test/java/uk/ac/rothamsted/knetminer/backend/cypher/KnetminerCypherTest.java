@@ -3,6 +3,9 @@ package uk.ac.rothamsted.knetminer.backend.cypher;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -118,5 +121,23 @@ public class KnetminerCypherTest
 				}
 			});
 		});
+	}
+	
+	
+	//@Test
+	public void testRepeatedQueries () throws IOException
+	{
+		List<String> queries = getQueries ();
+		
+		Map<String, Long> freqs = queries.stream ()
+		.collect ( Collectors.groupingBy ( Function.identity (), Collectors.counting () ) );
+		
+		log.info ( "---- {} queries", freqs.size () );
+		
+		freqs
+			.entrySet ()
+			.stream ()
+			.sorted ( (e1, e2) -> Long.compare ( e2.getValue (), e1.getValue () ) )
+			.forEach ( e -> log.info ( "{}: {}", e.getValue (), e.getKey () ) );
 	}
 }
