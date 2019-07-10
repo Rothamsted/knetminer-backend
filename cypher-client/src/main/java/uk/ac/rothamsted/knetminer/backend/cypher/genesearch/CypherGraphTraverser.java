@@ -4,10 +4,12 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -172,7 +174,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			));
 				
 		// And now let's hand it to Cypher.
-		List<EvidencePathNode> result;
+		List<EvidencePathNode> result = new ArrayList<> ();
 		
 		// By wrapping the stream in a a try/with, close() is triggered at the end that closes 
 		// the underlining Cypher transactions
@@ -188,11 +190,16 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 					// This will also deal with timeouts and their tracking on the performanceTracker
-					Stream<List<ONDEXEntity>> cypaths = PagedCyPathFinder.findPathsWithPaging ( 
-						startGeneIri, query, getPageSize (), luceneMgr, cyProvider,
+					// Moreover, consider the performance tracker too
+					Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> PagedCyPathFinder.findPathsWithPaging ( 
+						startGeneIri, q, getPageSize (), luceneMgr, cyProvider,
 						performanceTracker, queryTimeout
 					);
-																		
+					
+					Stream<List<ONDEXEntity>> cypaths = this.performanceTracker == null 
+						? queryAction.apply ( query )
+						: this.performanceTracker.track ( queryAction, query );
+					
 					// Now map the paths to the format required by the traverser (see above)
 					return cypaths
 						.map ( path -> buildEvidencePath ( path ) )

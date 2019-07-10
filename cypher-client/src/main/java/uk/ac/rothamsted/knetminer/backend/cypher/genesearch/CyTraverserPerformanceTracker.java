@@ -149,8 +149,8 @@ class CyTraverserPerformanceTracker
 				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
 				ncompleted == 0 ? 0d : 1d * nresults / ncompleted,
-				ncompleted == 0 ? 0d : 1d * query2StartTimes.get ( query ) / ncompleted,
-				ncompleted == 0 ? 0d : 1d * query2FetchTimes.get ( query ) / ncompleted,
+				nqueries == 0 ? 0d : 1d * query2StartTimes.get ( query ) / nqueries,
+				nqueries == 0 ? 0d : 1d * query2FetchTimes.get ( query ) / nqueries,
 				nresults == 0 ? 0d : 1d * query2PathLen.get ( query ) / nresults
 			);
 		}

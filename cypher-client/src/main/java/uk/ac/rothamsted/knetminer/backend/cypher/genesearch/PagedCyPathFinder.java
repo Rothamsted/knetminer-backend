@@ -3,15 +3,12 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import static java.util.Spliterator.IMMUTABLE;
 import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterators.spliteratorUnknownSize;
-import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -102,16 +99,12 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>
 			"offset", offset,
 			"pageSize", pageSize
 		); 
-		
-		Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> cyProvider.queryToStream (
-			cyClient -> cyClient.findPaths ( luceneMgr, q, params )
-		);
-			
+					
 		String pagedQuery = query + PAGINATION_TRAIL;
 
-		this.currentPageStream = performanceTracker == null 
-			? queryAction.apply ( pagedQuery )
-			: performanceTracker.track ( queryAction, pagedQuery );
+		this.currentPageStream = cyProvider.queryToStream (
+			cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
+		);
 			
 		this.currentPageIterator = currentPageStream.iterator ();
 		
