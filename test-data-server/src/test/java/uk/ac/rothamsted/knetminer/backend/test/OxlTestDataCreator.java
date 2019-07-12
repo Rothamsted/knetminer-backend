@@ -14,7 +14,7 @@ import net.sourceforge.ondex.export.oxl.Export;
 import net.sourceforge.ondex.parser.oxl.Parser;
 
 /**
- * TODO: comment me!
+ * Takes a test OXL and adds a few items, which are useful to write unit tests.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>19 Feb 2019</dd></dl>
