@@ -128,7 +128,14 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	public void close ()
 	{
 		if ( this.wasClosed ) return;
-		if ( this.currentPageStream != null ) this.currentPageStream.close ();
-		this.wasClosed = true;
+		try {
+			if ( this.currentPageIterator == null ) return; // was never used
+			if ( !this.currentPageIterator.hasNext () ) return; // was already closed by nextPage()
+			if ( this.currentPageStream == null ) return; // TODO: warning/error?
+			this.currentPageStream.close ();
+		}
+		finally {
+			this.wasClosed = true;
+		}
 	}	
 }
