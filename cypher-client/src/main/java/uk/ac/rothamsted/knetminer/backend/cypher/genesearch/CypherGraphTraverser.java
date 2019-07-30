@@ -190,39 +190,41 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		.parallelStream ()
 		.forEach ( query -> 
 		{
-			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-			// This will also deal with timeouts and their tracking on the performanceTracker
-			// Moreover, consider the performance tracker too
-			try ( 
-				PagedCyPathFinder pathsItr = new PagedCyPathFinder (
-					startGeneIri, query, getPageSize (), cyProvider, luceneMgr
-				)
-			)
-			{
-				// Used below, by the performanceTracker
-				int counters[] = { 0, 0 };
-				
-				// Wrap the query into a timeout manager
-				Runnable queryAction = () -> timedQuery ( 
-		  		() -> pathsItr.forEachRemaining ( 
-		  			path -> { 
-		  				result.add ( buildEvidencePath ( path ) );
-		  				counters [ 0 ]++; // no. of resulting paths
-		  				counters [ 1 ] += path.size (); // total path lengths
-		  			}), 
-		  		queryTimeout, 
-		  		startGeneIri, 
-		  		query 
-				);
-	
-				// Further wrap it with machinery that accumulates query performance-related stats
-				if ( this.performanceTracker == null )
-					queryAction.run ();
-				else
-					this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
-				
-				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
-			} // try
+			// Used below, by the performanceTracker
+			int counters[] = { 0, 0 };
+			
+			// Wrap the query into a timeout manager
+			Runnable queryAction = () -> timedQuery ( 
+	  		() -> 
+	  		{
+	  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
+	  			// This will also deal with timeouts and their tracking on the performanceTracker
+	  			// Moreover, consider the performance tracker too
+	  			try ( 
+	  				PagedCyPathFinder pathsItr = new PagedCyPathFinder (
+  						startGeneIri, query, getPageSize (), cyProvider, luceneMgr ) 
+  				)
+	  			{
+		  			pathsItr.forEachRemaining ( 
+		  				path -> { 
+		  					result.add ( buildEvidencePath ( path ) );
+		  					counters [ 0 ]++; // no. of resulting paths
+		  					counters [ 1 ] += path.size (); // total path lengths
+		  				});
+	  			} // try pathsItr
+	  		}, // queryAction 
+	  		queryTimeout, 
+	  		startGeneIri, 
+	  		query 
+			);
+
+			// Further wrap it with machinery that accumulates query performance-related stats
+			if ( this.performanceTracker == null )
+				queryAction.run ();
+			else
+				this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
+			
+			if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
 		}); // stream.forEach
 									
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
