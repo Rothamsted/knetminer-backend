@@ -75,7 +75,7 @@ public class CypherGraphTraverserIT
 			.findAny ()
 			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
 		
-		graphTraverser.setOption ( CypherGraphTraverser.CFGOPT_CY_PAGE_SIZE, 5 ); // Just to try out
+		graphTraverser.setOption ( CypherGraphTraverser.CFGOPT_CY_PAGE_SIZE, 5l ); // Just to try out
 		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graphResource.getGraph (), startConcept, null );
 
 		assertTrue ( "No EvidencePath returned!", paths.size () > 0 );
@@ -128,7 +128,8 @@ public class CypherGraphTraverserIT
 	@SuppressWarnings ( "rawtypes" )
 	public void testMultipleStartConcepts ()
 	{
-		graphTraverser.setOption ( "isPerformanceTrackingEnabled", true );
+		// Just to see the reports
+		graphTraverser.setOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, true );
 
 		Stream<String> conceptIris = Stream.of ( 
 			iri ( "bkr:gene_at4g26080_locus_2005488"	),

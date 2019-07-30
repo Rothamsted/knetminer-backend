@@ -6,7 +6,6 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -169,7 +168,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
   	
-  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 1000 );
+  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 1000l, Long::parseUnsignedLong );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
@@ -194,34 +193,37 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 			// This will also deal with timeouts and their tracking on the performanceTracker
 			// Moreover, consider the performance tracker too
-			Iterator<List<ONDEXEntity>> pathsItr = new PagedCyPathFinder (
-				startGeneIri, query, getPageSize (), cyProvider, luceneMgr
-			);
-					
-			// Used below, by the performanceTracker
-			int counters[] = { 0, 0 };
-			
-			// Wrap the query into a timeout manager
-			Runnable queryAction = () -> timedQuery ( 
-	  		() -> pathsItr.forEachRemaining ( 
-	  			path -> { 
-	  				result.add ( buildEvidencePath ( path ) );
-	  				counters [ 0 ]++; // no. of resulting paths
-	  				counters [ 1 ] += path.size (); // total path lengths
-	  			}), 
-	  		queryTimeout, 
-	  		startGeneIri, 
-	  		query 
-			);
-
-			// Further wrap it with machinery that accumulates query performance-related stats
-			if ( this.performanceTracker == null )
-				queryAction.run ();
-			else
-				this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
-			
-			if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
-		});
+			try ( 
+				PagedCyPathFinder pathsItr = new PagedCyPathFinder (
+					startGeneIri, query, getPageSize (), cyProvider, luceneMgr
+				)
+			)
+			{
+				// Used below, by the performanceTracker
+				int counters[] = { 0, 0 };
+				
+				// Wrap the query into a timeout manager
+				Runnable queryAction = () -> timedQuery ( 
+		  		() -> pathsItr.forEachRemaining ( 
+		  			path -> { 
+		  				result.add ( buildEvidencePath ( path ) );
+		  				counters [ 0 ]++; // no. of resulting paths
+		  				counters [ 1 ] += path.size (); // total path lengths
+		  			}), 
+		  		queryTimeout, 
+		  		startGeneIri, 
+		  		query 
+				);
+	
+				// Further wrap it with machinery that accumulates query performance-related stats
+				if ( this.performanceTracker == null )
+					queryAction.run ();
+				else
+					this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
+				
+				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
+			} // try
+		}); // stream.forEach
 									
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		return filter == null ? result : filter.filterPaths ( result );
@@ -315,14 +317,14 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CFGOPT_CY_PAGE_SIZE, 2500 );
+		return this.getOption ( CFGOPT_CY_PAGE_SIZE, 2500l, Long::parseUnsignedLong );
 	}
 
 	public void setPageSize ( long pageSize ) {
 		this.setOption ( CFGOPT_CY_PAGE_SIZE, pageSize );
 	}
 
-	
+		
 	/**
 	 * Wraps the default implementation to enable to track query performance, via {@link CyTraverserPerformanceTracker}. 
 	 */
@@ -333,7 +335,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		init ();
 		
-		if ( this.getOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, false ) )
+		if ( this.getOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, false, Boolean::parseBoolean ) )
 			this.performanceTracker = new CyTraverserPerformanceTracker ();
 				
 		this.queryProgressLogger = new PercentProgressLogger ( 

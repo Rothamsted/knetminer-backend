@@ -9,8 +9,11 @@ import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.machinezoo.noexception.Exceptions;
+
 import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.searchable.LuceneEnv;
+import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
 
@@ -25,7 +28,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * <dl><dt>Date:</dt><dd>10 Jul 2019</dd></dl>
  *
  */
-class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>
+class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 {
 	/**
 	 * Used internally to compose the Cypher queries
@@ -42,6 +45,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>
 	private Stream<List<ONDEXEntity>> currentPageStream = null;
 	private Iterator<List<ONDEXEntity>> currentPageIterator = null;
 	
+	private boolean wasClosed = false;
 	
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
@@ -63,9 +67,17 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>
 	 */
 	private void nextPage ()
 	{
+		if ( this.wasClosed ) ExceptionUtils.throwEx ( 
+			IllegalArgumentException.class, 
+			"The Cypher Path Finder for this query was closed, gene: <%s>, offset: %d, query: [%s]",
+			this.startGeneIri,
+			this.offset,
+			this.query
+		);
+		
 		// Close the stream that is going to be disposed
 		if ( this.currentPageStream != null ) this.currentPageStream.close ();
-			
+		
 		offset += pageSize;
 		log.trace ( "offset: {} for query: {}", offset, query );
 		
@@ -111,5 +123,12 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>
 		// If you call it at the appropriate time, it was prepared by the hasNext() method above
 		return currentPageIterator.next ();
 	}
-	
+
+	@Override
+	public void close ()
+	{
+		if ( this.wasClosed ) return;
+		if ( this.currentPageStream != null ) this.currentPageStream.close ();
+		this.wasClosed = true;
+	}	
 }
