@@ -5,19 +5,25 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
@@ -39,6 +45,7 @@ import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
+import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
@@ -46,7 +53,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * 
  * <p>This traverser expects certain initialisation parameters:
  * <ul>
- * 	<li>{@link #CONFIG_PATH_OPT} set to a proper Spring config file.</li>
+ * 	<li>{@link #CFGOPT_PATH} set to a proper Spring config file.</li>
  * 	<li>{@code LuceneEnv}, which must be a proper {@link LuceneEnv} instance, corresponding to the {@code graph} parameter
  * 	received by {@link #traverseGraph(ONDEXGraph, ONDEXConcept, FilterPaths)}</li>
  * </ul>
@@ -69,12 +76,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * <p>See tests for examples of the kind of file expected here. Default value for this option is {@code "backend/config.xml"}.</p>
 	 * 
 	 */
-	public static final String CONFIG_PATH_OPT = "knetminer.backend.configPath";
+	public static final String CFGOPT_PATH = "knetminer.backend.configPath";
 
 	/**
 	 * This allows for changing {@link #getPageSize()} via {@link #setOption(String, Object)}.
 	 */
-	public static final String CONFIG_CY_PAGE_SIZE = "knetminer.backend.cypher.pageSize";
+	public static final String CFGOPT_CY_PAGE_SIZE = "knetminer.backend.cypher.pageSize";
 
 	/**
 	 * This allows for stopping queries when they don't complete within a given time.
@@ -82,7 +89,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * -1 means the queries aren't timed out on the client side, but the Neo4j server might still be 
 	 * enforcing limits.
 	 */
-	public static final String CONFIG_CY_QUERY_TIMEOUT = "knetminer.backend.cypher.queryTimeoutMs";
+	public static final String CFGOPT_CY_QUERY_TIMEOUT = "knetminer.backend.cypher.queryTimeoutMs";
 
 	
 	protected static AbstractApplicationContext springContext;
@@ -90,6 +97,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 	/** Tracks how many queries x genes have been completed so far */
 	private PercentProgressLogger queryProgressLogger = null;
+	
+	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
+
 	
 	/**
 	 * Has to be initialised by {@link AbstractGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, FilterPaths)}.
@@ -110,17 +120,17 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		{
 			if ( springContext != null ) return;
 			
-			String cfgPath = this.getOption ( CONFIG_PATH_OPT, "backend/config.xml" );
+			String cfgPath = this.getOption ( CFGOPT_PATH, "backend/config.xml" );
 			File cfgFile = new File ( cfgPath );
 			
 			if ( !cfgFile.exists () ) ExceptionUtils.throwEx ( 
 				UncheckedFileNotFoundException.class,
 				"Backend configuration file '%s' not found, please set %s correctly",
 				cfgFile.getAbsolutePath (),
-				CONFIG_PATH_OPT
+				CFGOPT_PATH
 			);
 			
-			String furl = "file://" + cfgFile.getAbsolutePath ();
+			String furl = "file:///" + cfgFile.getAbsolutePath ();
 			log.info ( "Configuring {} from <{}>", this.getClass ().getCanonicalName (), furl );
 			springContext = new FileSystemXmlApplicationContext ( furl );
 			springContext.registerShutdownHook ();
@@ -159,7 +169,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
   	
-  	long queryTimeout = this.getOption ( CONFIG_CY_QUERY_TIMEOUT, 1000 );
+  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 1000 );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
@@ -174,53 +184,50 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			));
 				
 		// And now let's hand it to Cypher.
-		List<EvidencePathNode> result = new ArrayList<> ();
+		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> () );
 		
-		// By wrapping the stream in a a try/with, close() is triggered at the end that closes 
-		// the underlining Cypher transactions
-		//
-		try ( 
-			// We're returning a stream of paths per query (each query can return more than one)
-			// which need to be flat-mapped to the outside (the stream of stream of paths becomes a single stream of paths)
-			Stream<EvidencePathNode> resultStrm = getCypherQueries ()
-				.parallelStream ()
-				.flatMap ( query -> 
-				{
-					//log.info ( "traversing the gene: \"{}\" with the query: <<{}>>", startGeneIri, query );
-
-					// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-					// This will also deal with timeouts and their tracking on the performanceTracker
-					// Moreover, consider the performance tracker too
-					Function<String, Stream<List<ONDEXEntity>>> queryAction = q -> PagedCyPathFinder.findPathsWithPaging ( 
-						startGeneIri, q, getPageSize (), luceneMgr, cyProvider,
-						performanceTracker, queryTimeout
-					);
-					
-					Stream<List<ONDEXEntity>> cypaths = this.performanceTracker == null 
-						? queryAction.apply ( query )
-						: this.performanceTracker.track ( queryAction, query );
-					
-					// Now map the paths to the format required by the traverser (see above)
-					return cypaths
-						.map ( path -> buildEvidencePath ( path ) )
-						.onClose ( () -> 
-						{ 
-							if ( queryProgressLogger != null ) queryProgressLogger.updateWithIncrement ();
-							//log.info ( "/end traversal of the gene: \"{}\" with the query: [{}]", startGeneIri, query ) ;
-						});
-				})
-		) // try-with
+		// Loop over all the queries with the parameter gene
+		getCypherQueries ()
+		.parallelStream ()
+		.forEach ( query -> 
 		{
-			// Now further convert into a collection, the format required as return value.
-			result = resultStrm.collect ( Collectors.toList () );
-		}
+			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
+			// This will also deal with timeouts and their tracking on the performanceTracker
+			// Moreover, consider the performance tracker too
+			Iterator<List<ONDEXEntity>> pathsItr = new PagedCyPathFinder (
+				startGeneIri, query, getPageSize (), cyProvider, luceneMgr
+			);
 					
+			// Used below, by the performanceTracker
+			int counters[] = { 0, 0 };
+			
+			// Wrap the query into a timeout manager
+			Runnable queryAction = () -> timedQuery ( 
+	  		() -> pathsItr.forEachRemaining ( 
+	  			path -> { 
+	  				result.add ( buildEvidencePath ( path ) );
+	  				counters [ 0 ]++; // no. of resulting paths
+	  				counters [ 1 ] += path.size (); // total path lengths
+	  			}), 
+	  		queryTimeout, 
+	  		startGeneIri, 
+	  		query 
+			);
+
+			// Further wrap it with machinery that accumulates query performance-related stats
+			if ( this.performanceTracker == null )
+				queryAction.run ();
+			else
+				this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
+			
+			if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
+		});
+									
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
-		if ( filter != null ) result = filter.filterPaths ( result );
-
-		return result;
+		return filter == null ? result : filter.filterPaths ( result );
 	}
-
+	
+	
 	/**
 	 * Utility to convert a list of {@link ONDEXEntity}ies, interpreted as a chain of concept/relation pairs, to an
 	 * {@link EvidencePathNode evidence path}, as defined by the {@link AbstractGraphTraverser graph traverser interface}.
@@ -264,18 +271,57 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		return result;
 	}
 	
+	
+	/**
+	 * Decorates a query operation with common controls, namely: executes with time constraints and 
+	 * throws a {@link GenericNeo4jException} if something bad happens.
+	 * 
+	 * In case of timeout, returns {@code timeoutReturnValue} 
+	 */
+	private void timedQuery ( 
+		Runnable queryAction, long queryTimeoutMs, String startGeneIri, String query 
+	)
+	{
+		try
+		{
+			// No timeout wanted
+			if ( queryTimeoutMs == -1 ) queryAction.run ();
+			
+			TIME_LIMITER.callWithTimeout ( 
+				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
+			);
+		}
+		catch ( UncheckedTimeoutException ex ) 
+		{
+			// Let's just ignore it and go on with other queries
+			// The performanceTracker takes note of this event
+		}
+		catch ( Exception ex )
+		{
+			throw ExceptionUtils.buildEx ( 
+				GenericNeo4jException.class, 
+				"Error while traversing Neo4j gene graph: %s. Gene IRI is: <%s>. Query is: \"%s\"",
+				ex.getMessage (),
+				startGeneIri,
+				StringEscapeUtils.escapeJava ( query )
+			);
+		}			
+	}	
+	
+	
 	/**
 	 * The page size used with Cypher queries. {@link #findPathsWithPaging(LuceneEnv, String, String)} is the method where
-	 * this is used. This value can be set via {@link #setOption(String, Object)}, using {@link #CONFIG_CY_PAGE_SIZE}.
+	 * this is used. This value can be set via {@link #setOption(String, Object)}, using {@link #CFGOPT_CY_PAGE_SIZE}.
 	 * 
 	 */
 	public long getPageSize () {
-		return this.getOption ( CONFIG_CY_PAGE_SIZE, 2500 );
+		return this.getOption ( CFGOPT_CY_PAGE_SIZE, 2500 );
 	}
 
 	public void setPageSize ( long pageSize ) {
-		this.setOption ( CONFIG_CY_PAGE_SIZE, pageSize );
+		this.setOption ( CFGOPT_CY_PAGE_SIZE, pageSize );
 	}
+
 	
 	/**
 	 * Wraps the default implementation to enable to track query performance, via {@link CyTraverserPerformanceTracker}. 
@@ -287,7 +333,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		init ();
 		
-		if ( this.getOption ( "isPerformanceTrackingEnabled", false ) )
+		if ( this.getOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, false ) )
 			this.performanceTracker = new CyTraverserPerformanceTracker ();
 				
 		this.queryProgressLogger = new PercentProgressLogger ( 

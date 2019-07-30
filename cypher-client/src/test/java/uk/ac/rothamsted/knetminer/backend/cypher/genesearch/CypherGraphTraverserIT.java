@@ -58,7 +58,7 @@ public class CypherGraphTraverserIT
 	{
 		Map<String, Object> options = new HashMap<> ();
 		options.put ( "GraphTraverserClass", CypherGraphTraverser.class.getName () );
-		options.put ( CypherGraphTraverser.CONFIG_PATH_OPT, "target/test-classes/test-config/config.xml" );
+		options.put ( CypherGraphTraverser.CFGOPT_PATH, "target/test-classes/test-config/config.xml" );
 		options.put ( "LuceneEnv", graphResource.getLuceneMgr () );
 		graphTraverser = AbstractGraphTraverser.getInstance ( options );
 	}
@@ -75,7 +75,7 @@ public class CypherGraphTraverserIT
 			.findAny ()
 			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
 		
-		graphTraverser.setOption ( CypherGraphTraverser.CONFIG_CY_PAGE_SIZE, 5 ); // Just to try out
+		graphTraverser.setOption ( CypherGraphTraverser.CFGOPT_CY_PAGE_SIZE, 5 ); // Just to try out
 		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graphResource.getGraph (), startConcept, null );
 
 		assertTrue ( "No EvidencePath returned!", paths.size () > 0 );

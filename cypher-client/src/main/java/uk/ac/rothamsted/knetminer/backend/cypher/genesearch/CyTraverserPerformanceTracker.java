@@ -6,21 +6,20 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
+
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
-import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import uk.ac.ebi.utils.time.XStopWatch;
 
@@ -30,11 +29,11 @@ import uk.ac.ebi.utils.time.XStopWatch;
  */
 class CyTraverserPerformanceTracker 
 {
-	/** Times to send the query and get a first reply **/
-	private Map<String, Long> query2StartTimes = Collections.synchronizedMap ( new HashMap<> () );
+	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTrackingEnabled";
+
 	
 	/** Times to fetch all the results **/
-	private Map<String, Long> query2FetchTimes = Collections.synchronizedMap ( new HashMap<> () );
+	private Map<String, Long> query2ExecTimes = Collections.synchronizedMap ( new HashMap<> () );
 
 	/** No of results (pahts) returned by each query **/
 	private Map<String, Integer> query2Results = Collections.synchronizedMap ( new HashMap<> () );
@@ -46,7 +45,7 @@ class CyTraverserPerformanceTracker
 	private Map<String, Integer> query2Timeouts = Collections.synchronizedMap ( new HashMap<> () );
 	
 	/** Sums of returned path lengths for the each query **/
-	private Map<String, Long> query2PathLen = Collections.synchronizedMap ( new HashMap<> () );
+	private Map<String, Long> query2PathLens = Collections.synchronizedMap ( new HashMap<> () );
 	
 	
 	/** Total no. of invocations, ie #queries x #genes **/ 
@@ -55,73 +54,52 @@ class CyTraverserPerformanceTracker
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 			
-	public CyTraverserPerformanceTracker () 
+	CyTraverserPerformanceTracker () 
 	{
 		CypherGraphTraverser.getCypherQueries().forEach ( q -> {
-			this.query2StartTimes.put ( q, 0l );
-			this.query2FetchTimes.put ( q, 0l );
+			this.query2ExecTimes.put ( q, 0l );
 			this.query2Invocations.put ( q, 0 );
 			this.query2Timeouts.put ( q, 0 );
-			this.query2PathLen.put ( q, 0l );
+			this.query2PathLens.put ( q, 0l );
 			this.query2Results.put ( q, 0 );
 		});
 	}
 
-	public Stream<List<ONDEXEntity>> track (
-		Function<String, Stream<List<ONDEXEntity>>> queryAction,
-		String query
-	)
-	{
-		// We keep them without the pagination tail
-		final String queryNrm = StringUtils.removeEnd ( query, PagedCyPathFinder.PAGINATION_TRAIL );
-		
-		@SuppressWarnings ( "unchecked" )
-		Stream<List<ONDEXEntity>> result[] = new Stream [ 1 ];
-		
-		long startTime = XStopWatch.profile ( () -> { result [ 0 ] = queryAction.apply ( query ); } );
-		
-		query2StartTimes.compute ( queryNrm, (q,t) -> t + startTime );
-		
-		XStopWatch fetchTimer = new XStopWatch ();
-		
-		result [ 0 ] = result [ 0 ]
-		.peek ( pathEls -> 
-		{
-			// stats timing the first time/path it's invoked, then onClose() will get the total time elapsed
-			// after all the stream has been consumed
-			fetchTimer.resumeOrStart (); 
-			query2Results.compute ( queryNrm, (q,nr) -> nr + 1 );
-			query2PathLen.compute ( queryNrm, (q,pl) -> pl + pathEls.size () );
-		})
-		.onClose ( () -> {
-			// Track what is presumably the fetch time 
-		  // (we come here after all the paths in the stream have been consumed) 
-			query2FetchTimes.compute (
-				queryNrm, 
-				(q,t) -> ( !fetchTimer.isStarted () ? 0 : fetchTimer.getTime () ) + t
-			);
-			// TODO: DEBUG, requires better engineering
-			if ( invocations.get () % 100000 == 0 ) logStats (); 
-		});
-		
-		query2Invocations.compute ( queryNrm, (q,n) -> n + 1 );
-		invocations.incrementAndGet ();
-					
-		return result [ 0 ];
-	}
-	
-	/** 
-	 * Tracks the fact a query has timed out. We have invocations from the main class, so we define this method.
-	 * @return the no. of currently timed out queries. 
+	/**
+	 * <p>Does the tracking. This runs the {@code queryAction} and registers the time it took to run.</p>
+	 * 
+	 * <p>Then, it also tracks the paths returned by this query and the sum of their lengths. As you can see, the invoker 
+	 * has to provide code to compute such counts.</p>
+	 * 
+	 * <p>Moreover, if {@code queryAction} throws {@link UncheckedTimeoutException}, time and path counters aren't updated,
+	 * the timeout counter is update instead. This is useful when the query action makes use of {@link TimeLimiter}</p>
+	 * 
 	 */
-	public int trackTimeout ( String query ) {
-		return this.query2Timeouts.compute ( query, (q, ct) -> ct + 1 );
+	void track ( String query, Runnable queryAction, Supplier<Integer> pathsCounter, Supplier<Integer> pathLenCounter )
+	{
+		try {
+			long time = XStopWatch.profile ( queryAction );
+			this.query2ExecTimes.compute ( query, (k, t) -> t + time );
+			this.query2Results.compute ( query, (k, n) -> n + pathsCounter.get () );
+			this.query2PathLens.compute ( query, (k, n) -> n + pathLenCounter.get () );
+		}
+		catch ( UncheckedTimeoutException ex ) {
+			// Track the query timed out, the other updates above are skipped by the exec flow.
+			this.query2Timeouts.compute ( query, (q, ct) -> ct + 1 );
+		}
+		finally
+		{
+			this.query2Invocations.compute ( query, (k, n) -> n + 1 );
+			// TODO: makes this window a config option
+			if ( invocations.incrementAndGet () % 100000 == 0 ) logStats ();
+		}
 	}
+
 	
 	/**
 	 * Reports the stats accumulated so far using the underlining logging system.
 	 */
-	public void logStats ()
+	void logStats ()
 	{
 		StringWriter statsSW = new StringWriter ();
 		PrintWriter out = new PrintWriter ( statsSW );
@@ -131,7 +109,7 @@ class CyTraverserPerformanceTracker
 		if ( nTotQueries == 0 ) return;
 		
 		out.println (   
-			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths\tAvg Start Time(ms)\tAvg Fetch Time(ms)\tAvg Path Len" 
+			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths\tAvg Time(ms)\tAvg Path Len" 
 		);
 		
 		SortedSet<String> queries = new TreeSet<> ( query2Invocations.keySet () );
@@ -143,15 +121,14 @@ class CyTraverserPerformanceTracker
 			int ncompleted = nqueries - ntimeouts;
 							
 			out.printf (
-				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
+				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\n",
 				escapeJava ( query ),
 				nqueries,
 				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
 				ncompleted == 0 ? 0d : 1d * nresults / ncompleted,
-				nqueries == 0 ? 0d : 1d * query2StartTimes.get ( query ) / nqueries,
-				nqueries == 0 ? 0d : 1d * query2FetchTimes.get ( query ) / nqueries,
-				nresults == 0 ? 0d : 1d * query2PathLen.get ( query ) / nresults
+				nqueries == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / nqueries,
+				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults
 			);
 		}
 		out.println ( "" );
