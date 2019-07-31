@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.neo4j.driver.v1.Value;
@@ -168,7 +169,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
   	
-  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 1000l, Long::parseUnsignedLong );
+  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 200l, Long::parseUnsignedLong );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
@@ -186,20 +187,18 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> () );
 		
 		// Loop over all the queries with the parameter gene
-		getCypherQueries ()
-		.parallelStream ()
-		.forEach ( query -> 
+		// We close this stream here because we noticed "connection already closed" errors with neo4j
+		//
+		try ( Stream<String> queries = getCypherQueries ().parallelStream (); )
 		{
-			// Used below, by the performanceTracker
-			int counters[] = { 0, 0 };
-			
-			// Wrap the query into a timeout manager
-			Runnable queryAction = () -> timedQuery ( 
-	  		() -> 
-	  		{
+			queries.forEach ( query -> 
+			{
+				// Used below, by the performanceTracker
+				int counters[] = { 0, 0 };
+				
+				Runnable queryAction = 
+	  		() -> {
 	  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-	  			// This will also deal with timeouts and their tracking on the performanceTracker
-	  			// Moreover, consider the performance tracker too
 	  			try ( 
 	  				PagedCyPathFinder pathsItr = new PagedCyPathFinder (
   						startGeneIri, query, getPageSize (), cyProvider, luceneMgr ) 
@@ -212,21 +211,18 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		  					counters [ 1 ] += path.size (); // total path lengths
 		  				});
 	  			} // try pathsItr
-	  		}, // queryAction 
-	  		queryTimeout, 
-	  		startGeneIri, 
-	  		query 
-			);
-
-			// Further wrap it with machinery that accumulates query performance-related stats
-			if ( this.performanceTracker == null )
-				queryAction.run ();
-			else
-				this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );
-			
-			if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
-		}); // stream.forEach
-									
+	  		}; // queryAction				
+				
+  			// Don't allow it to run too long (if queryTimeout != -1)
+				Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
+	
+				// Further wrap it with machinery that accumulates query performance-related stats
+				performanceTrackedQuery ( timedQueryAction, query, counters );
+				
+				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
+			}); // stream.forEach
+		} // try-with queries
+				
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		return filter == null ? result : filter.filterPaths ( result );
 	}
@@ -277,33 +273,35 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	
 	/**
-	 * Decorates a query operation with common controls, namely: executes with time constraints and 
-	 * throws a {@link GenericNeo4jException} if something bad happens.
+	 * Runs a query action with time restrictions (if queryTimeOutMs != -1).
 	 * 
-	 * In case of timeout, returns {@code timeoutReturnValue} 
+	 * if the query can't run within its time limits, #UncheckedTimeoutException is thrown. This is possibly
+	 * intercepted by {@link CyTraverserPerformanceTracker}.
+	 * 
 	 */
-	private void timedQuery ( 
-		Runnable queryAction, long queryTimeoutMs, String startGeneIri, String query 
-	)
+	private void timedQuery ( Runnable queryAction, long queryTimeoutMs, String startGeneIri, String query )
 	{
 		try
 		{
 			// No timeout wanted
-			if ( queryTimeoutMs == -1 ) queryAction.run ();
+			if ( queryTimeoutMs == -1l ) {
+				queryAction.run ();
+				return;
+			}
 			
 			TIME_LIMITER.callWithTimeout ( 
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);
 		}
-		catch ( UncheckedTimeoutException ex ) 
-		{
-			// Let's just ignore it and go on with other queries
-			// The performanceTracker takes note of this event
+		catch ( UncheckedTimeoutException ex ) {
+			// Don't wrap it with other exception types, but let it flow to the performance tracker
+			throw ex;
 		}
 		catch ( Exception ex )
 		{
 			throw ExceptionUtils.buildEx ( 
-				GenericNeo4jException.class, 
+				GenericNeo4jException.class,
+				ex,
 				"Error while traversing Neo4j gene graph: %s. Gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIri,
@@ -311,6 +309,30 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			);
 		}			
 	}	
+	
+	/**
+	 * Another wrapper for a query action that is used to 
+	 * {@link CyTraverserPerformanceTracker track the query performance}. 
+	 * 
+	 */
+	private void performanceTrackedQuery ( Runnable queryAction, String query, int[] counters )
+	{
+		if ( this.performanceTracker == null )
+		{
+			try {
+				queryAction.run ();
+			}
+			catch ( UncheckedTimeoutException ex ) {
+				// We must intercept it if the performance tracker isn't here doing it, and we 
+				// just ignores timed out queries.
+				// TODO: once-time message?
+			}
+		}
+		else
+			this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );		
+	}
+	
+	
 	
 	
 	/**

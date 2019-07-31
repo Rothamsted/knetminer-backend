@@ -50,6 +50,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
+	
 	PagedCyPathFinder ( 
 		String startGeneIri, String query, long pageSize, CypherClientProvider cyProvider,
 		LuceneEnv luceneMgr	
@@ -126,7 +127,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 
 	@Override
 	public List<ONDEXEntity> next ()
-	{
+	{		
 		if ( !this.hasNext () ) throwEx ( 
 			NoSuchElementException.class, "Cypher Path Finder has no more items (hasNext() == false)"
 		);

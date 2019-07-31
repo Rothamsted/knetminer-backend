@@ -184,13 +184,23 @@ public class CypherClient implements AutoCloseable
 	}
 
 	/**
-	 * Ends/commits a transaction, using {@link Transaction#close() Neo4j method}.
+	 * Ends and possibly commits a transaction, using {@link Transaction#close() Neo4j method}.
+	 * The commit will happen unless {@link #fail()} was invoked.
 	 */
 	public synchronized void end ()
 	{
 		tx.close ();
 		tx = null;
 		openTxsCount.decrementAndGet ();
+	}
+	
+	/**
+	 * Fails/rollback the current transaction. This doesn't {@link #end()} the transaction, call that method 
+	 * for that.
+	 */
+	public synchronized void fail ()
+	{
+		tx.failure ();
 	}
 		
 	/**
