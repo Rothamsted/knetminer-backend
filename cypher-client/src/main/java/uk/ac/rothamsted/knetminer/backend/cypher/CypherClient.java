@@ -17,7 +17,6 @@ import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Value;
-import org.neo4j.driver.v1.Values;
 import org.neo4j.driver.v1.types.Entity;
 import org.neo4j.driver.v1.types.Path;
 import org.slf4j.Logger;
@@ -66,6 +65,8 @@ public class CypherClient implements AutoCloseable
 	 * 
 	 * <p>if params is non-null, it is used to instantiate the query, via {@link #queryToStream(String, Value)}.</p>
 	 * 
+	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
+	 * 
 	 */
 	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query, Value params )
 	{
@@ -98,11 +99,14 @@ public class CypherClient implements AutoCloseable
 	}
 
 	/**
-	 * Low-level Neo4j quering.
+	 * <p>Low-level Neo4j querying.</p>
 	 * 
-	 * Uses the Neo4j client to issue the query, wrapping it into facilities like transaction auto-opening, and then
+	 * <p>Uses the Neo4j client to issue the query, wrapping it into facilities like transaction auto-opening, and then
 	 * wraps the resulting records into a stream, in a dynamic/lazy way, that is, a {@link StatementResult} is 
-	 * iterated only when the corresponding {@link Stream} methods are invoked.
+	 * iterated only when the corresponding {@link Stream} methods are invoked.</p>
+	 * 
+	 * <p>Note that this method returns an immutable parallel stream, so you might need {@link Stream#sequential()}
+	 * in your code (eg, in {@link Stream#forEach(java.util.function.Consumer)}, to ensure thread safety).</p>
 	 * 
 	 */
 	protected Stream<Record> queryToStream ( String query, Value params )
@@ -119,12 +123,14 @@ public class CypherClient implements AutoCloseable
 	
   
 	/**
-	 * Runs the query via {@link #queryToStream(String, Value)} and, for each Cypher node/relation returned, 
+	 * <p>Runs the query via {@link #queryToStream(String, Value)} and, for each Cypher node/relation returned, 
 	 * extracts the {@code iri} property and eventually returns a stream of iri lists, one list per path.
 	 * This assumes the query returns a path ({@code MATCH p = .... RETURN p}) as first projection. The IRIs are used
 	 * by methods like {@link #findPaths(LuceneEnv, String, Value)}, to convert IRIs to Ondex entities, which assumes 
 	 * the Neo4j database corresponds to the in-memory Ondex graph (i.e., was created using the neo4j export tool, using
-	 * the in-memory OXL).
+	 * the in-memory OXL).</p>
+	 * 
+	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
 	 */
   public Stream<List<String>> findPathIris ( String query, Value params )
   {
@@ -247,7 +253,7 @@ public class CypherClient implements AutoCloseable
 	public synchronized void close ()
 	{
 		if ( this.isTxOpen () ) this.end ();
-		this.neoSession.close ();
+		if ( this.neoSession.isOpen () ) this.neoSession.close ();
 		neoSession = null;
 	}	
 }

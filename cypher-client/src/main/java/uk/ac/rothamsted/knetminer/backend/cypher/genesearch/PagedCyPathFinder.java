@@ -2,14 +2,13 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.machinezoo.noexception.Exceptions;
 
 import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.searchable.LuceneEnv;
@@ -23,6 +22,8 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * <p>This uses {@link CypherClient#findPaths(LuceneEnv, String, Value)} to get the paths for a gene
  * that are reachable from the query parameter. Additionally, this method queries the Neo4j server 
  * in a paginated fashion, by fetching {@link #getPageSize()} paths per query.</p>
+ * 
+ * <p>Because this is used to process a single query sequentially, this method isn't thread-safe</p>
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>10 Jul 2019</dd></dl>
@@ -45,7 +46,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	private Stream<List<ONDEXEntity>> currentPageStream = null;
 	private Iterator<List<ONDEXEntity>> currentPageIterator = null;
 	
-	private boolean wasClosed = false;
+	private boolean isClosed = false, isFinished = false;
 	
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
@@ -64,19 +65,15 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 
 	/**
 	 * Issues the query with the current offset. @see {@link #hasNext()}.
+	 * @return true if it found a non-empty page. Else, invokes {@link #closePage()}, sets {@link #isFinished} and 
+	 * returns false.
 	 */
-	private void nextPage ()
+	private boolean nextPage ()
 	{
-		if ( this.wasClosed ) ExceptionUtils.throwEx ( 
-			IllegalArgumentException.class, 
-			"The Cypher Path Finder for this query was closed, gene: <%s>, offset: %d, query: [%s]",
-			this.startGeneIri,
-			this.offset,
-			this.query
-		);
+		if ( this.isFinished ) return false; // you're calling me after both hasNext() and the last page said we're over.
 		
-		// Close the stream that is going to be disposed
-		if ( this.currentPageStream != null ) this.currentPageStream.close ();
+		// Close the current exhausted stream, which is going to be disposed (if non-null)
+		this.closePage ();
 		
 		offset += pageSize;
 		log.trace ( "offset: {} for query: {}", offset, query );
@@ -90,15 +87,20 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 		String pagedQuery = query + PAGINATION_TRAIL;
 
 		this.currentPageStream = cyProvider.queryToStream (
-			cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
-		);
-			
+				cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
+			)
+			.sequential ();
 		this.currentPageIterator = currentPageStream.iterator ();
 		
-		// Force the closure of the last empty query
-		if ( !this.currentPageIterator.hasNext () ) this.currentPageStream.close ();
+		if ( this.currentPageIterator.hasNext () ) return true;
+		
+		// else, no more pages, let's close and mark it's all over
+		this.closePage ();
+		this.isFinished = true;
+		return false;
 	}
 
+	
 	/**
 	 * How it works: We need this special iterator to do the paging trick. 
 	 * Its hasNext() method asks the underlining stream if it has more items. When not, it issues another
@@ -108,34 +110,62 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	@Override
 	public boolean hasNext ()
 	{
-		// do it the first time
-		if ( currentPageIterator == null ) this.nextPage ();
-		// and whenever the current page is over
-		else if ( !currentPageIterator.hasNext () ) nextPage ();
+		if ( this.isClosed ) throwEx ( 
+			IllegalStateException.class, "The Cypher Path Finder for this query was closed"
+		);
 		
-		// if false the first time => no result. Else, it becomes false for the first offset that is empty
-		return currentPageIterator.hasNext ();
+		// You're still calling me after the last empty page 
+		if ( this.isFinished ) return false;
+		
+		// get a first iterator if it's the first time we're called
+		if ( this.currentPageIterator == null ) return this.nextPage ();
+		// or check the current iterator if it was already created by previous calls, possibly advance
+		// one page if the iterator is exhausted
+		return this.currentPageIterator.hasNext () || nextPage ();
 	}
 
 	@Override
 	public List<ONDEXEntity> next ()
 	{
+		if ( !this.hasNext () ) throwEx ( 
+			NoSuchElementException.class, "Cypher Path Finder has no more items (hasNext() == false)"
+		);
+			
 		// If you call it at the appropriate time, it was prepared by the hasNext() method above
 		return currentPageIterator.next ();
 	}
 
+	
 	@Override
 	public void close ()
 	{
-		if ( this.wasClosed ) return;
-		try {
-			if ( this.currentPageIterator == null ) return; // was never used
-			if ( !this.currentPageIterator.hasNext () ) return; // was already closed by nextPage()
-			if ( this.currentPageStream == null ) return; // TODO: warning/error?
-			this.currentPageStream.close ();
-		}
-		finally {
-			this.wasClosed = true;
-		}
-	}	
+		if ( this.isClosed ) return;
+		this.closePage ();
+		this.isClosed = this.isFinished = true;
+	}
+	
+	private void closePage ()
+	{
+		if ( this.currentPageIterator == null ) return;
+		this.currentPageStream.close ();
+		this.currentPageIterator = null;
+		this.currentPageStream = null;
+	}
+	
+	
+	/**
+	 * A template to report exceptions, adds query and gene to the prefixMsg.
+	 */
+	private void throwEx ( Class<? extends RuntimeException> ex, String prefixMsg )
+	{
+		ExceptionUtils.throwEx ( 
+			ex, 
+			"%s, gene: <%s>, offset: %d, query: [%s]",
+			prefixMsg,
+			this.startGeneIri,
+			this.offset,
+			this.query
+		);		
+	}
+
 }
