@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -30,7 +29,19 @@ import uk.ac.ebi.utils.time.XStopWatch;
  */
 class CyTraverserPerformanceTracker 
 {
-	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTrackingEnabled";
+	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTracking.enabled";
+
+	/**
+	 * <p>Based on this option given to the {@link CypherGraphTraverser}, reports partial results via {@link #logStats()} 
+	 * every a number of {@link #track(String, Runnable, Supplier, Supplier)} invocations equal to this value.</p>
+	 * 
+	 * <p>Consider that every invocation corresponds to one gene and one query, 
+	 * so this value should reflect a fraction of genes*queries.</p>
+	 * 
+	 * <p>if -1, doesn't do any periodic report</p>
+	 * 
+	 */
+	public static final String CFGOPT_PERFORMANCE_REPORT_FREQ = "knetminer.backend.traverserPerformanceTracking.reportFrequency";
 
 	
 	/** Times to fetch all the results **/
@@ -51,6 +62,8 @@ class CyTraverserPerformanceTracker
 	
 	/** Total no. of invocations, ie #queries x #genes **/ 
 	private AtomicInteger invocations = new AtomicInteger ( 0 );
+	
+	private int reportFrequency = -1;
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
@@ -91,8 +104,8 @@ class CyTraverserPerformanceTracker
 		finally
 		{
 			this.query2Invocations.compute ( query, (k, n) -> n + 1 );
-			// TODO: makes this window a config option
-			if ( invocations.incrementAndGet () % 100000 == 0 ) logStats ();
+			this.invocations.incrementAndGet ();
+			if ( this.reportFrequency > 0 && invocations.get () % this.reportFrequency == 0 ) logStats ();
 		}
 	}
 
@@ -136,4 +149,16 @@ class CyTraverserPerformanceTracker
 
 		log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", statsSW.toString () );
 	}
+
+	/** @see CFGOPT_PERFORMANCE_REPORT_FREQ */	
+	public int getReportFrequency ()
+	{
+		return reportFrequency;
+	}
+
+	public void setReportFrequency ( int reportFrequency )
+	{
+		this.reportFrequency = reportFrequency;
+	}
+	
 }

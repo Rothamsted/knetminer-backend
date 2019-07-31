@@ -2,6 +2,8 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
+import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_PERFORMANCE_REPORT_FREQ;
+import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -169,7 +171,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
   	
-  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 200l, Long::parseUnsignedLong );
+  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 3000l, Long::parseUnsignedLong );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
@@ -195,29 +197,28 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			{
 				// Used below, by the performanceTracker
 				int counters[] = { 0, 0 };
-				
-				Runnable queryAction = 
-	  		() -> {
-	  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-	  			try ( 
-	  				PagedCyPathFinder pathsItr = new PagedCyPathFinder (
-  						startGeneIri, query, getPageSize (), cyProvider, luceneMgr ) 
-  				)
-	  			{
+
+				try ( PagedCyPathFinder pathsItr = 
+					new PagedCyPathFinder ( startGeneIri, query, getPageSize (), cyProvider, luceneMgr ); 
+				)
+				{
+					Runnable queryAction = 
+					() -> {
+		  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 		  			pathsItr.forEachRemaining ( 
 		  				path -> { 
 		  					result.add ( buildEvidencePath ( path ) );
 		  					counters [ 0 ]++; // no. of resulting paths
 		  					counters [ 1 ] += path.size (); // total path lengths
 		  				});
-	  			} // try pathsItr
-	  		}; // queryAction				
-				
-  			// Don't allow it to run too long (if queryTimeout != -1)
-				Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
-	
-				// Further wrap it with machinery that accumulates query performance-related stats
-				performanceTrackedQuery ( timedQueryAction, query, counters );
+		  		}; // queryAction				
+					
+	  			// Don't allow it to run too long (if queryTimeout != -1)
+					Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
+		
+					// Further wrap it with machinery that accumulates query performance-related stats
+					performanceTrackedQuery ( timedQueryAction, query, counters );
+				} // try-with pathsItr
 				
 				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
 			}); // stream.forEach
@@ -359,8 +360,13 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		init ();
 		
-		if ( this.getOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, false, Boolean::parseBoolean ) )
+		if ( this.getOption ( CFGOPT_TRAVERSER_PERFORMANCE, false, Boolean::parseBoolean ) )
+		{
 			this.performanceTracker = new CyTraverserPerformanceTracker ();
+			this.performanceTracker.setReportFrequency (
+				this.getOption ( CFGOPT_PERFORMANCE_REPORT_FREQ, -1, Integer::parseInt )
+			);
+		}
 				
 		this.queryProgressLogger = new PercentProgressLogger ( 
 			"{}% of graph traversing queries processed",

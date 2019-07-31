@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
+import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,7 +130,7 @@ public class CypherGraphTraverserIT
 	public void testMultipleStartConcepts ()
 	{
 		// Just to see the reports
-		graphTraverser.setOption ( CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE, true );
+		graphTraverser.setOption ( CFGOPT_TRAVERSER_PERFORMANCE, true );
 
 		Stream<String> conceptIris = Stream.of ( 
 			iri ( "bkr:gene_at4g26080_locus_2005488"	),
