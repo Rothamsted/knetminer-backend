@@ -89,17 +89,17 @@ class CyTraverserPerformanceTracker
 	 * the timeout counter is update instead. This is useful when the query action makes use of {@link TimeLimiter}</p>
 	 * 
 	 */
-	void track ( String query, Runnable queryAction, Supplier<Integer> pathsCounter, Supplier<Integer> pathLenCounter )
+	void track ( String query, Runnable queryAction, Supplier<Integer> pathsCounter, Supplier<Integer> pathLensCounter )
 	{
 		try {
 			long time = XStopWatch.profile ( queryAction );
 			this.query2ExecTimes.compute ( query, (k, t) -> t + time );
 			this.query2Results.compute ( query, (k, n) -> n + pathsCounter.get () );
-			this.query2PathLens.compute ( query, (k, n) -> n + pathLenCounter.get () );
+			this.query2PathLens.compute ( query, (k, l) -> l + pathLensCounter.get () );
 		}
 		catch ( UncheckedTimeoutException ex ) {
 			// Track the query timed out, the other updates above are skipped by the exec flow.
-			this.query2Timeouts.compute ( query, (q, ct) -> ct + 1 );
+			this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
 		}
 		finally
 		{
@@ -141,7 +141,7 @@ class CyTraverserPerformanceTracker
 				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
 				ncompleted == 0 ? 0d : 1d * nresults / ncompleted,
-				nqueries == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / nqueries,
+				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted,
 				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults
 			);
 		}
