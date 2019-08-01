@@ -68,7 +68,7 @@ public class CypherClientProvider
 	{
 		try ( CypherClient client = this.newClient ( writeAccessMode ) ) {
 			return inTransaction 
-				? client.runTx ( () -> action.apply ( client ) ) 
+				? client.runTx ( action ) 
 				: action.apply ( client );
 		}
 	}

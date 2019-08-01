@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -114,8 +115,7 @@ public class CypherClient implements AutoCloseable
 		this.checkOpen ();
 		StatementResult cursor = params == null 
 			? this.tx.run ( query )
-			: this.tx.run ( query, params )				
-		;
+			: this.tx.run ( query, params );
 				
 		Spliterator<Record> splitr = spliteratorUnknownSize ( cursor, Spliterator.IMMUTABLE );
 		return StreamSupport.stream ( splitr, false );		
@@ -237,11 +237,11 @@ public class CypherClient implements AutoCloseable
 	 * {@link #begin()} and {@link #end()}.
 	 *  
 	 */
-	public <T> T runTx ( Supplier<T> action )
+	<T> T runTx ( Function<CypherClient, T> action )
 	{
 		this.checkOpen ();
 		try {
-			return action.get ();
+			return action.apply ( this );
 		}
 		finally {
 			this.end ();
@@ -251,8 +251,8 @@ public class CypherClient implements AutoCloseable
 	/**
 	 * Wrapper without parameters.
 	 */
-	public Void runTx ( Runnable action ) {
-		return runTx ( () -> { action.run (); return null; } );
+	 Void runTx ( Consumer<CypherClient> action ) {
+		return runTx ( client -> { action.accept ( client ); return null; } );
 	}
 	
 	/**

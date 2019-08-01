@@ -198,27 +198,27 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				// Used below, by the performanceTracker
 				int counters[] = { 0, 0 };
 
-				try ( PagedCyPathFinder pathsItr = 
-					new PagedCyPathFinder ( startGeneIri, query, getPageSize (), cyProvider, luceneMgr ); 
-				)
-				{
-					Runnable queryAction = 
-					() -> {
+				Runnable queryAction = 
+				() -> {
+					try (	final PagedCyPathFinder pathsItr = 
+									new PagedCyPathFinder (	startGeneIri, query, getPageSize (), cyProvider, luceneMgr )
+					)
+					{
 		  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
-		  			pathsItr.forEachRemaining ( 
-		  				path -> { 
-		  					result.add ( buildEvidencePath ( path ) );
-		  					counters [ 0 ]++; // no. of resulting paths
-		  					counters [ 1 ] += path.size (); // total path lengths
-		  				});
-		  		}; // queryAction				
-					
-	  			// Don't allow it to run too long (if queryTimeout != -1)
-					Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
-		
-					// Further wrap it with machinery that accumulates query performance-related stats
-					performanceTrackedQuery ( timedQueryAction, query, counters );
-				} // try-with pathsItr
+						pathsItr.forEachRemaining ( 
+						path -> {
+	  					result.add ( buildEvidencePath ( path ) );
+	  					counters [ 0 ]++; // no. of resulting paths
+	  					counters [ 1 ] += path.size (); // total path lengths
+						});
+					} // try-with pathsItr
+	  		}; // queryAction				
+				
+  			// Don't allow it to run too long (if queryTimeout != -1)
+				Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
+	
+				// Further wrap it with machinery that accumulates query performance-related stats
+				performanceTrackedQuery ( timedQueryAction, query, counters );
 				
 				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
 			}); // stream.forEach
@@ -289,7 +289,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				queryAction.run ();
 				return;
 			}
-			
+						
 			TIME_LIMITER.callWithTimeout ( 
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);
