@@ -88,9 +88,9 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 		String pagedQuery = query + PAGINATION_TRAIL;
 
 		this.currentPageStream = cyProvider.queryToStream (
-				cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
-			)
-			.sequential ();
+			cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
+		)
+		.sequential ();
 		this.currentPageIterator = currentPageStream.iterator ();
 		
 		if ( this.currentPageIterator.hasNext () ) return true;
