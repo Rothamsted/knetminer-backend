@@ -32,7 +32,7 @@ public class TestGraphResource extends ExternalResource
 	protected synchronized void after ()
 	{
 		if ( luceneMgr == null ) return;
-		luceneMgr.closeIndex ();
+		luceneMgr.closeAll ();
 	}
 
 	

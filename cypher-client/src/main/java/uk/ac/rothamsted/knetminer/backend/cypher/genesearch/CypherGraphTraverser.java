@@ -171,7 +171,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
   		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
   	);
   	
-  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 3000l, Long::parseUnsignedLong );
+  	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 3000l, Long::parseLong );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
 		
