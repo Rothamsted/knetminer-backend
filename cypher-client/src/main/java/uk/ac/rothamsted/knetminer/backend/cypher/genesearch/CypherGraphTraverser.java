@@ -324,9 +324,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				queryAction.run ();
 			}
 			catch ( UncheckedTimeoutException ex ) {
-				// We must intercept it if the performance tracker isn't here doing it, and we 
-				// just ignores timed out queries.
-				// TODO: once-time message?
+				// The performance tracker isn't here to intercept and track it, so we just ignore the timed out queries. 
+				// TODO: one-time message?
 			}
 		}
 		else
