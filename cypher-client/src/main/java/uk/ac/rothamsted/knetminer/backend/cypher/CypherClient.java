@@ -65,14 +65,43 @@ public class CypherClient implements AutoCloseable
 	 * 
 	 * <p>if params is non-null, it is used to instantiate the query, via {@link #queryToStream(String, Value)}.</p>
 	 * 
-	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
+	 * <p>This is based on {@link #findPathIris(String, Value)}, which uses {@link #queryToStream(String, Value)} 
+	 * (see the note about parallelism attached to that method), and {@link #findPathsFromIris(LuceneEnv, Stream)}.</p>
 	 * 
 	 */
 	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query, Value params )
 	{
 		Stream<List<String>> rawResults = findPathIris ( query, params );
-		
-		return rawResults.map ( 
+		try {
+			return findPathsFromIris ( luceneMgr, rawResults );
+		}
+		catch ( IllegalStateException ex ) {
+			throw ExceptionUtils.buildEx (
+				IllegalStateException.class,
+				ex,
+				"Error while running Cypher traverser for query: <%s>: %s",
+				query, ex.getMessage ()
+			);
+		}
+	}
+
+	/**
+	 * Wrapper without query parameters.
+	 */
+	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query ) {
+		return findPaths ( luceneMgr, query, null );
+	}
+	
+	/**
+	 * A low-level version of {@link #findPaths(LuceneEnv, String, Value)}, which just returns path IRis
+	 * for every paths achievable from the query.
+	 *  
+	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
+	 * 
+	 */
+	public static Stream<List<ONDEXEntity>> findPathsFromIris ( LuceneEnv luceneMgr, Stream<List<String>> pathsAsIris )
+	{
+		return pathsAsIris.map ( 
 			iris -> { 
 				int[] pathIdx = new int [] { -1 };
 				return iris.stream ()
@@ -83,21 +112,15 @@ public class CypherClient implements AutoCloseable
 						  : luceneMgr.getRelationByIRI ( iri );
 						if ( oe == null ) ExceptionUtils.throwEx (
 							IllegalStateException.class, 
-							"Cannot find any Ondex %s for URI '%s'. Cypher Query is: %s. Index fetched from it is %d.",
-							pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, query, pathIdx[ 0 ]
+							"Cannot find any Ondex %s for URI '%s', at index %d.",
+							pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, pathIdx[ 0 ]
 						);
 						return oe;
 					}).collect ( Collectors.toList () );
 			});
 	}
 
-	/**
-	 * Wrapper without query parameters.
-	 */
-	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query ) {
-		return findPaths ( luceneMgr, query, null );
-	}
-
+		
 	/**
 	 * <p>Low-level Neo4j querying.</p>
 	 * 
