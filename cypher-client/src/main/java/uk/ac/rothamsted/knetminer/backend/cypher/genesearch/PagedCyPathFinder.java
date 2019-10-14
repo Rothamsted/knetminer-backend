@@ -10,8 +10,6 @@ import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sourceforge.ondex.core.ONDEXEntity;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
@@ -19,8 +17,8 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
 /**
  * <p>Support component for {@link CypherGraphTraverser} that manages Cypher queries against a Knetminer Neo4j database.</p>
  * 
- * <p>This uses {@link CypherClient#findPaths(LuceneEnv, String, Value)} to get the paths for a gene
- * that are reachable from the query parameter. Additionally, this method queries the Neo4j server 
+ * <p>This uses {@link CypherClient#findPathIris(String, Value)} to get the path IRIs for a gene
+ * that is reachable from the {@code query} parameter. Additionally, this method queries the Neo4j server 
  * in a paginated fashion, by fetching {@link #getPageSize()} paths per query.</p>
  * 
  * <p>Because this is used to process a single query sequentially, this method isn't thread-safe</p>
@@ -29,7 +27,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * <dl><dt>Date:</dt><dd>10 Jul 2019</dd></dl>
  *
  */
-class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
+class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 {
 	/**
 	 * Used internally to compose the Cypher queries
@@ -40,11 +38,10 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	private final String query;
 	private final long pageSize;
 	private final CypherClientProvider cyProvider;
-	private final LuceneEnv luceneMgr;
 	
 	private long offset;
-	private Stream<List<ONDEXEntity>> currentPageStream = null;
-	private Iterator<List<ONDEXEntity>> currentPageIterator = null;
+	private Stream<List<String>> currentPageStream = null;
+	private Iterator<List<String>> currentPageIterator = null;
 	
 	private boolean isClosed = false, isFinished = false;
 	
@@ -52,15 +49,13 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 
 	
 	PagedCyPathFinder ( 
-		String startGeneIri, String query, long pageSize, CypherClientProvider cyProvider,
-		LuceneEnv luceneMgr	
+		String startGeneIri, String query, long pageSize, CypherClientProvider cyProvider	
 	)
 	{
 		this.startGeneIri = startGeneIri;
 		this.query = query;
 		this.pageSize = pageSize;
 		this.cyProvider = cyProvider;
-		this.luceneMgr = luceneMgr;
 		this.offset = -pageSize;
 	}
 
@@ -88,7 +83,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 		String pagedQuery = query + PAGINATION_TRAIL;
 
 		this.currentPageStream = cyProvider.queryToStream (
-			cyClient -> cyClient.findPaths ( luceneMgr, pagedQuery, params )
+			cyClient -> cyClient.findPathIris ( pagedQuery, params )
 		)
 		.sequential ();
 		this.currentPageIterator = currentPageStream.iterator ();
@@ -126,7 +121,7 @@ class PagedCyPathFinder implements Iterator<List<ONDEXEntity>>, AutoCloseable
 	}
 
 	@Override
-	public List<ONDEXEntity> next ()
+	public List<String> next ()
 	{		
 		if ( !this.hasNext () ) throwEx ( 
 			NoSuchElementException.class, "Cypher Path Finder has no more items (hasNext() == false)"

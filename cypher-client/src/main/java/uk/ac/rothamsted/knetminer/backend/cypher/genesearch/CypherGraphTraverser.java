@@ -186,8 +186,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			));
 				
 		// And now let's hand it to Cypher.
-		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> () );
-		
+		// All the results
+		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> ( 40 ) );
+
 		// Loop over all the queries with the parameter gene
 		// We close this stream here because we noticed "connection already closed" errors with neo4j
 		//
@@ -195,21 +196,29 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		{
 			queries.forEach ( query -> 
 			{
+				// Results from this query in raw format, ie, lists of URIs
+				// We need to do this in two steps, ie, firs the IRIs then the Ondex entities obtained via
+				// Ondex Lucene Index, because the query can be interrupted and this is very bad for lucene
+				// (https://issues.apache.org/jira/browse/LUCENE-7248).
+				//
+				List<List<String>> queryResultIris = new ArrayList<> ( 20 );
+				final List<List<String>> roQueryResultIris = queryResultIris; // just for the lambda RO requirements
+				
 				// Used below, by the performanceTracker
 				int counters[] = { 0, 0 };
 
 				Runnable queryAction = 
 				() -> {
 					try (	final PagedCyPathFinder pathsItr = 
-									new PagedCyPathFinder (	startGeneIri, query, getPageSize (), cyProvider, luceneMgr )
+									new PagedCyPathFinder (	startGeneIri, query, getPageSize (), cyProvider )
 					)
 					{
 		  			// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 						pathsItr.forEachRemaining ( 
-						path -> {
-	  					result.add ( buildEvidencePath ( path ) );
+						pathIris -> {
+							roQueryResultIris.add ( pathIris );
 	  					counters [ 0 ]++; // no. of resulting paths
-	  					counters [ 1 ] += path.size (); // total path lengths
+	  					counters [ 1 ] += pathIris.size (); // total path lengths
 						});
 					} // try-with pathsItr
 	  		}; // queryAction				
@@ -218,12 +227,28 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				Runnable timedQueryAction = () -> timedQuery ( queryAction, queryTimeout, startGeneIri, query ); 
 	
 				// Further wrap it with machinery that accumulates query performance-related stats
-				performanceTrackedQuery ( timedQueryAction, query, counters );
+				try {
+					performanceTrackedQuery ( timedQueryAction, query, counters );
+				}
+				catch ( UncheckedTimeoutException ex ) {
+					// The query didn't complete within the timeout, results are partial, we must invalidate
+					// everything
+					queryResultIris = null;
+					if ( log.isTraceEnabled () )
+						log.trace ( "Query timed out. Gene: <{}>, query: {}", startGeneIri, query );
+				}
+
+				// OK, now convert the IRIs into Ondex entities
+				if ( queryResultIris != null )
+					CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.parallelStream () )
+					.map ( this::buildEvidencePath )
+					.forEach ( result::add );
 				
 				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
-			}); // stream.forEach
+			}); // query stream.forEach
 		} // try-with queries
 				
+		
 		// This is an optional method to filter out unwanted results. In Knetminer it's usually null
 		return filter == null ? result : filter.filterPaths ( result );
 	}
@@ -317,17 +342,10 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * 
 	 */
 	private void performanceTrackedQuery ( Runnable queryAction, String query, int[] counters )
+		throws UncheckedTimeoutException
 	{
 		if ( this.performanceTracker == null )
-		{
-			try {
-				queryAction.run ();
-			}
-			catch ( UncheckedTimeoutException ex ) {
-				// The performance tracker isn't here to intercept and track it, so we just ignore the timed out queries. 
-				// TODO: one-time message?
-			}
-		}
+			queryAction.run ();
 		else
 			this.performanceTracker.track ( query, queryAction, () -> counters [ 0 ], () -> counters [ 1 ] );		
 	}
