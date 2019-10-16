@@ -197,7 +197,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			queries.forEach ( query -> 
 			{
 				// Results from this query in raw format, ie, lists of URIs
-				// We need to do this in two steps, ie, firs the IRIs then the Ondex entities obtained via
+				// We need to do this in two steps, ie, first the IRIs then the Ondex entities obtained via
 				// Ondex Lucene Index, because the query can be interrupted and this is very bad for lucene
 				// (https://issues.apache.org/jira/browse/LUCENE-7248).
 				//
@@ -240,7 +240,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 				// OK, now convert the IRIs into Ondex entities
 				if ( queryResultIris != null )
-					CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.parallelStream () )
+					CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.stream () )
 					.map ( this::buildEvidencePath )
 					.forEach ( result::add );
 				
