@@ -100,6 +100,9 @@ class CyTraverserPerformanceTracker
 		catch ( UncheckedTimeoutException ex ) {
 			// Track the query timed out, the other updates above are skipped by the exec flow.
 			this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
+			// Don't wrap it with other exception types, but let it flow to the invoker, which 
+			// needs to know it, in order to perform cancelling operations
+			throw ex;
 		}
 		finally
 		{

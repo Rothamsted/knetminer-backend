@@ -101,25 +101,32 @@ public class CypherClient implements AutoCloseable
 	 */
 	public static Stream<List<ONDEXEntity>> findPathsFromIris ( LuceneEnv luceneMgr, Stream<List<String>> pathsAsIris )
 	{
-		return pathsAsIris.map ( 
-			iris -> { 
-				int[] pathIdx = new int [] { -1 };
-				return iris.stream ()
-					.map ( iri ->
-					{ 
-						ONDEXEntity oe = ++pathIdx[ 0 ] % 2 == 0 
-						  ? luceneMgr.getConceptByIRI ( iri ) 
-						  : luceneMgr.getRelationByIRI ( iri );
-						if ( oe == null ) ExceptionUtils.throwEx (
-							IllegalStateException.class, 
-							"Cannot find any Ondex %s for URI '%s', at index %d.",
-							pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, pathIdx[ 0 ]
-						);
-						return oe;
-					}).collect ( Collectors.toList () );
-			});
+		return pathsAsIris.map ( thisPathIris -> findPathFromIris ( luceneMgr, thisPathIris ));
 	}
 
+	/**
+	 * This is like {@link #findPathsFromIris(LuceneEnv, Stream)}, but works on the IRIs of a single path, 
+	 * might be useful sometimes. Se the notes repored in the other method.
+	 *  
+	 */
+	public static List<ONDEXEntity> findPathFromIris ( LuceneEnv luceneMgr, List<String> pathsAsIris )
+	{
+		int[] pathIdx = new int [] { -1 };
+		return pathsAsIris.stream ()
+			.map ( iri ->
+			{ 
+				ONDEXEntity oe = ++pathIdx[ 0 ] % 2 == 0 
+				  ? luceneMgr.getConceptByIRI ( iri ) 
+				  : luceneMgr.getRelationByIRI ( iri );
+				if ( oe == null ) ExceptionUtils.throwEx (
+					IllegalStateException.class, 
+					"Cannot find any Ondex %s for URI '%s', at index %d.",
+					pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, pathIdx[ 0 ]
+				);
+				return oe;
+			}).collect ( Collectors.toList () );
+	}	
+	
 		
 	/**
 	 * <p>Low-level Neo4j querying.</p>

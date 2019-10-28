@@ -1,5 +1,6 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_PERFORMANCE_REPORT_FREQ;
@@ -8,6 +9,7 @@ import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPe
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -201,6 +203,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				// Ondex Lucene Index, because the query can be interrupted and this is very bad for lucene
 				// (https://issues.apache.org/jira/browse/LUCENE-7248).
 				//
+				// Note on sycnrhonizedList: it's because we're seeing unexplicable ConcurrentModificationException
+				// I suspect they come from interrupted threads.
+				//
 				List<List<String>> queryResultIris = new ArrayList<> ( 20 );
 				final List<List<String>> roQueryResultIris = queryResultIris; // just for the lambda RO requirements
 				
@@ -238,11 +243,33 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 						log.trace ( "Query timed out. Gene: <{}>, query: {}", startGeneIri, query );
 				}
 
+				// DEBUG log.info ( "--- DONE (Cypher): <{}>, query: \"{}\"", startGeneIri, escapeJava ( query ) );
+
 				// OK, now convert the IRIs into Ondex entities
 				if ( queryResultIris != null )
-					CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.stream () )
-					.map ( this::buildEvidencePath )
-					.forEach ( result::add );
+					try
+					{
+						// TODO: possibly fixed, remove synch
+						// We're seeing ConcurrentModificationException, my suspect is this is caused by 
+						// interrupted threads.
+						// synchronized ( queryResultIris ) 
+						{
+							CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.stream () )
+							.map ( this::buildEvidencePath )
+							.forEach ( result::add );
+						}
+					}
+					// TODO: possibly fixed, remove synch and CME
+					catch ( ConcurrentModificationException ex ) 
+					{
+						// TODO: shouldn't happen, but just in case
+						log.warn ( 
+							"For some reason, I got ConcurrentModificationException while traversing Gene: <{}>, with query: {}", 
+							startGeneIri,	query
+						);
+					}
+
+				// DEBUG log.info ( "--- DONE (Lucene): <{}>, query: \"{}\"", startGeneIri, escapeJava ( query ) );
 				
 				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
 			}); // query stream.forEach
@@ -319,9 +346,16 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);
 		}
-		catch ( UncheckedTimeoutException ex ) {
+		catch ( UncheckedTimeoutException|InterruptedException ex ) {
 			// Don't wrap it with other exception types, but let it flow to the performance tracker
-			throw ex;
+			throw ExceptionUtils.buildEx ( 
+				UncheckedTimeoutException.class,
+				ex,
+				"Timed out query: %s. Gene IRI is: <%s>. Query is: \"%s\"",
+				ex.getMessage (),
+				startGeneIri,
+				StringEscapeUtils.escapeJava ( query )
+			);
 		}
 		catch ( Exception ex )
 		{
@@ -387,7 +421,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				
 		this.queryProgressLogger = new PercentProgressLogger ( 
 			"{}% of graph traversing queries processed",
-			concepts.size () * getCypherQueries ().size () 
+			concepts.size () * getCypherQueries ().size (),
+			1 // TODO: debug, go back to 10 sooner than later
 		);
 		
 		try {
