@@ -28,10 +28,6 @@
       <artifactId>junit</artifactId>
     </dependency>
 		<dependency>
-			<groupId>net.sourceforge.ondex.core</groupId>
-			<artifactId>lucene</artifactId>
-		</dependency>
-		<dependency>
 		  <groupId>net.sourceforge.ondex.modules</groupId>
 		  <artifactId>rdf-common</artifactId>
 			<scope>test</scope>
@@ -47,7 +43,11 @@
 		<dependency>
 	  	<groupId>net.sourceforge.ondex.core</groupId>
 	   	<artifactId>algorithms</artifactId>
-		</dependency>	    		
+		</dependency>	  
+		<dependency>
+			<groupId>net.sourceforge.ondex.core</groupId>
+			<artifactId>base</artifactId>
+		</dependency>			
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>

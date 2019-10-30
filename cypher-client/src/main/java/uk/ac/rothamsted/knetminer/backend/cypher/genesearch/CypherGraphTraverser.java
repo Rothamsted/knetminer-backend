@@ -1,6 +1,5 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_PERFORMANCE_REPORT_FREQ;
@@ -31,7 +30,6 @@ import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
-import net.sourceforge.ondex.algorithm.graphquery.GraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.Transition;
 import net.sourceforge.ondex.algorithm.graphquery.nodepath.EvidencePathNode;
@@ -42,7 +40,6 @@ import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import net.sourceforge.ondex.core.ONDEXRelation;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
@@ -55,11 +52,9 @@ import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database
  * storing a BioKNO-based model of an Ondex/Knetminer graph. Currently the backend datbase is based on Neo4j.</p>
  * 
- * <p>This traverser expects certain initialisation parameters:
+ * <p>This traverser expects the following in {@link #getOptions()}:
  * <ul>
  * 	<li>{@link #CFGOPT_PATH} set to a proper Spring config file.</li>
- * 	<li>{@code LuceneEnv}, which must be a proper {@link LuceneEnv} instance, corresponding to the {@code graph} parameter
- * 	received by {@link #traverseGraph(ONDEXGraph, ONDEXConcept, FilterPaths)}</li>
  * </ul>
  * 
  * Usually the above params are properly set by {@code rres.knetminer.datasource.ondexlocal.OndexServiceProvider}. 
@@ -120,7 +115,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		// Double-check lazy init (https://www.geeksforgeeks.org/java-singleton-design-pattern-practices-examples/)
 		if ( springContext != null ) return;
 		
-		synchronized ( GraphTraverser.class )
+		synchronized ( CypherGraphTraverser.class )
 		{
 			if ( springContext != null ) return;
 			
@@ -152,10 +147,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * to Ondex concept/relation pairs</li>
 	 * 	<li>The first matching node of each query must receive a {@code startQuery} parameter: 
 	 * {@code MATCH path = (g1:Gene{ iri: $startIri }) ...}. See the tests in this hereby project for details.</li>
-	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.
-	 *  The parameter OXL graph must also match the {@link LuceneEnv Lucene index} set by {@link #init()}, via the 
-	 *  {@code LuceneEnv} {@link #getOption(String) option}.
-	 *  </li>
+	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.</li>
 	 * </ul>
 	 * 
 	 */
@@ -166,13 +158,6 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	)
 	{
 		init ();
-		
-		LuceneEnv luceneMgr = this.getOption ( "LuceneEnv" );
-  	if ( luceneMgr == null ) throw new IllegalArgumentException (
-  			"Cannot initialise the Cypher resourceResource traverser: "
-  		+ "you must pass me the LuceneEnv option (see OndexServiceProvider)"
-  	);
-  	
   	long queryTimeout = this.getOption ( CFGOPT_CY_QUERY_TIMEOUT, 3000l, Long::parseLong );
  		
 		CypherClientProvider cyProvider = springContext.getBean ( CypherClientProvider.class );
@@ -254,7 +239,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 						// interrupted threads.
 						// synchronized ( queryResultIris ) 
 						{
-							CypherClient.findPathsFromIris ( luceneMgr, queryResultIris.stream () )
+							CypherClient.findPathsFromIris ( graph, queryResultIris.stream () )
 							.map ( this::buildEvidencePath )
 							.forEach ( result::add );
 						}
@@ -388,8 +373,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	
 	/**
-	 * The page size used with Cypher queries. {@link #findPathsWithPaging(LuceneEnv, String, String)} is the method where
-	 * this is used. This value can be set via {@link #setOption(String, Object)}, using {@link #CFGOPT_CY_PAGE_SIZE}.
+	 * The page size used with Cypher queries. This is used with PagedCyPathFinder to query the Cypher server in a paged
+	 * fashion, using pages of this size. This value can be set via {@link #setOption(String, Object)}, 
+	 * using {@link #CFGOPT_CY_PAGE_SIZE}. The default of 2500 should be fine in most cases.
 	 * 
 	 */
 	public long getPageSize () {

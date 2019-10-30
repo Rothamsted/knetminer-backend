@@ -19,7 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
-		<ondex.version>2.1.1b-SNAPSHOT</ondex.version>
+		<ondex.version>2.1.1-SNAPSHOT</ondex.version>
 		
 		<neo4j.server.version>3.4.6</neo4j.server.version>
 		<neo4j.server.boltPort>17690</neo4j.server.boltPort>
@@ -63,15 +63,21 @@
 				<version>${ondex.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>net.sourceforge.ondex.core</groupId>
-				<artifactId>lucene</artifactId>
-				<version>${ondex.version}</version>			
-			</dependency>
-			<dependency>
 				<groupId>net.sourceforge.ondex.modules</groupId>
 				<artifactId>oxl</artifactId>
 				<version>${ondex.version}</version>			
 			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.ondex.core</groupId>
+				<artifactId>base</artifactId>
+				<version>${ondex.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>			
 			<dependency>
 					<groupId>net.sourceforge.ondex.core</groupId>
 					<artifactId>workflow-api</artifactId>

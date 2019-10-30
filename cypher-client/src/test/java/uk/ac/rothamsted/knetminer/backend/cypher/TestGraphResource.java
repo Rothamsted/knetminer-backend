@@ -3,11 +3,12 @@ package uk.ac.rothamsted.knetminer.backend.cypher;
 import org.junit.rules.ExternalResource;
 
 import net.sourceforge.ondex.core.ONDEXGraph;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
+import net.sourceforge.ondex.core.util.GraphMemIndex;
 import net.sourceforge.ondex.parser.oxl.Parser;
 
 /**
- * An {@link ExternalResource} that initialiases an {@link ONDEXGraph} and its {@link LuceneEnv index manager}.
+ * An {@link ExternalResource} that initialiases a new {@link ONDEXGraph} to be used for the tests and also prepares/resets
+ * its {@link GraphMemIndex}.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>31 Jan 2019</dd></dl>
@@ -15,31 +16,23 @@ import net.sourceforge.ondex.parser.oxl.Parser;
  */
 public class TestGraphResource extends ExternalResource
 {
-	private static LuceneEnv luceneMgr = null;
 	private static ONDEXGraph graph = null;
 	
 	@Override
-	protected synchronized void before () throws Throwable
+	protected synchronized void before ()
 	{
-		if ( graph != null ) return;
-		
-		graph = Parser.loadOXL ( "target/dependency/ara-tiny.oxl" );
-		luceneMgr = new LuceneEnv ( "target/ara-tiny-lucene", true );
-		luceneMgr.setONDEXGraph ( graph );
+		if ( graph == null )
+			graph = Parser.loadOXL ( "target/dependency/ara-tiny.oxl" );
+		//GraphMemIndex.getInstance ( graph ).updateIndex ();
 	}
 
 	@Override
 	protected synchronized void after ()
 	{
-		if ( luceneMgr == null ) return;
-		luceneMgr.closeAll ();
+		//GraphMemIndex.getInstance ( graph ).clear ();
 	}
 
 	
-	public LuceneEnv getLuceneMgr () {
-		return luceneMgr;
-	}
-
 	public ONDEXGraph getGraph () {
 		return graph;
 	}

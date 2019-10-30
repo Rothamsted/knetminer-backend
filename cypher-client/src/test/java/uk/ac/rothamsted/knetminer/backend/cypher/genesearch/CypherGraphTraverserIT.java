@@ -34,7 +34,7 @@ import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXEntity;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import net.sourceforge.ondex.core.ONDEXRelation;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
+import net.sourceforge.ondex.core.util.GraphMemIndex;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.TestGraphResource;
 
@@ -60,7 +60,6 @@ public class CypherGraphTraverserIT
 		Map<String, Object> options = new HashMap<> ();
 		options.put ( "GraphTraverserClass", CypherGraphTraverser.class.getName () );
 		options.put ( CypherGraphTraverser.CFGOPT_PATH, "target/test-classes/test-config/config.xml" );
-		options.put ( "LuceneEnv", graphResource.getLuceneMgr () );
 		graphTraverser = AbstractGraphTraverser.getInstance ( options );
 	}
 			
@@ -139,9 +138,9 @@ public class CypherGraphTraverserIT
 			iri ( "bkr:gene_at1g63650_locus_2026629" )
 		);
 				
-		LuceneEnv luceneMgr = graphResource.getLuceneMgr ();
+		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graphResource.getGraph () );
 		List<ONDEXConcept> startConcepts = conceptIris.map ( iri -> {
-			ONDEXConcept c = luceneMgr.getConceptByIRI ( iri );
+			ONDEXConcept c = memIdx.get ( "iri", iri );
 			if ( c == null ) throwEx (
 				IllegalArgumentException.class,
 				"Concept <%s> not found!", 

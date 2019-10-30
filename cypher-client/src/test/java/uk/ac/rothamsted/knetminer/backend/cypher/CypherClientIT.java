@@ -109,7 +109,7 @@ public class CypherClientIT
 			"LIMIT 10";
 		
 		List<List<ONDEXEntity>> odxEnts = cyProvider.query ( 
-			client -> client.findPaths ( graphResource.getLuceneMgr (), query ).collect ( Collectors.toList () ) 
+			client -> client.findPaths ( graphResource.getGraph (), query ).collect ( Collectors.toList () ) 
 		);
 		
 		Assert.assertNotNull ( "Null result!", odxEnts );

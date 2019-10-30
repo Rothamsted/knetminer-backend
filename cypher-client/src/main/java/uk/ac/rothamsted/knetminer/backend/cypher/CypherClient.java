@@ -1,6 +1,7 @@
 package uk.ac.rothamsted.knetminer.backend.cypher;
 
 import static java.util.Spliterators.spliteratorUnknownSize;
+import static net.sourceforge.ondex.core.util.ONDEXGraphUtils.getEntityType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,11 @@ import org.neo4j.driver.v1.types.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXEntity;
-import net.sourceforge.ondex.core.searchable.LuceneEnv;
+import net.sourceforge.ondex.core.ONDEXGraph;
+import net.sourceforge.ondex.core.ONDEXRelation;
+import net.sourceforge.ondex.core.util.GraphMemIndex;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 
 /**
@@ -66,14 +70,14 @@ public class CypherClient implements AutoCloseable
 	 * <p>if params is non-null, it is used to instantiate the query, via {@link #queryToStream(String, Value)}.</p>
 	 * 
 	 * <p>This is based on {@link #findPathIris(String, Value)}, which uses {@link #queryToStream(String, Value)} 
-	 * (see the note about parallelism attached to that method), and {@link #findPathsFromIris(LuceneEnv, Stream)}.</p>
+	 * (see the note about parallelism attached to that method), and {@link #findPathsFromIris(ONDEXGraph, Stream)}.</p>
 	 * 
 	 */
-	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query, Value params )
+	public Stream<List<ONDEXEntity>> findPaths ( ONDEXGraph graph, String query, Value params )
 	{
 		Stream<List<String>> rawResults = findPathIris ( query, params );
 		try {
-			return findPathsFromIris ( luceneMgr, rawResults );
+			return findPathsFromIris ( graph, rawResults );
 		}
 		catch ( IllegalStateException ex ) {
 			throw ExceptionUtils.buildEx (
@@ -88,43 +92,62 @@ public class CypherClient implements AutoCloseable
 	/**
 	 * Wrapper without query parameters.
 	 */
-	public Stream<List<ONDEXEntity>> findPaths ( LuceneEnv luceneMgr, String query ) {
-		return findPaths ( luceneMgr, query, null );
+	public Stream<List<ONDEXEntity>> findPaths ( ONDEXGraph graph, String query ) {
+		return findPaths ( graph, query, null );
 	}
 	
 	/**
-	 * A low-level version of {@link #findPaths(LuceneEnv, String, Value)}, which just returns path IRis
-	 * for every paths achievable from the query.
+	 * A low-level version of {@link #findPaths(ONDEXGraph, String, Value), which just returns path IRIs
+	 * for every path achievable from the query.
 	 *  
 	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
 	 * 
 	 */
-	public static Stream<List<ONDEXEntity>> findPathsFromIris ( LuceneEnv luceneMgr, Stream<List<String>> pathsAsIris )
+	public static Stream<List<ONDEXEntity>> findPathsFromIris ( ONDEXGraph graph, Stream<List<String>> pathsAsIris )
 	{
-		return pathsAsIris.map ( thisPathIris -> findPathFromIris ( luceneMgr, thisPathIris ));
+		return pathsAsIris.map ( thisPathIris -> findPathFromIris ( graph, thisPathIris ));
 	}
 
 	/**
-	 * This is like {@link #findPathsFromIris(LuceneEnv, Stream)}, but works on the IRIs of a single path, 
-	 * might be useful sometimes. Se the notes repored in the other method.
+	 * This is like {@link #findPathsFromIris(ONDEXGraph, Stream)}, but works on the IRIs of a single path, 
+	 * might be useful sometimes. @see the notes reported in the other method.
 	 *  
 	 */
-	public static List<ONDEXEntity> findPathFromIris ( LuceneEnv luceneMgr, List<String> pathsAsIris )
+	public static List<ONDEXEntity> findPathFromIris ( ONDEXGraph graph, List<String> pathsAsIris )
 	{
+		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graph );
 		int[] pathIdx = new int [] { -1 };
 		return pathsAsIris.stream ()
 			.map ( iri ->
 			{ 
-				ONDEXEntity oe = ++pathIdx[ 0 ] % 2 == 0 
-				  ? luceneMgr.getConceptByIRI ( iri ) 
-				  : luceneMgr.getRelationByIRI ( iri );
+				
+				Class<? extends ONDEXEntity> targetClass = ++pathIdx[ 0 ] % 2 == 0 
+					? ONDEXConcept.class
+				  : ONDEXRelation.class;
+
+				ONDEXEntity oe = memIdx.get ( "iri", iri );
+				
 				if ( oe == null ) ExceptionUtils.throwEx (
 					IllegalStateException.class, 
-					"Cannot find any Ondex %s for URI '%s', at index %d.",
-					pathIdx[ 0 ] % 2 == 0 ? "concept" : "relation", iri, pathIdx[ 0 ]
+					"Cannot find any Ondex %s for URI '%s', for the index %d of a path",
+					getEntityType ( targetClass ),
+					iri,
+					pathIdx[ 0 ]
 				);
+								
+				if ( !targetClass.isInstance ( oe ) ) ExceptionUtils.throwEx (
+					IllegalStateException.class, 
+					"The URI <%s> is about a %s, but %s is expected at index %d of a path",
+					iri,
+					getEntityType ( oe ),
+					getEntityType ( targetClass ),
+					pathIdx [ 0 ]
+				);
+				
 				return oe;
-			}).collect ( Collectors.toList () );
+				
+			}) // pathsAsIris.map()
+			.collect ( Collectors.toList () );
 	}	
 	
 		
@@ -155,7 +178,7 @@ public class CypherClient implements AutoCloseable
 	 * <p>Runs the query via {@link #queryToStream(String, Value)} and, for each Cypher node/relation returned, 
 	 * extracts the {@code iri} property and eventually returns a stream of iri lists, one list per path.
 	 * This assumes the query returns a path ({@code MATCH p = .... RETURN p}) as first projection. The IRIs are used
-	 * by methods like {@link #findPaths(LuceneEnv, String, Value)}, to convert IRIs to Ondex entities, which assumes 
+	 * by methods like {@link #findPaths(ONDEXGraph, String, Value)}, to convert IRIs to Ondex entities, which assumes 
 	 * the Neo4j database corresponds to the in-memory Ondex graph (i.e., was created using the neo4j export tool, using
 	 * the in-memory OXL).</p>
 	 * 
