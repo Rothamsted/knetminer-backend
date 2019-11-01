@@ -21,7 +21,7 @@
 		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
 		<ondex.version>2.1.1-SNAPSHOT</ondex.version>
 		
-		<neo4j.server.version>3.4.6</neo4j.server.version>
+		<neo4j.server.version>3.5.12</neo4j.server.version>
 		<neo4j.server.boltPort>17690</neo4j.server.boltPort>
 		<neo4j.server.httpPort>17490</neo4j.server.httpPort>
 		<!-- update-sources.sh needs to override this -->
