@@ -31,9 +31,11 @@ import net.sourceforge.ondex.core.util.GraphMemIndex;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 
 /**
- * A facade for Cypher/Neo4j clients, allowing  for simplified transaction management and specific Knetminer functions.
- * A client instance is associated to a Neo4j {@link Session}, this is either passed to the constructor, or set  
+ * <p>A facade for Cypher/Neo4j clients, allowing  for simplified transaction management and specific Knetminer functions.
+ * A client instance is associated to a Neo4j {@link Session}, this is either passed to the constructor, or set.</p>  
  *
+ * <p>TODO: comments </p>
+ * 
  * @author brandizi
  * <dl><dt>Date:</dt><dd>11 Oct 2018</dd></dl>
  *
@@ -113,11 +115,11 @@ public class CypherClient implements AutoCloseable
 	 * might be useful sometimes. @see the notes reported in the other method.
 	 *  
 	 */
-	public static List<ONDEXEntity> findPathFromIris ( ONDEXGraph graph, List<String> pathsAsIris )
+	public static List<ONDEXEntity> findPathFromIris ( ONDEXGraph graph, List<String> pathAsIris )
 	{
 		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graph );
 		int[] pathIdx = new int [] { -1 };
-		return pathsAsIris.stream ()
+		return pathAsIris.stream ()
 			.map ( iri ->
 			{ 
 				
@@ -159,7 +161,9 @@ public class CypherClient implements AutoCloseable
 	 * iterated only when the corresponding {@link Stream} methods are invoked.</p>
 	 * 
 	 * <p>Note that this method returns an immutable parallel stream, so you might need {@link Stream#sequential()}
-	 * in your code (eg, in {@link Stream#forEach(java.util.function.Consumer)}, to ensure thread safety).</p>
+	 * in your code (eg, in {@link Stream#forEach(java.util.function.Consumer)}, to ensure thread safety).
+	 * TODO: for the moment it's not parallel, probably it's not good to stress the Neo4j connection with 
+	 * parallelism, to be verified..</p>
 	 * 
 	 */
 	protected Stream<Record> queryToStream ( String query, Value params )
@@ -170,7 +174,7 @@ public class CypherClient implements AutoCloseable
 			: this.tx.run ( query, params );
 				
 		Spliterator<Record> splitr = spliteratorUnknownSize ( cursor, Spliterator.IMMUTABLE );
-		return StreamSupport.stream ( splitr, false );		
+		return StreamSupport.stream ( splitr, false );
 	}
 	
   

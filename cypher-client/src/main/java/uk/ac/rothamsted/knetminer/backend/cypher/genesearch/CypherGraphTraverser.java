@@ -174,7 +174,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				
 		// And now let's hand it to Cypher.
 		// All the results
-		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> ( 40 ) );
+		final List<EvidencePathNode> result = Collections.synchronizedList ( new ArrayList<> () );
 
 		// Loop over all the queries with the parameter gene
 		// We close this stream here because we noticed "connection already closed" errors with neo4j
@@ -191,7 +191,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				// Note on sycnrhonizedList: it's because we're seeing unexplicable ConcurrentModificationException
 				// I suspect they come from interrupted threads.
 				//
-				List<List<String>> queryResultIris = new ArrayList<> ( 20 );
+				List<List<String>> queryResultIris = new ArrayList<> ();
 				final List<List<String>> roQueryResultIris = queryResultIris; // just for the lambda RO requirements
 				
 				// Used below, by the performanceTracker
@@ -224,6 +224,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					// The query didn't complete within the timeout, results are partial, we must invalidate
 					// everything
 					queryResultIris = null;
+					roQueryResultIris.clear (); // we suspect they're leaked when the action above is interrupted
 					if ( log.isTraceEnabled () )
 						log.trace ( "Query timed out. Gene: <{}>, query: {}", startGeneIri, query );
 				}
@@ -239,7 +240,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 						// interrupted threads.
 						// synchronized ( queryResultIris ) 
 						{
-							CypherClient.findPathsFromIris ( graph, queryResultIris.stream () )
+							CypherClient.findPathsFromIris ( graph, queryResultIris.parallelStream () )
+							.parallel ()
 							.map ( this::buildEvidencePath )
 							.forEach ( result::add );
 						}
