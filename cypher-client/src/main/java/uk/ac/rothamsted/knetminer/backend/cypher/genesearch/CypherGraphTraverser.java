@@ -224,7 +224,6 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 					// The query didn't complete within the timeout, results are partial, we must invalidate
 					// everything
 					queryResultIris = null;
-					roQueryResultIris.clear (); // we suspect they're leaked when the action above is interrupted
 					if ( log.isTraceEnabled () )
 						log.trace ( "Query timed out. Gene: <{}>, query: {}", startGeneIri, query );
 				}
