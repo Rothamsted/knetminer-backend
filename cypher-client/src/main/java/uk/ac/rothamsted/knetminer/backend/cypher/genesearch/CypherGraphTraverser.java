@@ -1,5 +1,6 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CyTraverserPerformanceTracker.CFGOPT_PERFORMANCE_REPORT_FREQ;
@@ -341,7 +342,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 				"Timed out query: %s. Gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIri,
-				StringEscapeUtils.escapeJava ( query )
+				escapeJava ( query )
 			);
 		}
 		catch ( Exception ex )
