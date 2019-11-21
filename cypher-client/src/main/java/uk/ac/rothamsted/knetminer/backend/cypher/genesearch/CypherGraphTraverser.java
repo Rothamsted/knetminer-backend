@@ -255,6 +255,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 						);
 					}
 
+				roQueryResultIris.clear (); // TODO: debugging memory leak issues.
 				// DEBUG log.info ( "--- DONE (Lucene): <{}>, query: \"{}\"", startGeneIri, escapeJava ( query ) );
 				
 				if ( this.queryProgressLogger != null ) this.queryProgressLogger.updateWithIncrement ();
