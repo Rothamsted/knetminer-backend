@@ -58,15 +58,15 @@ import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 public class SinglePathQueryProcessor
 	extends ListBasedBatchProcessor<ONDEXConcept, Consumer<List<ONDEXConcept>>>
 {	
-	public static final long DEFAULT_QUERY_BATCH_SIZE = 10000;
+	public static final long DEFAULT_QUERY_BATCH_SIZE = 1000;
 	
 	private String pathQuery;
 		
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
 	
-	@Autowired ( required = false ) @Qualifier ( "queryTimeout" )
-	private long queryTimeout = 2500;
+	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
+	private long queryTimeout = 5000;
 	
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
