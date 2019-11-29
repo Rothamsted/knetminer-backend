@@ -128,6 +128,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		init ();
 
+		log.info ( "Graph Traverser, beginning parallel traversing of {} concept(s)", concepts.size () );
+		
 		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
 		PathQueryProcessor queryProcessor = this.springContext.getBean ( PathQueryProcessor.class );
 		queryProcessor.process ( graph, concepts, result );

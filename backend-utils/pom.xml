@@ -6,4 +6,5 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>backend-utils</artifactId>
+  <description>TODO: For the moment, it's empty. To be decided if it has to be removed.</description>
 </project>
