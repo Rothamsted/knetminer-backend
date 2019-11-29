@@ -3,7 +3,6 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -130,9 +129,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 		log.info ( "Graph Traverser, beginning parallel traversing of {} concept(s)", concepts.size () );
 		
-		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
 		PathQueryProcessor queryProcessor = this.springContext.getBean ( PathQueryProcessor.class );
-		queryProcessor.process ( graph, concepts, result );
+		Map<ONDEXConcept, List<EvidencePathNode>> result = queryProcessor.process ( graph, concepts );
 
 		if ( filter == null ) return result;
 		

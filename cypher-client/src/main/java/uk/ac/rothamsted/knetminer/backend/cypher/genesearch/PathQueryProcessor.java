@@ -3,6 +3,8 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import static java.lang.Math.ceil;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,14 +72,16 @@ public class PathQueryProcessor implements ApplicationContextAware
 	}
 	
 	@SuppressWarnings ( { "rawtypes" } )
-	public void process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts, Map<ONDEXConcept, List<EvidencePathNode>> result )
+	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
+		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
+		
 		this.cyTraverserPerformanceTracker.reset ();
 				
 		PercentProgressLogger queryProgressLogger = new PercentProgressLogger ( 
 			"{}% of graph traversing queries processed",
 			(long) ceil ( 1.0 * concepts.size () / this.queryBatchSize ) * semanticMotifsQueries.size (),
-			1 // TODO: debug, go back to 10 sooner than later
+			10
 		);
 		
 		this.semanticMotifsQueries.parallelStream ()
@@ -88,6 +92,8 @@ public class PathQueryProcessor implements ApplicationContextAware
 		});
 		
 		this.cyTraverserPerformanceTracker.logStats ();
+		
+		return result;
 	}
 	
 	

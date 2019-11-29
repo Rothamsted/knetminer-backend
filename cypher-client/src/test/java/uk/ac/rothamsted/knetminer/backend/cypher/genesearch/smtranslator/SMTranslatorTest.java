@@ -16,7 +16,6 @@ import net.sourceforge.ondex.core.memory.MemoryONDEXGraph;
 import net.sourceforge.ondex.exception.type.ParsingFailedException;
 import net.sourceforge.ondex.parser.oxl.Parser;
 import uk.ac.ebi.utils.io.IOUtils;
-import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.smtranslator.StateMachine2CyTranslator;
 
 /**
  * Tests {@link StateMachine2CyTranslator}. Tests are based on dummy SM files in src/test/resources, open them

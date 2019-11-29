@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,7 +64,7 @@ public class SinglePathQueryProcessor
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
 	
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
-	private long queryTimeout = 5000;
+	private long queryTimeout = 60 * 1000;
 	
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
@@ -122,10 +120,11 @@ public class SinglePathQueryProcessor
 			queryProgressLogger.updateWithIncrement ();
 		});
 
-		// TODO: parallelStream() might be worth here and should work, but need testing.
-		// This is only about scanning the concepts in parallel or not, the queries are 
-		// parallel anyway.
+		// TODO: parallelStream() might be worth here and should work, but needs testing.
+		// This is only about scanning the concepts and build the batches in parallel or not, 
+		// querying the batches of concepts is parallel anyway.
 		super.process ( concept -> concepts.stream ().forEach ( concept ) );
+		
 	}
 	
 	
@@ -301,10 +300,12 @@ public class SinglePathQueryProcessor
 				odxEnt.getClass ().getCanonicalName () 
 			);
 		}
+		
 		if ( result == null ) throwEx ( 
 			IllegalStateException.class, 
 			"Internal error: Cypher Graph Traverser got a null result from entity->evidence-path conversion"
 		);
+		
 		return result;
 	}
 

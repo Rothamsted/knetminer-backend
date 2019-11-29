@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
