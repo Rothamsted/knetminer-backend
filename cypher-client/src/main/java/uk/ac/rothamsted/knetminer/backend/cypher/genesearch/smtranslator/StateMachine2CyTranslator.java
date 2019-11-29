@@ -229,7 +229,7 @@ public class StateMachine2CyTranslator
 				// A new path, choose a name and build the final query by wrapping the clauses collected so far from
 				// upstream nodes.
 				String qname = format ( "%03d_L%02d_%s", resultsCount.incrementAndGet (), distance, buildNodeId ( state ) );
-				result.put ( qname, "MATCH path = " + partialQuery + "\nRETURN path" );
+				result.put ( qname, "MATCH path = " + partialQuery + "\nWHERE gene_1.iri IN $startGeneIris\nRETURN path" );
 				return;
 			}
 
@@ -355,13 +355,7 @@ public class StateMachine2CyTranslator
 		String nodeMatchStr = buildNodeId ( s );
 		if ( isLoopMode ) nodeMatchStr += "b";
 		nodeMatchStr += ":" + s.getValidConceptClass ().getId ();
-		
-		if ( stateMachine.getStart ().equals ( s ) ) {
-			// for the first state, the form is (gene_1:Gene{ iri: $startIri}), where the placeholder
-			// is instantiated by the graph traverser.
-			nodeMatchStr += "{ iri: $startIri }";
-		}
-				
+						
 		return "(" + nodeMatchStr + ")";
 	}
 	

@@ -1,65 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
 
-		<!-- 
-		  Just leave this here. It means some components are got from the Java source files, by means of
-		  Spring annotations. You do need this base (which the declaration below extend/override). 
-		-->
-    <context:component-scan base-package = "uk.ac.rothamsted.knetminer.backend" />
+	<!-- 
+	  Just leave this here. It means some components are got from the Java source files, by means of
+	  Spring annotations. You do need this base (which the declarations below extend/override). 
+	-->
+  <context:component-scan base-package = "uk.ac.rothamsted.knetminer.backend" />
     
-    <bean name = "configDirPath" class = "java.lang.String">
-    	<constructor-arg value = "target/test-classes/test-config" />
-    </bean> 
+  <bean name = "configDirPath" class = "java.lang.String">
+  	<constructor-arg value = "target/test-classes/test-config" />
+  </bean> 
+
+	<!-- All the parameters below that are commented have defaults in the code, as specified in the comments, 
+	so you only need to uncomment if you want to change the defaults --> 
     
-		<!-- 
-			This is one of the many ways to read query definitions from files. 
-			All *.cypher files are read using our IOUtils. 
-		-->
-		<bean name = "semanticMotifsQueries" class = "java.util.Arrays" factory-method = "asList" >
-			<constructor-arg>
-				<bean class = "uk.ac.ebi.utils.io.IOUtils" factory-method = "readFiles">
-					<constructor-arg ref = "configDirPath" />
-					<constructor-arg>
-						<bean class = "org.apache.commons.io.filefilter.WildcardFileFilter">
-							<constructor-arg value = "*.cypher" />
-						</bean>
-					</constructor-arg>
-				</bean>
-			</constructor-arg>
+	<!-- 
+		This is one of the many ways to read query definitions from files. 
+		All *.cypher files are read using our IOUtils. 
+	-->
+	<bean name = "semanticMotifsQueries" class = "java.util.Arrays" factory-method = "asList" >
+		<constructor-arg>
+			<bean class = "uk.ac.ebi.utils.io.IOUtils" factory-method = "readFiles">
+				<constructor-arg ref = "configDirPath" />
+				<constructor-arg>
+					<bean class = "org.apache.commons.io.filefilter.WildcardFileFilter">
+						<constructor-arg value = "*.cypher" />
+					</bean>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	
+	<!--
+		This is another possible initialisation pattern.
+		Apache IOUtils are used to read file contents into strings. 
+	-->	
+	<!-- util:list id = "semanticMotifsQueries" value-type = "java.lang.String">
+		<bean class = "org.apache.commons.io.IOUtils" factory-method = "toString">
+			<constructor-arg 
+				value = "classpath:test-config/simple-protein-publication.cypher"
+				type = "java.io.Reader" 
+			/>
 		</bean>
-		
-			<!--
-				This is another possible initialisation pattern.
-				Apache IOUtils are used to read file contents into strings. 
-			-->		
-			<!-- util:list id = "semanticMotifsQueries" value-type = "java.lang.String">
-			<bean class = "org.apache.commons.io.IOUtils" factory-method = "toString">
-				<constructor-arg 
-					value = "classpath:test-config/simple-protein-publication.cypher"
-					type = "java.io.Reader" 
-				/>
-			</bean>
-			<bean class = "org.apache.commons.io.IOUtils" factory-method = "toString">
-				<constructor-arg 
-					value = "classpath:test-config/simple-gene-occurrence.cypher"
-					type = "java.io.Reader" 
-				/>
-			</bean>
-		</util:list -->
+		<bean class = "org.apache.commons.io.IOUtils" factory-method = "toString">
+			<constructor-arg 
+				value = "classpath:test-config/simple-gene-occurrence.cypher"
+				type = "java.io.Reader" 
+			/>
+		</bean>
+	</util:list -->
         
- 		<!-- The Neo4j driver -->
-		<bean id = "neoDriver" class = "org.neo4j.driver.v1.GraphDatabase" 
-					factory-method="driver" destroy-method="">
-			<constructor-arg value = "bolt://127.0.0.1:${neo4j.server.boltPort}" />
-			<constructor-arg>
-				<bean class = "org.neo4j.driver.v1.AuthTokens" factory-method = "basic">
-					<constructor-arg value = "neo4j" />
-					<constructor-arg value = "test" />
-				</bean>
-			</constructor-arg>
-		</bean>
+        
+ 	<!-- The Neo4j driver -->
+	<bean id = "neoDriver" class = "org.neo4j.driver.v1.GraphDatabase" 
+			factory-method="driver" destroy-method="">
+		<constructor-arg value = "bolt://127.0.0.1:${neo4j.server.boltPort}" />
+		<constructor-arg>
+			<bean class = "org.neo4j.driver.v1.AuthTokens" factory-method = "basic">
+				<constructor-arg value = "neo4j" />
+				<constructor-arg value = "test" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	
+	<!-- 
+		Cypher queries about semantic motifs are paginated in two ways: each query is passes a chunk of initial genes
+	 	to work out, and results from the query are fetched in a paginated loop (ie, using LIMIT/OFFSET).
+	 	
+	 	Very likely, you don't want to touch these values, unless you're a developer knowing what you're doing.  
+	 
+	-->    	 
+ 
+  <!-- This is the number of gene parameters that the query receives -->
+	<!-- <bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg type = "java.lang.Long" value = "10000" /></bean> -->
+  <!-- This is a test setting, needed in the tests -->
+	<bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
+
+	<!-- This is for the page size -->
+  <!-- <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean> -->
+  <!-- This is a test setting, needed in the tests -->
+  <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
+    
+    
+  <!-- 
+  	Queries that take longer than this time are aborted and their partial results ignored. 
+  	This is important in order to avoid that some troubling query hangs the whole traversal
+  	job 
+  -->
+	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "2500"/></bean> -->
+	
+	<!-- 
+		This is mostly for debug purposes. The graph traverser has a performance tracker, which periodically logs the 
+		measured performance of the semantic motif queries it submits to Neo4j.
+		
+		If this value is < 0, no performance tracking is performed.
+		If it's 0, reports are logged only when an entire set of genes are traversed.
+		If it's >0, reports are logged every a number of queries specified by this parameter. 
+		
+	-->
+	<!--   <bean name = "performanceReportFrequency" class = "java.lang.Long"><constructor-arg value = "0" /></bean> -->
+	
 </beans>

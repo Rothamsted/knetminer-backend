@@ -64,7 +64,7 @@ public class KnetminerCypherTest
 	{
 		try ( Session session = neoDriver.session ( AccessMode.READ ) )
 		{
-			StatementResult res = session.run ( "MATCH (g:Gene{TAXID:'4565'}) RETURN g.iri LIMIT 10000" );
+			StatementResult res = session.run ( "MATCH (g:Gene{TAXID:'4565'}) RETURN g.iri LIMIT 100" );
 			return res.list ( r -> r.get ( 0 ).asString () );
 		}
 	}
@@ -87,57 +87,35 @@ public class KnetminerCypherTest
 		ProgressLogger tracker = new ProgressLogger ( "{} paths returned", 100 );
 		
 		// For each IRI and for each query
-		geneIris
+		queries
 		.parallelStream ()
-		.forEach ( iri -> 
+		.forEach ( query -> 
 		{
-			queries
-			.parallelStream ()
-			.forEach ( query -> 
-			{
-				// get paginated results
-				
-				long pageSize = 2500;
-				final String pgQuery = query + "\nSKIP $offset LIMIT " + pageSize;
+			// get paginated results
+			
+			long pageSize = 2500;
+			final String pgQuery = query + "\nSKIP $offset LIMIT " + pageSize;
 
-				for ( long offset = 0;; offset += pageSize ) 
-				{
-					long offsetFinal = offset;
-					// wrappint it into try() forces closure as soon as it's no longer needed
-					try ( 
-						Stream<List<String>> paths = cyProvider.queryToStream ( 
-							client -> client.findPathIris ( 
-								pgQuery, 
-								Values.parameters ( "startIri", iri, "offset", offsetFinal ) 
-							)
+			for ( long offset = 0;; offset += pageSize ) 
+			{
+				long offsetFinal = offset;
+				// wrapInt it into try() forces closure as soon as it's no longer needed
+				try ( 
+					Stream<List<String>> paths = cyProvider.queryToStream ( 
+						client -> client.findPathIris ( 
+							pgQuery, 
+							Values.parameters ( "startGeneIris", geneIris, "offset", offsetFinal ) 
 						)
-						//.onClose ( () -> log.info ( "CLOSING" ) )
 					)
-					{
-						long ct = paths.count ();
-						if ( ct == 0 ) break;
-						tracker.updateWithIncrement ( ct );
-					}
+					//.onClose ( () -> log.info ( "CLOSING" ) )
+				)
+				{
+					long ct = paths.count ();
+					if ( ct == 0 ) break;
+					tracker.updateWithIncrement ( ct );
 				}
-			});
+			}
 		});
 	}
 	
-	
-	//@Test
-	public void testRepeatedQueries () throws IOException
-	{
-		List<String> queries = getQueries ();
-		
-		Map<String, Long> freqs = queries.stream ()
-		.collect ( Collectors.groupingBy ( Function.identity (), Collectors.counting () ) );
-		
-		log.info ( "---- {} queries", freqs.size () );
-		
-		freqs
-			.entrySet ()
-			.stream ()
-			.sorted ( (e1, e2) -> Long.compare ( e2.getValue (), e1.getValue () ) )
-			.forEach ( e -> log.info ( "{}: {}", e.getValue (), e.getKey () ) );
-	}
 }

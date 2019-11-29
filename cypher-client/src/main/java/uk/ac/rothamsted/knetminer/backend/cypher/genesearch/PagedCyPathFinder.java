@@ -5,10 +5,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import javax.annotation.Resource;
+
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
@@ -27,17 +33,23 @@ import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
  * <dl><dt>Date:</dt><dd>10 Jul 2019</dd></dl>
  *
  */
+@Component @Scope ( "prototype" )
 class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 {
 	/**
 	 * Used internally to compose the Cypher queries
 	 */
-	static final String PAGINATION_TRAIL = "\nSKIP $offset LIMIT $pageSize";
+	private static final String PAGINATION_TRAIL = "\nSKIP $offset LIMIT $pageSize";
 
-	private final String startGeneIri;
-	private final String query;
-	private final long pageSize;
-	private final CypherClientProvider cyProvider;
+	private List<String> startGeneIris;
+	private String query;
+	
+	@Autowired ( required = false ) @Qualifier ( "queryPageSize" )
+	private long queryPageSize = 2500;
+	
+	@Resource
+	private CypherClientProvider cypherClientProvider;
+	
 	
 	private long offset;
 	private Stream<List<String>> currentPageStream = null;
@@ -48,15 +60,11 @@ class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	
-	PagedCyPathFinder ( 
-		String startGeneIri, String query, long pageSize, CypherClientProvider cyProvider	
-	)
+	public void init ( List<String> startGeneIris, String query )
 	{
-		this.startGeneIri = startGeneIri;
+		this.startGeneIris = startGeneIris;
 		this.query = query;
-		this.pageSize = pageSize;
-		this.cyProvider = cyProvider;
-		this.offset = -pageSize;
+		this.offset = -queryPageSize;
 	}
 
 	/**
@@ -71,18 +79,18 @@ class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 		// Close the current exhausted stream, which is going to be disposed (if non-null)
 		this.closePage ();
 		
-		offset += pageSize;
+		offset += queryPageSize;
 		log.trace ( "offset: {} for query: {}", offset, query );
 		
 		Value params = Values.parameters ( 
-			"startIri", startGeneIri,
+			"startGeneIris", startGeneIris,
 			"offset", offset,
-			"pageSize", pageSize
+			"pageSize", queryPageSize
 		); 
 					
 		String pagedQuery = query + PAGINATION_TRAIL;
 
-		this.currentPageStream = cyProvider.queryToStream (
+		this.currentPageStream = cypherClientProvider.queryToStream (
 			cyClient -> cyClient.findPathIris ( pagedQuery, params )
 		)
 		.sequential ();
@@ -156,9 +164,9 @@ class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 	{
 		ExceptionUtils.throwEx ( 
 			ex, 
-			"%s, gene: <%s>, offset: %d, query: [%s]",
+			"%s, initial gene: <%s>, offset: %d, query: [%s]",
 			prefixMsg,
-			this.startGeneIri,
+			this.startGeneIris.get ( 0 ),
 			this.offset,
 			this.query
 		);		

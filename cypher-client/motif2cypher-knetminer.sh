@@ -25,7 +25,7 @@ do
   out_base=$(echo "$i" | sed "s|^$species_dir/||")
   cy_out="$out_dir/$out_base/ws/neo4j/state-machine-queries"
     
-  mkdir --parent "$cy_out"
+  mkdir -p "$cy_out"
   rm -f "$cy_out/sm-"*.cypher
   
 	./motif2cypher.sh "$sm_file" "$cy_out" src/test/resources/wheat-metadata.xml

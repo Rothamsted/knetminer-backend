@@ -1,11 +1,12 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -13,8 +14,14 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
@@ -27,6 +34,7 @@ import uk.ac.ebi.utils.time.XStopWatch;
  * An helper for {@link CypherGraphTraverser}, which tracks the performance of multiple queries, during the execution 
  * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
  */
+@Component
 class CyTraverserPerformanceTracker 
 {
 	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTracking.enabled";
@@ -59,18 +67,34 @@ class CyTraverserPerformanceTracker
 	/** Sums of returned path lengths for the each query **/
 	private Map<String, Long> query2PathLens = Collections.synchronizedMap ( new HashMap<> () );
 	
-	
-	/** Total no. of invocations, ie #queries x #genes **/ 
+	/** Total no. of invocations, ie #queries x #genes / {@link #queryBatchSize} **/ 
 	private AtomicInteger invocations = new AtomicInteger ( 0 );
 	
-	private int reportFrequency = -1;
+	
+	@Autowired(required = false) @Qualifier ( "performanceReportFrequency" )
+	private int reportFrequency = 0;
+
+	
+	@Resource( name = "semanticMotifsQueries" )
+	private List<String> semanticMotifsQueries; 
+
+	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
+	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
+	
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 			
-	CyTraverserPerformanceTracker () 
+	CyTraverserPerformanceTracker () {
+	}
+
+	
+	@PostConstruct
+	public void reset ()
 	{
-		CypherGraphTraverser.getCypherQueries().forEach ( q -> {
+		if ( this.reportFrequency < 0 ) return; // tracking is disabled
+		invocations.getAndSet ( 0 );
+		this.semanticMotifsQueries.forEach ( q -> {
 			this.query2ExecTimes.put ( q, 0l );
 			this.query2Invocations.put ( q, 0 );
 			this.query2Timeouts.put ( q, 0 );
@@ -78,7 +102,7 @@ class CyTraverserPerformanceTracker
 			this.query2Results.put ( q, 0 );
 		});
 	}
-
+	
 	/**
 	 * <p>Does the tracking. This runs the {@code queryAction} and registers the time it took to run.</p>
 	 * 
@@ -91,6 +115,11 @@ class CyTraverserPerformanceTracker
 	 */
 	void track ( String query, Runnable queryAction, Supplier<Integer> pathsCounter, Supplier<Integer> pathLensCounter )
 	{
+		if ( this.reportFrequency < 0 ) {
+			// tracking is disabled
+			queryAction.run ();
+		}
+
 		try {
 			long time = XStopWatch.profile ( queryAction );
 			this.query2ExecTimes.compute ( query, (k, t) -> t + time );
@@ -118,6 +147,15 @@ class CyTraverserPerformanceTracker
 	 */
 	void logStats ()
 	{
+		if ( this.reportFrequency < 0 )
+		{
+			log.debug ( 
+				"{}.logStats(): performance tracking is disabled, ignoring this invocation",
+				this.getClass ().getSimpleName ()
+			);
+			return;
+		}
+
 		StringWriter statsSW = new StringWriter ();
 		PrintWriter out = new PrintWriter ( statsSW );
 		
@@ -126,7 +164,7 @@ class CyTraverserPerformanceTracker
 		if ( nTotQueries == 0 ) return;
 		
 		out.println (   
-			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths\tAvg Time(ms)\tAvg Path Len" 
+			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len" 
 		);
 		
 		SortedSet<String> queries = new TreeSet<> ( query2Invocations.keySet () );
@@ -143,7 +181,7 @@ class CyTraverserPerformanceTracker
 				nqueries,
 				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
-				ncompleted == 0 ? 0d : 1d * nresults / ncompleted,
+				ncompleted == 0 ? 0d : 1d * nresults / ( ncompleted * this.queryBatchSize ),
 				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted,
 				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults
 			);
@@ -153,15 +191,13 @@ class CyTraverserPerformanceTracker
 		log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", statsSW.toString () );
 	}
 
-	/** @see CFGOPT_PERFORMANCE_REPORT_FREQ */	
-	public int getReportFrequency ()
-	{
+
+	public int getReportFrequency () {
 		return reportFrequency;
 	}
 
-	public void setReportFrequency ( int reportFrequency )
-	{
+
+	public void setReportFrequency ( int reportFrequency ) {
 		this.reportFrequency = reportFrequency;
-	}
-	
+	}	
 }

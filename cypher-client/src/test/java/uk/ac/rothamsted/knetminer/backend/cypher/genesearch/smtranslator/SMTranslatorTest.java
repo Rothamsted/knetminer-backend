@@ -41,7 +41,7 @@ public class SMTranslatorTest
 			5,
 			new String [] { "L05_path_4", "L05_enzyme_8", "L05_path_5" },
 			new String [] {	
-				"gene_1:Gene{ iri: $startIri }",
+				"gene_1:Gene",
 				"(bioProc_3:BioProc)",
 				"- [part_of_3_5:part_of] - (path_5:Path)"
 			}
@@ -60,7 +60,7 @@ public class SMTranslatorTest
 			5,
 			new String [] { "L05_path_4", "L05_enzyme_8", "L05_path_5" },
 			new String [] {	
-				"gene_1:Gene{ iri: $startIri }",
+				"gene_1:Gene",
 				"(bioProc_3:BioProc)",
 				"- [part_of_3_5:part_of] - (path_5:Path)",
 				"- [regulates_1_7_d:regulates] -> (tO_7:TO)"
@@ -85,7 +85,7 @@ public class SMTranslatorTest
 				"L05_enzyme_8"
 			},
 			new String [] {	
-				"gene_1:Gene{ iri: $startIri }",
+				"gene_1:Gene",
 				"- [part_of_3_3:part_of*0..1] - (bioProc_3b:BioProc)",
 				"- [asso_wi_7_9_2:asso_wi*1..2] - (molFunc_9:MolFunc)",
 				"- [asso_wi_7_8:asso_wi] - (enzyme_8:Enzyme)"
@@ -106,7 +106,7 @@ public class SMTranslatorTest
 			4,
 			new String [] { "L05_path_5", "L05_tO_7" },
 			new String [] {	
-				"gene_1:Gene{ iri: $startIri }",
+				"gene_1:Gene",
 				"(bioProc_3:BioProc)",
 				// I must split transitions between the same nodes into two, since they have different length constraints
 				"- [is_part_of_3_5_2:is_part_of*1..2] - (path_5:Path)",
@@ -139,9 +139,9 @@ public class SMTranslatorTest
 				"- [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein)",
 				"(protein_10b:Protein)\n  - [rel_10_7:h_s_s|ortho|xref] - (protein_7:Protein)",
 				"(protein_10b:Protein)\n  - [rel_10_7_d_2:genetic|physical*1..2] -> (protein_7:Protein)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [rel_1_9:genetic|physical] - (gene_9:Gene)\n  - [cooc_wi_9_16:cooc_wi] - (trait_16:Trait)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [has_variation_1_15:has_variation] - (sNP_15:SNP)\n  - [associated_with_15_16:associated_with] - (trait_16:Trait)",
-				"(gene_1:Gene{ iri: $startIri })\n  - [cooc_wi_1_16:cooc_wi] - (trait_16:Trait)"
+				"(gene_1:Gene)\n  - [rel_1_9:genetic|physical] - (gene_9:Gene)\n  - [cooc_wi_9_16:cooc_wi] - (trait_16:Trait)",
+				"(gene_1:Gene)\n  - [has_variation_1_15:has_variation] - (sNP_15:SNP)\n  - [associated_with_15_16:associated_with] - (trait_16:Trait)",
+				"(gene_1:Gene)\n  - [cooc_wi_1_16:cooc_wi] - (trait_16:Trait)"
 			} 
 		);
 	}

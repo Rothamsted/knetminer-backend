@@ -3,6 +3,7 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import static info.marcobrandizi.rdfutils.namespaces.NamespaceUtils.iri;
 import static java.lang.String.format;
 import static net.sourceforge.ondex.core.util.ONDEXGraphUtils.getString;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -75,11 +76,8 @@ public class CypherGraphTraverserIT
 			.findAny ()
 			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
 		
-		graphTraverser.setOption ( CypherGraphTraverser.CFGOPT_CY_PAGE_SIZE, 5l ); // Just to try out
-		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graphResource.getGraph (), startConcept, null );
-
+		List<EvidencePathNode> paths = graphTraverser.traverseGraph ( graph, startConcept, null );
 		assertTrue ( "No EvidencePath returned!", paths.size () > 0 );
-		
 		
 		log.info ( "======== Results from traverseGraph() =======" );
 		logPaths ( paths );
@@ -138,7 +136,9 @@ public class CypherGraphTraverserIT
 			iri ( "bkr:gene_at1g63650_locus_2026629" )
 		);
 				
-		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graphResource.getGraph () );
+		ONDEXGraph graph = graphResource.getGraph ();
+
+		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graph );
 		List<ONDEXConcept> startConcepts = conceptIris.map ( iri -> {
 			ONDEXConcept c = memIdx.get ( "iri", iri );
 			if ( c == null ) throwEx (
@@ -151,9 +151,11 @@ public class CypherGraphTraverserIT
 		.collect ( Collectors.toList () );
 		
 		Map<ONDEXConcept, List<EvidencePathNode>> pathsMap = 
-			graphTraverser.traverseGraph ( graphResource.getGraph (), new HashSet<> ( startConcepts ), null );
+			graphTraverser.traverseGraph ( graph, new HashSet<> ( startConcepts ), null );
 		
 		assertNotNull ( "No result from traverseGraph(<set>) (null)", pathsMap );
+		logResultPaths ( pathsMap );
+		
 		assertTrue ( "No result from traverseGraph(<set>) (size)", pathsMap.size () > 0 );
 		assertEquals ( "traverseGraph(<set>) wrong size returned!", startConcepts.size (), pathsMap.keySet ().size () );
 		
@@ -328,5 +330,16 @@ public class CypherGraphTraverserIT
 			}
 			i++;
 		}
+	}
+	
+	
+	private void logResultPaths ( Map<ONDEXConcept, List<EvidencePathNode>> pathsMap )
+	{
+		pathsMap.forEach ( (gene, paths) ->
+			paths.forEach ( 
+				path -> log.info ( "FOUND PATH: {} => [{}]", getString ( gene ), join ( path, ", " ) )
+			)
+		);
+		
 	}
 }
