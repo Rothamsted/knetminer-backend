@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
@@ -29,13 +29,14 @@ import com.google.common.util.concurrent.UncheckedTimeoutException;
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import uk.ac.ebi.utils.time.XStopWatch;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 
 /**
  * An helper for {@link CypherGraphTraverser}, which tracks the performance of multiple queries, during the execution 
  * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
  */
 @Component
-class CyTraverserPerformanceTracker 
+public class CyTraverserPerformanceTracker 
 {
 	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTracking.enabled";
 

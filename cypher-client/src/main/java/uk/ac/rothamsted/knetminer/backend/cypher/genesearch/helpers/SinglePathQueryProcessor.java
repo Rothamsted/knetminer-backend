@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
@@ -6,6 +6,7 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,10 +54,10 @@ import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
  *
  */
 @Component @Scope ( "prototype" )
-public class SinglePathQueryProcessor
+class SinglePathQueryProcessor
 	extends ListBasedBatchProcessor<ONDEXConcept, Consumer<List<ONDEXConcept>>>
 {	
-	public static final long DEFAULT_QUERY_BATCH_SIZE = 1000;
+	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
 	
 	private String pathQuery;
 		
@@ -64,7 +65,7 @@ public class SinglePathQueryProcessor
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
 	
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
-	private long queryTimeout = 60 * 1000;
+	private long queryTimeoutMs = 20 * 1000;
 	
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
@@ -89,15 +90,18 @@ public class SinglePathQueryProcessor
   
 	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
 
-	
-	public SinglePathQueryProcessor ()
 	{
-		super ();
+		this.setJobLogPeriod ( -1 ); // We do all the logging about submitted/completed jobs
 		
 		synchronized ( SinglePathQueryProcessor.class ) {
 			if ( SHARED_EXECUTOR == null ) SHARED_EXECUTOR = this.getExecutor ();
 			else this.setExecutor ( SHARED_EXECUTOR );
 		}
+	}
+	
+	public SinglePathQueryProcessor ()
+	{
+		super ();
 	}	
 
 	@PostConstruct
@@ -153,8 +157,8 @@ public class SinglePathQueryProcessor
 		// Base Cypher query action
 		Runnable queryAction = () -> this.doQuery ( startGeneIris, queryResultIris, performanceCounters );
 
-		// Don't allow it to run too long (if queryTimeout != -1)
-		Runnable timedQueryAction = () -> timedQuery ( queryAction, this.queryTimeout, startGeneIris, pathQuery ); 
+		// Don't allow it to run too long (if queryTimeoutMs != -1)
+		Runnable timedQueryAction = () -> timedQuery ( queryAction, this.queryTimeoutMs, startGeneIris, pathQuery ); 
 
 		
 		// Wrap it further with the machinery that accumulates query performance-related stats
@@ -188,7 +192,7 @@ public class SinglePathQueryProcessor
 			EvidencePathNode path = this.buildEvidencePath ( pathEntities );
 			ONDEXConcept firstGene = (ONDEXConcept) pathEntities.get ( 0 );
 			
-			result.computeIfAbsent ( firstGene, k -> new ArrayList<> () )
+			result.computeIfAbsent ( firstGene, k -> Collections.synchronizedList ( new ArrayList<> () ) )
 				.add ( path );
 		});
 	}

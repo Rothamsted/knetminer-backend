@@ -23,6 +23,8 @@ import net.sourceforge.ondex.core.ONDEXGraph;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers.CyTraverserPerformanceTracker;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers.PathQueryProcessor;
 
 /**
  * <p>A {@link AbstractGraphTraverser graph traverser} based on Cypher queries against a property graph database

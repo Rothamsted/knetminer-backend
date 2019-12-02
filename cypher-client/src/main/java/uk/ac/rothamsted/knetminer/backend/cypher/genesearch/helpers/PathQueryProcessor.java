@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
 import static java.lang.Math.ceil;
 

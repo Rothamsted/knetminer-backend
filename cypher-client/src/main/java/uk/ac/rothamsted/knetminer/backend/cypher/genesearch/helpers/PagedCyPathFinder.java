@@ -1,4 +1,4 @@
-package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
+package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClientProvider;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 
 /**
  * <p>Support component for {@link CypherGraphTraverser} that manages Cypher queries against a Knetminer Neo4j database.</p>
