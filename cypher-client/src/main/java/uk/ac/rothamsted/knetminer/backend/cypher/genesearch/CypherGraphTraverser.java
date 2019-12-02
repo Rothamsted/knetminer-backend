@@ -32,10 +32,10 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers.PathQueryPro
  * 
  * <p>This traverser expects the following in {@link #getOptions()}:
  * <ul>
- * 	<li>{@link #CFGOPT_PATH} set to a proper Spring config file.</li>
+ * 	<li>{@link #CFGOPT_PATH} set to a proper Spring config file. Many other options are
+ *  defined in this file, see <a href = "https://tinyurl.com/tt5qe96">our test config</a> for details.</li>
  * </ul>
  * 
- * Usually the above params are properly set by {@code rres.knetminer.datasource.ondexlocal.OndexServiceProvider}. 
  * </p>
  *
  * @author brandizi
@@ -55,7 +55,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 */
 	public static final String CFGOPT_PATH = "knetminer.backend.configPath";
 
-	// Made private so we can use it in tests.
+	// Made protected, so we can use it in tests.
 	protected static AbstractApplicationContext springContext;
 		
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
@@ -92,18 +92,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	}
 	
 	/**
-	 * Uses queries in the {@link #springContext} bean named {@code semanticMotifsQueries}. Each query must fulfil certain 
-	 * requirement:
-	 * 
-	 * <ul>
-	 * 	<li>The query must return a path as first projected result (see {@link CypherClient#findPathIris(String, Value)}</li>
-	 * 	<li>Every returned path must match an Ondex gene concept as first node, followed by Cypher entities corresponding
-	 * to Ondex concept/relation pairs</li>
-	 * 	<li>The first matching node of each query must receive a {@code startQuery} parameter: 
-	 * {@code MATCH path = (g1:Gene{ iri: $startIri }) ...}. See the tests in this hereby project for details.</li>
-	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.</li>
-	 * </ul>
-	 * 
+	 * This is implemented as a wrapper of the
+	 * {@link #traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene version}.
 	 */
 	@Override
 	@SuppressWarnings ( { "rawtypes" } )
@@ -120,8 +110,22 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 		
 	/**
-	 * Wraps the default implementation to enable to track query performance, via {@link CyTraverserPerformanceTracker}. 
-	 */
+	 * Uses queries in the {@link #springContext} bean named {@code semanticMotifsQueries}. Each query must fulfil certain 
+	 * requirement:
+	 * 
+	 * <ul>
+	 * 	<li>The query must return a path as first projected result (see {@link CypherClient#findPathIris(String, Value)}</li>
+	 * 	<li>Every returned path must match an Ondex gene concept as first node, followed by Cypher entities corresponding
+	 * to Ondex concept/relation pairs</li>
+	 * 	<li>The query must deal with the {@code $startGeneIris} parameter, of type list of strings, which are a set of 
+	 * starting genes that the traverser wants to explore. Typically, this will be arranged this way: 
+	 * {@code MATCH path = (g1:Gene) ... WHERE g1.iri IN $startGeneIris RETURN path}. See the tests in this hereby project 
+	 * for details.</li>
+	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.</li>
+	 * </ul>
+	 * 
+	 * The implementation of this method is based on {@link PathQueryProcessor}.
+	 */	
 	@Override
 	@SuppressWarnings ( { "rawtypes", "static-access" } )
 	public Map<ONDEXConcept, List<EvidencePathNode>> traverseGraph ( 

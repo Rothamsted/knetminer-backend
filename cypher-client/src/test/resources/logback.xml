@@ -33,7 +33,7 @@
     <appender-ref ref="FileApp" />
   </root>
 
-  <!-- Add define  more loggers this way if you want finer reports for selected components -->
+  <!-- Define more loggers this way if you want finer reports for selected components -->
 	<!-- logger name = "TDB" level = "info" / -->
 
 </configuration>

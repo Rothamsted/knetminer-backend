@@ -32,8 +32,12 @@ import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 
 /**
- * An helper for {@link CypherGraphTraverser}, which tracks the performance of multiple queries, during the execution 
- * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.
+ * <p>An helper for {@link CypherGraphTraverser}, which tracks the performance of multiple queries, during the execution 
+ * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.</p>
+ * 
+ * <p>Note that, because queries are run against batches of starting genes, as per {@link SinglePathQueryProcessor}, many
+ * of the figures reported by this component refer to the performance per single batch, not per single gene. 
+ * TODO: add the batch size as parameter and change the reporting.</p>
  */
 @Component
 public class CyTraverserPerformanceTracker 

@@ -146,7 +146,9 @@ public class CypherClientIT
 		);
 	}
 	
-	
+	/**
+	 * Tests with parametric query.
+	 */
 	@Test
 	public void findPathIrisWithParamsTest ()
 	{

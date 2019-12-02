@@ -42,12 +42,15 @@ import net.sourceforge.ondex.core.ONDEXRelation;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
+import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
 import uk.ac.ebi.utils.threading.batchproc.processors.ListBasedBatchProcessor;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
- * TODO: comment me!
+ * An helper (used by {@link SinglePathQueryProcessor}) to traverse a list of genes with a single query. 
+ * This is based on {@link BatchProcessor}, which is used to group start genes into batches and run one
+ * query per batch as a parallel task. 
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>25 Nov 2019</dd></dl>
@@ -88,6 +91,7 @@ class SinglePathQueryProcessor
    */
   private static ExecutorService SHARED_EXECUTOR;
   
+  /** Used by {@link #timedQuery(Runnable, long, List, String)}. */
 	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
 
 	{
@@ -109,7 +113,10 @@ class SinglePathQueryProcessor
 		this.getBatchCollector ().setMaxBatchSize ( this.queryBatchSize );
 	}
 	
-		
+	
+	/**
+	 * This is the entry point used by {@link PathQueryProcessor#process(ONDEXGraph, Collection)}.
+	 */
 	@SuppressWarnings ( "rawtypes" )
 	public void process ( 
 		ONDEXGraph graph,

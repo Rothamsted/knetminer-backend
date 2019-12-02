@@ -27,9 +27,16 @@ import net.sourceforge.ondex.algorithm.graphquery.nodepath.EvidencePathNode;
 import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
+import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 
 /**
- * TODO: comment me!
+ * An helper for {@link CypherGraphTraverser}, which manages {@link SinglePathQueryProcessor}-s, by dispatching the 
+ * starting gene list received by 
+ * {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, net.sourceforge.ondex.algorithm.graphquery.FilterPaths)}
+ * one {@link SinglePathQueryProcessor} per query configured in {@link #semanticMotifsQueries} (via Spring).
+ * 
+ * The query-specific path processors are cached in this class, in order to avoid performance problems.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>28 Nov 2019</dd></dl>
@@ -71,6 +78,10 @@ public class PathQueryProcessor implements ApplicationContextAware
 	public PathQueryProcessor () {
 	}
 	
+	/**
+	 * This is the entry point used by 
+	 * {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, java.util.Set, net.sourceforge.ondex.algorithm.graphquery.FilterPaths)}.
+	 */
 	@SuppressWarnings ( { "rawtypes" } )
 	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
