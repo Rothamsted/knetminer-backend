@@ -58,7 +58,7 @@
         
  	<!-- The Neo4j driver -->
 	<bean id = "neoDriver" class = "org.neo4j.driver.v1.GraphDatabase" 
-			factory-method="driver" destroy-method="">
+			factory-method="driver">
 		<constructor-arg value = "bolt://127.0.0.1:${neo4j.server.boltPort}" />
 		<constructor-arg>
 			<bean class = "org.neo4j.driver.v1.AuthTokens" factory-method = "basic">
@@ -66,6 +66,14 @@
 				<constructor-arg value = "test" />
 			</bean>
 		</constructor-arg>
+		<!-- This does some tuning on the kind of needs we have with Knetminer -->
+		<constructor-arg type="org.neo4j.driver.v1.Config" 
+			value = "#{T(org.neo4j.driver.v1.Config).build ()
+				.withConnectionAcquisitionTimeout ( 10, T(java.util.concurrent.TimeUnit).SECONDS )
+				.withConnectionTimeout ( 10, T(java.util.concurrent.TimeUnit).SECONDS )
+				.toConfig ()
+			}"
+		/>
 	</bean>
 	
 	
@@ -78,12 +86,12 @@
 	-->    	 
  
   <!-- This is the number of gene parameters that the query receives -->
-	<!-- <bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg type = "java.lang.Long" value = "1000" /></bean> -->
+	<!-- <bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg type = "java.lang.Long" value = "500" /></bean> -->
   <!-- This is a test setting, needed in the tests -->
 	<bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
 
 	<!-- This is for the page size -->
-  <!-- <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean> -->
+  <!-- <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "2500" /></bean> -->
   <!-- This is a test setting, needed in the tests -->
   <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
     
@@ -93,7 +101,7 @@
   	This is important in order to avoid that some troubling query hangs the whole traversal
   	job 
   -->
-	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "5000"/></bean> -->
+	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "20000"/></bean> -->
 	
 	<!-- 
 		This is mostly for debug purposes. The graph traverser has a performance tracker, which periodically logs the 
