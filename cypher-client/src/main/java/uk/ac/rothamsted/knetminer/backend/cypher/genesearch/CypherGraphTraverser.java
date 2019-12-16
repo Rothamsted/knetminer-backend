@@ -55,8 +55,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 */
 	public static final String CFGOPT_PATH = "knetminer.backend.configPath";
 
-	// Made protected, so we can use it in tests.
-	protected static AbstractApplicationContext springContext;
+	private static AbstractApplicationContext springContext;
 		
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 
@@ -87,6 +86,13 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			log.info ( "Configuring {} from <{}>", this.getClass ().getCanonicalName (), furl );
 			springContext = new FileSystemXmlApplicationContext ( furl );
 			springContext.registerShutdownHook ();
+			
+			// Sometimes this is set via options for debugging purposes 
+			Integer reportFrequency = this.getOption ( "performanceReportFrequency" );
+			if ( reportFrequency != null )
+				springContext.getBean ( CyTraverserPerformanceTracker.class )
+					.setReportFrequency ( reportFrequency );
+			
 			log.info ( "{} configured", this.getClass ().getCanonicalName () );
 		}		
 	}
@@ -148,11 +154,13 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		return result;
 	}
 
-	@Override
-	public void setOption ( String key, Object value )
+	
+	public String getPerformanceStats ()
 	{
-		super.setOption ( key, value );
-		if ( !"performanceReportFrequency".equals ( key ) ) return;
-		springContext.getBean ( CyTraverserPerformanceTracker.class ).setReportFrequency ( (int) value );
+		if ( springContext == null ) throw new IllegalStateException (
+			"getPerformanceStats() cannot be invoked before init(), ignoring it at this stage" 
+		);
+		CyTraverserPerformanceTracker performanceTracker = springContext.getBean ( CyTraverserPerformanceTracker.class );
+		return performanceTracker.getStats ();
 	}
 }

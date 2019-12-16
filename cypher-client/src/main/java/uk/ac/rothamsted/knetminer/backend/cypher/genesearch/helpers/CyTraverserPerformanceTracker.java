@@ -147,10 +147,19 @@ public class CyTraverserPerformanceTracker
 	}
 
 	
+	void logStats ()
+	{
+		String stats = getStats ();
+		if ( stats == null ) return;
+		
+		log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", stats );
+	}
+
+	
 	/**
 	 * Reports the stats accumulated so far using the underlining logging system.
 	 */
-	void logStats ()
+	public String getStats ()
 	{
 		if ( this.reportFrequency < 0 )
 		{
@@ -158,7 +167,7 @@ public class CyTraverserPerformanceTracker
 				"{}.logStats(): performance tracking is disabled, ignoring this invocation",
 				this.getClass ().getSimpleName ()
 			);
-			return;
+			return null;
 		}
 
 		StringWriter statsSW = new StringWriter ();
@@ -166,7 +175,7 @@ public class CyTraverserPerformanceTracker
 		
 		final int nTotQueries = invocations.get ();
 		out.printf ( "\n\nTotal queries issued: %s\n", nTotQueries );
-		if ( nTotQueries == 0 ) return;
+		if ( nTotQueries == 0 ) return statsSW.toString ();
 		
 		out.println (   
 			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len" 
@@ -192,8 +201,7 @@ public class CyTraverserPerformanceTracker
 			);
 		}
 		out.println ( "" );
-
-		log.info ( "\n\n  -------------- Cypher Graph Traverser, Query Stats --------------\n{}", statsSW.toString () );
+		return statsSW.toString ();
 	}
 
 
