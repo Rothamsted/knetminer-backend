@@ -4,6 +4,7 @@ import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -99,7 +101,15 @@ public class CyTraverserPerformanceTracker
 	{
 		if ( this.reportFrequency < 0 ) return; // tracking is disabled
 		invocations.getAndSet ( 0 );
-		this.semanticMotifsQueries.forEach ( q -> {
+		
+		this.query2ExecTimes.clear ();
+		this.query2Invocations.clear ();
+		this.query2Timeouts.clear ();
+		this.query2PathLens.clear ();
+		this.query2Results.clear ();
+		
+		this.semanticMotifsQueries.forEach ( q ->
+		{
 			this.query2ExecTimes.put ( q, 0l );
 			this.query2Invocations.put ( q, 0 );
 			this.query2Timeouts.put ( q, 0 );
@@ -146,8 +156,10 @@ public class CyTraverserPerformanceTracker
 		}
 	}
 
-	
-	void logStats ()
+	/**
+	 * Sends {@link #getStats()} to the logging system.
+	 */
+	public void logStats ()
 	{
 		String stats = getStats ();
 		if ( stats == null ) return;
@@ -157,7 +169,7 @@ public class CyTraverserPerformanceTracker
 
 	
 	/**
-	 * Reports the stats accumulated so far using the underlining logging system.
+	 * Reports the stats accumulated so far.
 	 */
 	public String getStats ()
 	{
@@ -209,8 +221,20 @@ public class CyTraverserPerformanceTracker
 		return reportFrequency;
 	}
 
-
+	/**
+	 * We need to set this programmatically, not just via Spring
+	 */
 	public void setReportFrequency ( int reportFrequency ) {
 		this.reportFrequency = reportFrequency;
+	}
+
+	/**
+	 * We need to set this programmatically, not just via Spring.
+	 * This invokes {@link #reset()}, so every stats is lost.
+	 */
+	public void setSemanticMotifsQueries ( List<String> semanticMotifsQueries )
+	{
+		this.semanticMotifsQueries = semanticMotifsQueries;
+		this.reset ();
 	}	
 }

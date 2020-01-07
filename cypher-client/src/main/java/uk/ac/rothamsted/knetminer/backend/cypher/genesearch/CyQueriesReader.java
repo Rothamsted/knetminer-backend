@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,21 +21,21 @@ import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
  */
 public class CyQueriesReader
 {
-	public CyQueriesReader () {
+	private CyQueriesReader () {
 	}
 	
-	public List<String> readQueries ( Reader reader )
+	public static List<String> readQueries ( Reader reader )
 	{
 		BufferedReader lineRdr = new BufferedReader ( reader );
 		
 		return lineRdr.lines ()
-			.filter ( line -> line == null )
+			.filter ( line -> line != null )
 			.map ( String::trim )
-			.filter ( line -> line.length () == 0 || line.startsWith ( "#" ))
+			.filter ( line -> !( line.length () == 0 || line.startsWith ( "#" ) ) )
 			.collect ( Collectors.toList () );
 	}
 
-	public List<String> readQueries ( File qfile )
+	public static List<String> readQueries ( File qfile )
 	{
 		try {
 			return readQueries ( new FileReader ( qfile ) );
@@ -51,8 +52,12 @@ public class CyQueriesReader
 		}
 	}
 	
-	public List<String> readQueries ( String qfileName ) {
+	public static List<String> readQueries ( String qfileName ) {
 		return readQueries ( new File ( qfileName ) );
 	}
 
+	public static List<String> readQueriesFromString ( String queriesString ) {
+		return readQueries ( new StringReader ( queriesString ) );
+	}
+	
 }

@@ -73,6 +73,8 @@ public class PathQueryProcessor implements ApplicationContextAware
 			
 		});
 	
+	private PercentProgressLogger queryProgressLogger = null;
+	
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public PathQueryProcessor () {
@@ -89,12 +91,12 @@ public class PathQueryProcessor implements ApplicationContextAware
 		
 		this.cyTraverserPerformanceTracker.reset ();
 				
-		PercentProgressLogger queryProgressLogger = new PercentProgressLogger ( 
+		queryProgressLogger = new PercentProgressLogger ( 
 			"{}% of graph traversing queries processed",
 			(long) ceil ( 1.0 * concepts.size () / this.queryBatchSize ) * semanticMotifsQueries.size (),
 			10
 		);
-		
+						
 		this.semanticMotifsQueries.parallelStream ()
 			.forEach ( query -> 
 			{
@@ -112,5 +114,18 @@ public class PathQueryProcessor implements ApplicationContextAware
 	public void setApplicationContext ( ApplicationContext applicationContext ) throws BeansException
 	{
 		this.springContext = applicationContext;
-	}	
+	}
+
+	/**
+	 * There are components that redefine queries dynamically, out of Spring, so we need the setter here.
+	 */
+	public void setSemanticMotifsQueries ( List<String> semanticMotifsQueries )
+	{
+		this.semanticMotifsQueries = semanticMotifsQueries;
+	}
+
+	public double getPercentProgress () {
+		return this.queryProgressLogger.getPercentProgress ();
+	}
+		
 }

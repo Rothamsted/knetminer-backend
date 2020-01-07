@@ -154,7 +154,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		return result;
 	}
 
-	
+	/**
+	 * A wrapper of {@link CyTraverserPerformanceTracker#getStats()}.
+	 */
 	public String getPerformanceStats ()
 	{
 		if ( springContext == null ) throw new IllegalStateException (
@@ -163,4 +165,26 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		CyTraverserPerformanceTracker performanceTracker = springContext.getBean ( CyTraverserPerformanceTracker.class );
 		return performanceTracker.getStats ();
 	}
+	
+	/**
+	 * There are components that redefine queries dynamically, out of Spring, so we need this here.
+	 * This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}
+	 */
+	public void setSemanticMotifsQueries ( List<String> semanticMotifsQueries )
+	{
+		init ();
+		
+		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
+		qp.setSemanticMotifsQueries ( semanticMotifsQueries );
+
+		CyTraverserPerformanceTracker performanceTracker = springContext.getBean ( CyTraverserPerformanceTracker.class );
+		performanceTracker.setSemanticMotifsQueries ( semanticMotifsQueries );
+	}
+	
+	public double getPercentProgress ()
+	{
+		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
+		return qp.getPercentProgress ();
+	}
+	
 }
