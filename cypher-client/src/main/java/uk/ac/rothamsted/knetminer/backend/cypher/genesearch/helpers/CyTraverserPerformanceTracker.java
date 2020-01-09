@@ -186,7 +186,7 @@ public class CyTraverserPerformanceTracker
 		PrintWriter out = new PrintWriter ( statsSW );
 		
 		final int nTotQueries = invocations.get ();
-		out.printf ( "\n\nTotal queries issued: %s\n", nTotQueries );
+		out.printf ( "Total queries issued: %s\n", nTotQueries );
 		if ( nTotQueries == 0 ) return statsSW.toString ();
 		
 		out.println (   
