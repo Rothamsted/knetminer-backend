@@ -116,6 +116,14 @@ public class PathQueryProcessor implements ApplicationContextAware
 		this.springContext = applicationContext;
 	}
 
+	
+	/**
+	 * There are debugging/testing components reporting this (eg, cypher debugger in Knetminer).
+	 */
+	public List<String> getSemanticMotifsQueries () {
+		return semanticMotifsQueries;
+	}
+
 	/**
 	 * There are components that redefine queries dynamically, out of Spring, so we need the setter here.
 	 */
@@ -124,6 +132,10 @@ public class PathQueryProcessor implements ApplicationContextAware
 		this.semanticMotifsQueries = semanticMotifsQueries;
 	}
 
+	/**
+	 * Tells a percentage of completed queries. This assumes {@link #process(ONDEXGraph, Collection)} has been invoked and
+	 * doesn't do any synchronisation, ie, you are supposed to be asking approximate results.
+	 */
 	public double getPercentProgress () {
 		return this.queryProgressLogger.getPercentProgress ();
 	}

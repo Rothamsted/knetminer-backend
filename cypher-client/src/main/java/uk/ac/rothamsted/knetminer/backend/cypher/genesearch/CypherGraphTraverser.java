@@ -167,8 +167,21 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	}
 	
 	/**
+	 * There are components that redefine queries dynamically, out of Spring, and report the current ones, so we need 
+	 * this here. This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}.
+	 */
+	public List<String> getSemanticMotifsQueries ()
+	{
+		init ();
+				
+		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
+		return qp.getSemanticMotifsQueries ();
+	}
+	
+	
+	/**
 	 * There are components that redefine queries dynamically, out of Spring, so we need this here.
-	 * This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}
+	 * This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}.
 	 */
 	public void setSemanticMotifsQueries ( List<String> semanticMotifsQueries )
 	{
@@ -180,11 +193,15 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		CyTraverserPerformanceTracker performanceTracker = springContext.getBean ( CyTraverserPerformanceTracker.class );
 		performanceTracker.setSemanticMotifsQueries ( semanticMotifsQueries );
 	}
+
 	
+	
+	/**
+	 * Wrapper of {@link PathQueryProcessor#getPercentProgress()}.
+	 */
 	public double getPercentProgress ()
 	{
 		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
 		return qp.getPercentProgress ();
 	}
-	
 }
