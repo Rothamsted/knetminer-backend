@@ -46,6 +46,7 @@ import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
 import uk.ac.ebi.utils.threading.batchproc.processors.ListBasedBatchProcessor;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
+import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
@@ -338,6 +339,10 @@ class SinglePathQueryProcessor
 		this.pathQuery = pathQuery;
 	}
 
+	/**
+	 * Causes {@link #process(ONDEXGraph, Collection, Map, PercentProgressLogger) the ongoing} query processing to 
+	 * stop. This is used by {@link PathQueryProcessor#interrupt()}, see also {@link CypherGraphTraverser#interrupt()}.
+	 */
 	void interrupt () {
 		this.isInterrupted = true;
 	}	

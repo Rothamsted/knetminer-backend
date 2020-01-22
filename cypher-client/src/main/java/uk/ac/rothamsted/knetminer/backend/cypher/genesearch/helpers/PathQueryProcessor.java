@@ -151,10 +151,19 @@ public class PathQueryProcessor implements ApplicationContextAware
 			? 0d : this.queryProgressLogger.getPercentProgress ();
 	}
 	
+	/**
+	 * @see {@link CypherGraphTraverser#interrupt()} and {@link CypherGraphTraverser#isInterrupted()}.
+	 * 
+	 */
 	public boolean isInterrupted () {
 		return isInterrupted;
 	}
 
+	/**
+	 * @see {@link CypherGraphTraverser#interrupt()} and {@link CypherGraphTraverser#isInterrupted()}.
+	 * 
+	 * This propagates the interruption trigger to all of {@link PathQueryProcessor#interrupt()} the component is using.
+	 */
 	public void interrupt ()
 	{
 		this.isInterrupted = true;

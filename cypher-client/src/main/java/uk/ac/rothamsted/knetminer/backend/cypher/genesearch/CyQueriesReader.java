@@ -13,7 +13,12 @@ import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 
 /**
- * TODO: comment me!
+ * Single-string, single-file Cypher query reader.
+ * 
+ * <p>For the moment, reads queries in a simple format: one query per line, blank lines and lines starting with
+ * {@code '#'} are ignored.</p>
+ * 
+ * <p>TODO: advanced version, supporting multi-line queries.</p>
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>9 Dec 2019</dd></dl>

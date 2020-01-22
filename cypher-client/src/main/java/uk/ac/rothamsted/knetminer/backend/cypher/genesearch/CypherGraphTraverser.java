@@ -117,8 +117,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 
 		
 	/**
-	 * Uses queries in the {@link #springContext} bean named {@code semanticMotifsQueries}. Each query must fulfil certain 
-	 * requirement:
+	 * Uses queries in the {@link #springContext} bean named {@code semanticMotifsQueries}, which can be overridden with
+	 * {@link #setSemanticMotifsQueries(List)}. Each query must fulfil certain requirements:
 	 * 
 	 * <ul>
 	 * 	<li>The query must return a path as first projected result (see {@link CypherClient#findPathIris(String, Value)}</li>
@@ -131,7 +131,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 *  <li>Each returned Cypher node/relation must carry an {@code iri} property, coherent with the parameter {@code graph}.</li>
 	 * </ul>
 	 * 
-	 * The implementation of this method is based on {@link PathQueryProcessor}.
+	 * <p>The implementation of this method is based on {@link PathQueryProcessor}.</p>
 	 */	
 	@Override
 	@SuppressWarnings ( { "rawtypes", "static-access" } )
@@ -208,13 +208,23 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		return qp.getPercentProgress ();
 	}
 	
-	
+	/**
+	 * @see #interrupt()
+	 */
 	public boolean isInterrupted ()
 	{
 		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
 		return qp.isInterrupted ();
 	}
 	
+	/**
+	 * <p>This and isInterrupted() allows for stopping the traversal, a feature used in Knetminer {@code CypherDebugger} 
+	 * component.</p>
+	 * 
+	 * <p>They are wrappers of {@link PathQueryProcessor#interrupt()} and {@link PathQueryProcessor#isInterrupted()}.</p>
+	 * 
+	 * <p>There is an integration test about this.</p>
+	 */
 	public void interrupt ()
 	{
 		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
