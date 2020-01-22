@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -94,6 +95,8 @@ class SinglePathQueryProcessor
   /** Used by {@link #timedQuery(Runnable, long, List, String)}. */
 	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
 
+	private boolean isInterrupted = false; 
+	
 	{
 		this.setJobLogPeriod ( -1 ); // We do all the logging about submitted/completed jobs
 		
@@ -125,8 +128,11 @@ class SinglePathQueryProcessor
 		PercentProgressLogger queryProgressLogger
 	)
 	{
+		this.isInterrupted = false;
+		
 		this.setBatchJob ( batch -> 
 		{
+			if ( this.isInterrupted ) return;
 			this.queryJob ( graph, batch, result ); 
 			queryProgressLogger.updateWithIncrement ();
 		});
@@ -134,7 +140,16 @@ class SinglePathQueryProcessor
 		// TODO: parallelStream() might be worth here and should work, but needs testing.
 		// This is only about scanning the concepts and build the batches in parallel or not, 
 		// querying the batches of concepts is parallel anyway.
-		super.process ( concept -> concepts.stream ().forEach ( concept ) );	
+		//super.process ( concept -> concepts.stream ().forEach ( concept ) );	
+		
+		boolean wasInterrupted[] = new boolean[] { false };
+		super.process (
+			conceptConsumer -> wasInterrupted [ 0 ] = 
+				!concepts.stream ()
+				.peek ( conceptConsumer )
+				.allMatch ( concept -> !this.isInterrupted )
+		);
+		if ( wasInterrupted [ 0 ] ) log.debug ( "Query processor was interrupted, query is:\n  {}", this.pathQuery );
 	}
 	
 	
@@ -322,4 +337,8 @@ class SinglePathQueryProcessor
 	public void setPathQuery ( String pathQuery ) {
 		this.pathQuery = pathQuery;
 	}
+
+	void interrupt () {
+		this.isInterrupted = true;
+	}	
 }

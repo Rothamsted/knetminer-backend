@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -70,12 +74,14 @@ public class PathQueryProcessor implements ApplicationContextAware
 				result.setPathQuery ( pathQuery );
 				return result;
 			} 
-			
 		});
 	
 	private PercentProgressLogger queryProgressLogger = null;
+		
+	private boolean isInterrupted = false; 
 	
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
+
 	
 	public PathQueryProcessor () {
 	}
@@ -87,6 +93,8 @@ public class PathQueryProcessor implements ApplicationContextAware
 	@SuppressWarnings ( { "rawtypes" } )
 	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
+		this.isInterrupted = false;
+		
 		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
 		
 		this.cyTraverserPerformanceTracker.reset ();
@@ -96,16 +104,17 @@ public class PathQueryProcessor implements ApplicationContextAware
 			(long) ceil ( 1.0 * concepts.size () / this.queryBatchSize ) * semanticMotifsQueries.size (),
 			10
 		);
-						
-		this.semanticMotifsQueries.parallelStream ()
-			.forEach ( query -> 
-			{
-				SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
-				thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
+			
+		this.semanticMotifsQueries
+		.parallelStream ()
+		.forEach ( query -> 
+		{
+			if ( isInterrupted ) return;
+			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
+			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
 		});
 		
 		this.cyTraverserPerformanceTracker.logStats ();
-		
 		return result;
 	}
 	
@@ -136,8 +145,25 @@ public class PathQueryProcessor implements ApplicationContextAware
 	 * Tells a percentage of completed queries. This assumes {@link #process(ONDEXGraph, Collection)} has been invoked and
 	 * doesn't do any synchronisation, ie, you are supposed to be asking approximate results.
 	 */
-	public double getPercentProgress () {
-		return this.queryProgressLogger.getPercentProgress ();
+	public double getPercentProgress ()
+	{
+		return this.queryProgressLogger == null
+			? 0d : this.queryProgressLogger.getPercentProgress ();
 	}
-		
+	
+	public boolean isInterrupted () {
+		return isInterrupted;
+	}
+
+	public void interrupt ()
+	{
+		this.isInterrupted = true;
+		log.warn ( "Traversal was interrupted, stopping everything" );
+
+		this.semanticMotifsQueries.forEach ( query ->
+		{
+			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
+			thisQueryProc.interrupt ();
+		});
+	}	
 }

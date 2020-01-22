@@ -10,10 +10,15 @@ import static org.junit.Assert.assertTrue;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 import static uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers.CyTraverserPerformanceTracker.CFGOPT_TRAVERSER_PERFORMANCE;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -232,6 +237,54 @@ public class CypherGraphTraverserIT
 				"C{TestCC:TEST-ENT-01", 2
 		));		
 	}
+	
+	
+	@Test
+	@SuppressWarnings ( "rawtypes" )
+	public void testInterruption () throws InterruptedException, ExecutionException
+	{
+		Stream<String> conceptIris = Stream.of ( 
+			iri ( "bkr:gene_at4g26080_locus_2005488"	),
+			iri ( "bkr:gene_at5g35550_locus_2169538"	),
+			iri ( "bkr:gene_at2g40220_locus_2005490" ),
+			iri ( "bkr:gene_at1g63650_locus_2026629" )
+		);
+				
+		ONDEXGraph graph = graphResource.getGraph ();
+
+		GraphMemIndex memIdx = GraphMemIndex.getInstance ( graph );
+		List<ONDEXConcept> startConcepts = conceptIris.map ( iri -> {
+			ONDEXConcept c = memIdx.get ( "iri", iri );
+			if ( c == null ) throwEx (
+				IllegalArgumentException.class,
+				"Concept <%s> not found!", 
+				iri 
+			);
+			return c;
+		})
+		.collect ( Collectors.toList () );
+
+		CypherGraphTraverser cytraverser = (CypherGraphTraverser) graphTraverser;
+		
+		// We need some slow query to keep it busy while we interrupt it.
+		List<String> queries = new ArrayList<> ( cytraverser.getSemanticMotifsQueries () );
+		queries.add (
+			"MATCH path = (g:Gene) -[r*1..2]-> (c:Concept)\n"
+			+ "WHERE NONE ( rr IN relationships(path) WHERE TYPE(rr) = 'relatedConcept' )\n"
+			+ "  AND g.iri IN $startGeneIris\n"
+			+ "RETURN path"
+		);
+		cytraverser.setSemanticMotifsQueries ( queries );
+		
+		ExecutorService executor = Executors.newSingleThreadExecutor ();
+		Future<Map<ONDEXConcept, List<EvidencePathNode>>> pathsMapFuture
+			= executor.submit ( () -> cytraverser.traverseGraph ( graph, new HashSet<> ( startConcepts ), null ) );
+		Thread.sleep ( 500 ); // It needs sometime to startup and set interrupted flag to false 
+		cytraverser.interrupt ();
+		assertTrue ( "Interruption flag isn't set!", cytraverser.isInterrupted () );
+		assertEquals ( "Interruption didn't work!", 0, pathsMapFuture.get ().size () );
+	}
+	
 	
 	/**
 	 * Checks that paths contains a path with a given set of ondex entity constraints.

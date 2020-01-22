@@ -3,6 +3,7 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,7 +57,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	public static final String CFGOPT_PATH = "knetminer.backend.configPath";
 
 	private static AbstractApplicationContext springContext;
-		
+			
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	
@@ -140,10 +141,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		init ();
 
 		log.info ( "Graph Traverser, beginning parallel traversing of {} concept(s)", concepts.size () );
-		
+				
 		PathQueryProcessor queryProcessor = this.springContext.getBean ( PathQueryProcessor.class );
 		Map<ONDEXConcept, List<EvidencePathNode>> result = queryProcessor.process ( graph, concepts );
 
+		if ( this.isInterrupted () ) return new HashMap<> ();
+		
 		if ( filter == null ) return result;
 		
 		result.entrySet ()
@@ -204,4 +207,17 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
 		return qp.getPercentProgress ();
 	}
+	
+	
+	public boolean isInterrupted ()
+	{
+		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
+		return qp.isInterrupted ();
+	}
+	
+	public void interrupt ()
+	{
+		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
+		qp.interrupt ();
+	}	
 }
