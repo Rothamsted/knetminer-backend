@@ -61,15 +61,18 @@ import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 class SinglePathQueryProcessor
 	extends ListBasedBatchProcessor<ONDEXConcept, Consumer<List<ONDEXConcept>>>
 {	
-	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
-	
-	private String pathQuery;
-		
+	/** This is a configurable parameter */
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
 	
+	/** This is a configurable parameter */
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
 	private long queryTimeoutMs = 20 * 1000;
+
+	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
+
+	
+	private String pathQuery;
 	
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
@@ -157,6 +160,7 @@ class SinglePathQueryProcessor
 	private void queryJob ( ONDEXGraph graph, List<ONDEXConcept> batch, Map<ONDEXConcept, List<EvidencePathNode>> result )
 	{
 		// So, let's get the starting IRIs from the concepts parameter.
+		//
 		List<String> startGeneIris = batch.parallelStream ()
 			.map ( concept -> Optional
 				.ofNullable ( ONDEXGraphUtils.getAttribute ( graph, concept, "iri" ) )
@@ -179,7 +183,7 @@ class SinglePathQueryProcessor
 		Runnable queryAction = () -> this.doQuery ( startGeneIris, queryResultIris, performanceCounters );
 
 		// Don't allow it to run too long (if queryTimeoutMs != -1)
-		Runnable timedQueryAction = () -> timedQuery ( queryAction, this.queryTimeoutMs, startGeneIris, pathQuery ); 
+		Runnable timedQueryAction = () -> timedQuery ( queryAction, startGeneIris ); 
 
 		
 		// Wrap it further with the machinery that accumulates query performance-related stats
@@ -228,11 +232,12 @@ class SinglePathQueryProcessor
 		
 		// For each configured semantic motif query, get the paths from Neo4j + indexed resource
 		pathsItr.forEachRemaining ( 
-		pathIris -> {
-			queryResultIris.add ( pathIris );
-			performanceCounters [ 0 ]++; // no. of resulting paths
-			performanceCounters [ 1 ] += pathIris.size (); // total path lengths
-		});
+			pathIris -> {
+				queryResultIris.add ( pathIris );
+				performanceCounters [ 0 ]++; // no. of resulting paths
+				performanceCounters [ 1 ] += pathIris.size (); // total path lengths
+			}
+		);
 	}
 	
 	
@@ -243,12 +248,12 @@ class SinglePathQueryProcessor
 	 * intercepted by {@link CyTraverserPerformanceTracker}.
 	 * 
 	 */
-	private void timedQuery ( Runnable queryAction, long queryTimeoutMs, List<String> startGeneIris, String query )
+	private void timedQuery ( Runnable queryAction, List<String> startGeneIris )
 	{
 		try
 		{
 			// No timeout wanted
-			if ( queryTimeoutMs == -1l ) {
+			if ( this.queryTimeoutMs == -1l ) {
 				queryAction.run ();
 				return;
 			}
@@ -266,7 +271,7 @@ class SinglePathQueryProcessor
 				"Timed out query: %s. First gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIris.get ( 0 ),
-				escapeJava ( query )
+				escapeJava ( this.pathQuery )
 			);
 		}
 		catch ( Exception ex )
@@ -277,7 +282,7 @@ class SinglePathQueryProcessor
 				"Error while traversing Neo4j gene graph: %s. First gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIris.get ( 0 ),
-				escapeJava ( query )
+				escapeJava ( this.pathQuery )
 			);
 		}			
 	}		

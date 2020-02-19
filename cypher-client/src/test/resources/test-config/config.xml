@@ -87,12 +87,12 @@
  
   <!-- This is the number of gene parameters that the query receives -->
 	<!-- <bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg type = "java.lang.Long" value = "500" /></bean> -->
-  <!-- This is a test setting, needed in the tests -->
+  <!-- This is a test setting, needed in the tests, it's a very bad value in production -->
 	<bean name = "queryBatchSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
 
 	<!-- This is for the page size -->
   <!-- <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "2500" /></bean> -->
-  <!-- This is a test setting, needed in the tests -->
+  <!-- This is a test setting, needed in the tests, it's a very bad value in production -->
   <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
     
     

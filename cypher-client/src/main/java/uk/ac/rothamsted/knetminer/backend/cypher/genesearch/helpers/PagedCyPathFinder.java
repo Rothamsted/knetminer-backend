@@ -37,6 +37,11 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
 @Component @Scope ( "prototype" )
 class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 {
+	
+	/** This is a configurable parameter */
+	@Autowired ( required = false ) @Qualifier ( "queryPageSize" )
+	private long queryPageSize = 2500;
+
 	/**
 	 * Used internally to compose the Cypher queries
 	 */
@@ -44,9 +49,6 @@ class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 
 	private List<String> startGeneIris;
 	private String query;
-	
-	@Autowired ( required = false ) @Qualifier ( "queryPageSize" )
-	private long queryPageSize = 2500;
 	
 	@Resource
 	private CypherClientProvider cypherClientProvider;

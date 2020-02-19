@@ -42,20 +42,18 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
 @Component
 public class CyTraverserPerformanceTracker 
 {
-	public static final String CFGOPT_TRAVERSER_PERFORMANCE = "knetminer.backend.traverserPerformanceTracking.enabled";
+	/** This is a configurable parameter */
+	@Autowired(required = false) @Qualifier ( "performanceReportFrequency" )
+	private int reportFrequency = 0;
+	
+	/** This is a configurable parameter */
+	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
+	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
 
-	/**
-	 * <p>Based on this option given to the {@link CypherGraphTraverser}, reports partial results via {@link #logStats()} 
-	 * every a number of {@link #track(String, Runnable, Supplier, Supplier)} invocations equal to this value.</p>
-	 * 
-	 * <p>Consider that every invocation corresponds to one gene and one query, 
-	 * so this value should reflect a fraction of genes*queries.</p>
-	 * 
-	 * <p>if -1, doesn't do any periodic report</p>
-	 * 
-	 */
-	public static final String CFGOPT_PERFORMANCE_REPORT_FREQ = "knetminer.backend.traverserPerformanceTracking.reportFrequency";
-
+	/** This is a configurable parameter */
+	@Resource( name = "semanticMotifsQueries" )
+	private List<String> semanticMotifsQueries; 
+	
 	
 	/** Times to fetch all the results **/
 	private Map<String, Long> query2ExecTimes = Collections.synchronizedMap ( new HashMap<> () );
@@ -74,18 +72,7 @@ public class CyTraverserPerformanceTracker
 	
 	/** Total no. of invocations, ie #queries x #genes / {@link #queryBatchSize} **/ 
 	private AtomicInteger invocations = new AtomicInteger ( 0 );
-	
-	
-	@Autowired(required = false) @Qualifier ( "performanceReportFrequency" )
-	private int reportFrequency = 0;
 
-	
-	@Resource( name = "semanticMotifsQueries" )
-	private List<String> semanticMotifsQueries; 
-
-	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
-	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
-	
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
