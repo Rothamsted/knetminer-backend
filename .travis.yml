@@ -13,3 +13,8 @@ script:
 after_script:
   - echo -e "\n\n\tTerminating test resources\n"
   - ./resources-shutdown.sh
+  
+cache:
+  directories:
+    - $HOME/.m2
+  
