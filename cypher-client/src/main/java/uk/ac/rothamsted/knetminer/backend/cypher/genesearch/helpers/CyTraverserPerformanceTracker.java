@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -175,7 +176,7 @@ public class CyTraverserPerformanceTracker
 		if ( nTotQueries == 0 ) return statsSW.toString ();
 		
 		out.println (   
-			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len" 
+			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len\tTot Time(min)" 
 		);
 		
 		SortedSet<String> queries = new TreeSet<> ( query2Invocations.keySet () );
@@ -187,14 +188,15 @@ public class CyTraverserPerformanceTracker
 			int ncompleted = nqueries - ntimeouts;
 							
 			out.printf (
-				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\n",
+				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
 				escapeJava ( query ),
 				nqueries,
 				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
 				ncompleted == 0 ? 0d : 1d * nresults / ( ncompleted * this.queryBatchSize ),
 				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted,
-				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults
+				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults,
+				ncompleted == 0 ? 0 : query2ExecTimes.get ( query ) / ( 1000d * 60 )
 			);
 		}
 		out.println ( "" );
