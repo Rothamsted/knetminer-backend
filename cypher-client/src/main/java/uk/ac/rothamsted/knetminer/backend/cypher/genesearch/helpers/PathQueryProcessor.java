@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import javax.annotation.Resource;
 
+import org.neo4j.driver.v1.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -89,11 +91,11 @@ public class PathQueryProcessor implements ApplicationContextAware
 	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
 		this.isInterrupted = false;
+		doLogConfig ();
 		
 		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
-		
 		this.cyTraverserPerformanceTracker.reset ();
-				
+		
 		queryProgressLogger = new PercentProgressLogger ( 
 			"{}% of graph traversing queries processed",
 			(long) ceil ( 1.0 * concepts.size () / this.queryBatchSize ) * semanticMotifsQueries.size (),
@@ -169,5 +171,27 @@ public class PathQueryProcessor implements ApplicationContextAware
 			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
 			thisQueryProc.interrupt ();
 		});
-	}	
+	}
+	
+	/**
+	 * Logs some config params, it's invoked by {@link #process(ONDEXGraph, Collection)} for
+	 * diagnostic purposes.
+	 */
+	private void doLogConfig ()
+	{
+		log.info ( "---- Cypher Graph Traverser, Config -----" );
+		log.info ( "queryBatchSize = {}", this.queryBatchSize );
+		
+		BiConsumer<String, Class<?>> ctxBeanLogger = (name, cls) -> log.info ( "{} = {}",
+			name,
+			this.springContext.containsBean ( name ) 
+				? this.springContext.getBean ( name, cls )
+				: "<default>"
+		);
+
+		ctxBeanLogger.accept ( "queryTimeoutMs", Long.class );
+		ctxBeanLogger.accept ( "performanceReportFrequency", Integer.class );
+		
+		log.info ( "---- /CypherQueryTraverser, Config -----" );
+	}
 }

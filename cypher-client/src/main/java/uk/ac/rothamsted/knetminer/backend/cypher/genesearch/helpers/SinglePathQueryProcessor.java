@@ -198,11 +198,13 @@ class SinglePathQueryProcessor
 				() -> performanceCounters [ 1 ] 
 			);			
 		}
-		catch ( UncheckedTimeoutException ex ) {
-			// The query didn't complete within the timeout, results are partial, we must invalidate
-			// everything
+		catch ( UncheckedTimeoutException ex ) 
+		{
 			if ( log.isTraceEnabled () )
 				log.trace ( "Query timed out. First gene: <{}>, query: {}", startGeneIris.get ( 0 ), pathQuery );
+
+			// The query didn't complete within the timeout, results are partial, we must invalidate
+			// everything
 			return;
 		}
 		
