@@ -9,6 +9,9 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 
@@ -26,6 +29,8 @@ import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
  */
 public class CyQueriesReader
 {
+	private static final Logger log = LoggerFactory.getLogger ( CyQueriesReader.class );
+	
 	private CyQueriesReader () {
 	}
 	
@@ -43,6 +48,7 @@ public class CyQueriesReader
 	public static List<String> readQueries ( File qfile )
 	{
 		try {
+			log.info ( "Loading queries from '{}'", qfile.getAbsolutePath () );
 			return readQueries ( new FileReader ( qfile ) );
 		}
 		catch ( FileNotFoundException ex )
