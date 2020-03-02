@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -140,6 +141,8 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		init ();
 
+		this.removeDuplicatedQueries ();
+		
 		log.info ( "Graph Traverser, beginning parallel traversing of {} concept(s)", concepts.size () );
 				
 		PathQueryProcessor queryProcessor = this.springContext.getBean ( PathQueryProcessor.class );
@@ -197,7 +200,29 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		performanceTracker.setSemanticMotifsQueries ( semanticMotifsQueries );
 	}
 
-	
+	/**
+	 * This is invoked by {@link #traverseGraph(ONDEXGraph, Set, FilterPaths)}, to check that there aren't duplicated
+	 * queries in {@link #getSemanticMotifsQueries()}. The possible new query list is propagated to all components needing
+	 * it via {@link #setSemanticMotifsQueries(List)}. 
+	 * 
+	 */
+	private void removeDuplicatedQueries ()
+	{
+		List<String> newQueries = new ArrayList<> (),
+								 currentQueries = this.getSemanticMotifsQueries ();
+		Set<String> existing = new HashSet<> ();
+		getSemanticMotifsQueries ().forEach ( q ->
+		{
+			if ( existing.contains ( q ) ) return;
+			existing.add ( q );
+			newQueries.add ( q );
+		});
+		
+		if ( newQueries.size () == currentQueries.size () ) return;
+		
+		log.warn ( "There are duplicated queries, actual list that will be used will remove these" );
+		this.setSemanticMotifsQueries ( newQueries );
+	}
 	
 	/**
 	 * Wrapper of {@link PathQueryProcessor#getPercentProgress()}.
