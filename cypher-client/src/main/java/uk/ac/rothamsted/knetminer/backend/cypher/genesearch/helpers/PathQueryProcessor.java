@@ -191,6 +191,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 
 		ctxBeanLogger.accept ( "queryTimeoutMs", Long.class );
 		ctxBeanLogger.accept ( "performanceReportFrequency", Integer.class );
+		ctxBeanLogger.accept ( "queryPageSize", Long.class );
 		
 		log.info ( "---- /CypherQueryTraverser, Config -----" );
 	}
