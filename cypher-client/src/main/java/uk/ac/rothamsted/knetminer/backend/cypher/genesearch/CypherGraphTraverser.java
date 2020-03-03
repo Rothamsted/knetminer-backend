@@ -220,7 +220,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		
 		if ( newQueries.size () == currentQueries.size () ) return;
 		
-		log.warn ( "There are duplicated queries, actual list that will be used will remove these" );
+		log.warn ( "There are duplicated queries, the actual list that will be used will remove these" );
 		this.setSemanticMotifsQueries ( newQueries );
 	}
 	
