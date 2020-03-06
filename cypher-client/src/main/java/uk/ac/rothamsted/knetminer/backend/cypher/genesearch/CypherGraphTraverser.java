@@ -175,6 +175,9 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	/**
 	 * There are components that redefine queries dynamically, out of Spring, and report the current ones, so we need 
 	 * this here. This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}.
+	 * 
+	 * <b>WARNING</b>: duplicated queries are removed by the call to {@link #traverseGraph(ONDEXGraph, Set, FilterPaths)},
+	 * @see removeDuplicatedQueries.
 	 */
 	public List<String> getSemanticMotifsQueries ()
 	{

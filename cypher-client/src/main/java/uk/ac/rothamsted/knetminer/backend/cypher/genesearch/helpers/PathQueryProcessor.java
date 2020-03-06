@@ -123,8 +123,10 @@ public class PathQueryProcessor implements ApplicationContextAware
 	}
 
 	
-	/**
+	/** 
+	 * 
 	 * There are debugging/testing components reporting this (eg, cypher debugger in Knetminer).
+	 * @see {@link CypherGraphTraverser#getSemanticMotifsQueries()}.
 	 */
 	public List<String> getSemanticMotifsQueries () {
 		return semanticMotifsQueries;
