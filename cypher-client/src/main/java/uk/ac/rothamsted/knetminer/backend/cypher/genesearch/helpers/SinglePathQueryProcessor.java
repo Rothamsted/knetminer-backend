@@ -129,11 +129,6 @@ class SinglePathQueryProcessor
 	
 	{
 		this.setJobLogPeriod ( -1 ); // We do all the logging about submitted/completed jobs
-		
-		synchronized ( SinglePathQueryProcessor.class ) {
-			if ( SHARED_EXECUTOR == null ) SHARED_EXECUTOR = this.getExecutor ();
-			else this.setExecutor ( SHARED_EXECUTOR );
-		}
 	}
 	
 	public SinglePathQueryProcessor ()
@@ -145,12 +140,22 @@ class SinglePathQueryProcessor
 	private void init ()
 	{
 		this.getBatchCollector ().setMaxBatchSize ( this.queryBatchSize );
-		
-		if ( this.threadPoolSize != -1 || this.threadQueueSize != -1 )
+				
+		synchronized ( SinglePathQueryProcessor.class ) 
 		{
-			int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
-			int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
-			this.setExecutor ( HackedBlockingQueue.createExecutor ( poolSize, queueSize ) );
+			if ( SHARED_EXECUTOR != null )
+				this.setExecutor ( SHARED_EXECUTOR );
+			else
+			{
+				if ( this.threadPoolSize == -1 && this.threadQueueSize == -1 )
+					SHARED_EXECUTOR = this.getExecutor ();
+				else
+				{
+					int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
+					int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
+					this.setExecutor ( SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize ) );
+				}
+			}
 		}
 	}
 	
