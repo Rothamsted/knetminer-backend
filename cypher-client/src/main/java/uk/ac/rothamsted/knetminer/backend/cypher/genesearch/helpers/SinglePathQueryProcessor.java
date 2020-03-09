@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -161,7 +160,9 @@ class SinglePathQueryProcessor
 				{
 					int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
 					int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
-					this.setExecutor ( SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize ) );
+					this.setExecutor ( 
+						SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize )
+					);
 				}
 				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
 			}
