@@ -293,7 +293,7 @@ public class CypherGraphTraverserIT
 	@SuppressWarnings ( "rawtypes" )
 	private boolean checkPathEntities ( List<EvidencePathNode> paths, Object... testedParams )
 	{
-		return paths.parallelStream ().anyMatch ( path -> 
+		return paths.stream ().anyMatch ( path -> 
 		{ 
 			BiFunction<String, Integer, Boolean> oeChecker = ( label, idx ) -> 
 			ONDEXGraphUtils.getString ( path.getEntityAtPosition ( idx ) ).startsWith ( label );
@@ -317,7 +317,7 @@ public class CypherGraphTraverserIT
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	private boolean checkPathEvidences ( List<EvidencePathNode> paths, Object... testedParams )
 	{
-		return paths.parallelStream ()
+		return paths.stream ()
 		.map ( EvidencePathNode::getEvidencesInPositionOrder )
 		.anyMatch ( evidences -> 
 		{ 
