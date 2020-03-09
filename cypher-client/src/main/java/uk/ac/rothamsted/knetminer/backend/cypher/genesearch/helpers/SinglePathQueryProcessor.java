@@ -42,6 +42,7 @@ import net.sourceforge.ondex.core.ONDEXRelation;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
+import uk.ac.ebi.utils.threading.HackedBlockingQueue;
 import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
 import uk.ac.ebi.utils.threading.batchproc.processors.ListBasedBatchProcessor;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
@@ -69,6 +70,32 @@ class SinglePathQueryProcessor
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
 	private long queryTimeoutMs = 20 * 1000;
 
+	
+	/**
+	 * The pool size used by the query processor to send semantic motif queries in parallel to
+	 * Neo4j.
+	 * 
+	 * Namely, this is used with {@link #setExecutor(ExecutorService)}, which, in the default implementation,
+	 * uses this parameter and {@link #threadQueueSize} with {@link HackedBlockingQueue#createExecutor(int, int)},
+	 * ie, we use a fixed number of active threads, and a fixed number of thread queue.
+	 * 
+	 * If this value is -1, the default is {@link Runtime#availableProcessors()}.
+	 * If {@link #threadQueueSize} is -1, it's set to the default of {@link #threadPoolSize} * 2.
+	 * 
+	 * This is a configurable parameter, but we have it so just to test performance issues with Neo4j, it's unlikely
+	 * you will need to change the defaults.
+	 * 
+	 */
+	@Autowired ( required = false ) @Qualifier ( "queryThreadPoolSize" )
+	private int threadPoolSize = -1;
+	
+	/**
+	 * @see #threadPoolSize
+	 */
+	@Autowired ( required = false ) @Qualifier ( "queryThreadQueueSize" )
+	private int threadQueueSize = -1;
+	
+	
 	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
 
 	
@@ -115,8 +142,16 @@ class SinglePathQueryProcessor
 	}	
 
 	@PostConstruct
-	private void init () {
+	private void init ()
+	{
 		this.getBatchCollector ().setMaxBatchSize ( this.queryBatchSize );
+		
+		if ( this.threadPoolSize != -1 || this.threadQueueSize != -1 )
+		{
+			int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
+			int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
+			this.setExecutor ( HackedBlockingQueue.createExecutor ( poolSize, queueSize ) );
+		}
 	}
 	
 	
