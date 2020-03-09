@@ -63,6 +63,10 @@ import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 class SinglePathQueryProcessor
 	extends ListBasedBatchProcessor<ONDEXConcept, Consumer<List<ONDEXConcept>>>
 {	
+	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
+	
+	private String pathQuery;
+	
 	/** This is a configurable parameter */
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
@@ -95,20 +99,10 @@ class SinglePathQueryProcessor
 	 */
 	@Autowired ( required = false ) @Qualifier ( "queryThreadQueueSize" )
 	private int threadQueueSize = -1;
-	
-	
-	public static final long DEFAULT_QUERY_BATCH_SIZE = 500;
-
-	
-	private String pathQuery;
-	
+		
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
 	
-  @Lookup // this is a prototype-scoped bean, so we need lookup+getter. 
-  public PagedCyPathFinder getCyPathFinder () {
-    return null;
-  }	
 	
   /**
    * <p>We share a single executor between all the single query path processors, in order to
@@ -128,6 +122,13 @@ class SinglePathQueryProcessor
 
 	private boolean isInterrupted = false; 
 	
+	
+  @Lookup // this is a prototype-scoped bean, so we need lookup+getter. 
+  public PagedCyPathFinder getCyPathFinder () {
+    return null;
+  }	
+
+  
 	{
 		this.setJobLogPeriod ( -1 ); // We do all the logging about submitted/completed jobs
 	}
