@@ -43,6 +43,7 @@ import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.ebi.utils.threading.HackedBlockingQueue;
+import uk.ac.ebi.utils.threading.ThreadUtils;
 import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
 import uk.ac.ebi.utils.threading.batchproc.processors.ListBasedBatchProcessor;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
@@ -155,6 +156,7 @@ class SinglePathQueryProcessor
 					int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
 					this.setExecutor ( SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize ) );
 				}
+				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
 			}
 		}
 	}
@@ -391,5 +393,6 @@ class SinglePathQueryProcessor
 	 */
 	void interrupt () {
 		this.isInterrupted = true;
-	}	
+	}
+
 }

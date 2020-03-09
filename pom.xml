@@ -50,7 +50,7 @@
 			<dependency>
 				<groupId>uk.ac.rothamsted.rdf.neo4j</groupId>
 				<artifactId>neo4j-utils</artifactId>
-    		<version>0.0.1-SNAPSHOT</version>
+    		<version>1.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.ondex.core</groupId>
@@ -151,7 +151,7 @@
 			<dependency>
 				<groupId>uk.ac.ebi</groupId>
 				<artifactId>jutils-io</artifactId>
-				<version>8.0.1-SNAPSHOT</version>
+				<version>9.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<!-- Utilities for lambdas and collections -->
@@ -285,6 +285,21 @@
   <repositories>
 
 	  <repository>
+			<id>knetminer-releases</id>
+			<name>Rothamsted Maven Repo for Releases</name>
+			<url>http://knetminer.org/artifactory/repository/maven-releases</url>
+	  </repository>
+
+	  <snapshotRepository>
+			<id>knetminer-snapshots</id>
+			<name>Rothamsted Maven Repo for Snapshots</name>
+			<url>http://knetminer.org/artifactory/repository/maven-snapshots</url>
+	  </snapshotRepository>	
+
+		
+		<!-- TODO: to be dismissed -->
+		
+	  <repository>
 			<id>ondex-releases</id>
 			<name>Internal Releases</name>
 			<url>http://ondex.rothamsted.ac.uk/nexus/content/repositories/releases</url>
@@ -296,7 +311,7 @@
 			<url>http://ondex.rothamsted.ac.uk/nexus/content/repositories/snapshots</url>
 		  <snapshots><enabled>true</enabled></snapshots>
 	  </repository>
-
+	  
   	<!-- jutils -->
 		<repository>
 		  <id>EBIBioSamples-GH-repo</id>
