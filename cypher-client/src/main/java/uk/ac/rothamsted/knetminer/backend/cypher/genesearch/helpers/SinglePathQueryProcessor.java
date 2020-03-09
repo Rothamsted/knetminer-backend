@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -122,10 +123,15 @@ class SinglePathQueryProcessor
 
 	private boolean isInterrupted = false; 
 	
+
+  @Autowired private ApplicationContext springContext;
 	
-  @Lookup // this is a prototype-scoped bean, so we need lookup+getter. 
+  /**
+   * This is a prototype-scoped bean, so we need a getter that uses #springContext.
+   * Note that, for some reason {@code @Lookup} stopped to work at some point.
+   */
   public PagedCyPathFinder getCyPathFinder () {
-    return null;
+    return springContext.getBean ( PagedCyPathFinder.class );
   }	
 
   
