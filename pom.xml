@@ -285,16 +285,11 @@
   <repositories>
 
 	  <repository>
-			<id>knetminer-releases</id>
-			<name>Rothamsted Maven Repo for Releases</name>
-			<url>http://knetminer.org/artifactory/repository/maven-releases</url>
+			<id>knetminer-repo</id>
+			<name>Rothamsted Maven Repo</name>
+			<url>https://knetminer.org/artifactory/repository/maven-public/</url>
+		  <snapshots><enabled>true</enabled></snapshots>
 	  </repository>
-
-	  <snapshotRepository>
-			<id>knetminer-snapshots</id>
-			<name>Rothamsted Maven Repo for Snapshots</name>
-			<url>http://knetminer.org/artifactory/repository/maven-snapshots</url>
-	  </snapshotRepository>	
 
 		
 		<!-- TODO: to be dismissed -->
