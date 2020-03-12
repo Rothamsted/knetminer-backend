@@ -193,8 +193,6 @@ class SinglePathQueryProcessor
 		// TODO: parallelStream() might be worth here and should work, but needs testing.
 		// This is only about scanning the concepts and build the batches in parallel or not, 
 		// querying the batches of concepts is parallel anyway.
-		//super.process ( concept -> concepts.stream ().forEach ( concept ) );	
-		
 		boolean wasInterrupted[] = new boolean[] { false };
 		super.process (
 			conceptConsumer -> wasInterrupted [ 0 ] = 
