@@ -1,7 +1,9 @@
 language: java
 jdk: openjdk8
 
-install: echo "Skipping default installation step"
+install: 
+  # The common settings file used to build with Travis
+  - wget https://raw.githubusercontent.com/Rothamsted/knetminer-common/master/settings.xml
 
 before_script:
   - echo -e "\n\n\tInitialising test resources (data server etc)\n"
