@@ -161,7 +161,8 @@ public class PathQueryProcessor implements ApplicationContextAware
 	/**
 	 * @see {@link CypherGraphTraverser#interrupt()} and {@link CypherGraphTraverser#isInterrupted()}.
 	 * 
-	 * This propagates the interruption trigger to all of {@link PathQueryProcessor#interrupt()} the component is using.
+	 * This propagates the interruption trigger to all {@link PathQueryProcessor#interrupt() query processors}  that the 
+	 * component is using.
 	 */
 	public void interrupt ()
 	{

@@ -211,19 +211,25 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 */
 	private void removeDuplicatedQueries ()
 	{
+		// The new list isn't created from existing because we want to preserve the original order
+		//
 		List<String> newQueries = new ArrayList<> (),
 								 currentQueries = this.getSemanticMotifsQueries ();
 		Set<String> existing = new HashSet<> ();
-		getSemanticMotifsQueries ().forEach ( q ->
+		
+		for ( String q: currentQueries )
 		{
-			if ( existing.contains ( q ) ) return;
+			if ( existing.contains ( q ) ) {
+				log.warn ( "Removing duplicated traverser query: {}", q );
+				continue; 
+			}
 			existing.add ( q );
 			newQueries.add ( q );
-		});
+		}
 		
 		if ( newQueries.size () == currentQueries.size () ) return;
 		
-		log.warn ( "There are duplicated queries, the actual list that will be used will remove these" );
+		log.warn ( "Some duplicated traverser queries were removed, see log messages above" );
 		this.setSemanticMotifsQueries ( newQueries );
 	}
 	
