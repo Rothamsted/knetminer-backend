@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Resource;
@@ -24,10 +26,14 @@ import org.springframework.stereotype.Component;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.nodepath.EvidencePathNode;
 import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXGraph;
+import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
 
@@ -45,19 +51,22 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
  */
 @Component
 public class PathQueryProcessor implements ApplicationContextAware
-{
-	// Protected allows inner classes to access without synthetic methods
-	protected ApplicationContext springContext;
-	
+{	
+	/** This is a configurable parameter */
 	@Resource( name = "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
 
+	/** This is a configurable parameter */
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
 
+	/** This is a configurable parameter */
+	@Autowired ( required = false ) @Qualifier ( "traverserTimeoutMins" )
+	private long traverserTimeoutMins = 8 * 60;
+	
 	
 	private LoadingCache<String, SinglePathQueryProcessor> processorCache = 
 		CacheBuilder.newBuilder ()
@@ -72,11 +81,17 @@ public class PathQueryProcessor implements ApplicationContextAware
 				return result;
 			} 
 		});
+			
+	// Protected allows inner classes to access without synthetic methods
+	protected ApplicationContext springContext;
 	
-	private PercentProgressLogger queryProgressLogger = null;
-		
 	private boolean isInterrupted = false; 
 	
+	private PercentProgressLogger queryProgressLogger = null;
+	
+  /** Used by {@link #timedQuery(Runnable, long, List, String)}. */
+	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
+
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	
@@ -102,18 +117,61 @@ public class PathQueryProcessor implements ApplicationContextAware
 			10
 		);
 			
-		this.semanticMotifsQueries
-		.parallelStream ()
-		.forEach ( query -> 
+		try
 		{
-			if ( isInterrupted ) return;
-			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
-			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
-		});
-		
-		this.cyTraverserPerformanceTracker.logStats ();
+			this.processWithTimeout ( 
+			() -> this.semanticMotifsQueries
+				.parallelStream ()
+				.forEach ( query -> 
+				{
+					if ( isInterrupted ) return;
+					SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
+					thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
+				})
+			);
+		}
+		finally {
+			this.cyTraverserPerformanceTracker.logStats ();
+		}
 		return result;
 	}
+	
+	/**
+	 * Wraps the invocation of 
+	 * {@link SinglePathQueryProcessor#process(ONDEXGraph, Collection, Map, PercentProgressLogger) query processors} with
+	 * a {@link TIME_LIMITER time limiter} based on the {@link #traverserTimeoutMins} parameter. It just runs the action
+	 * if such parameter is -1.
+	 */
+	private void processWithTimeout ( Runnable action )
+	{
+		if ( this.traverserTimeoutMins == -1L ) {
+			action.run ();
+			return;
+		}
+		
+		try
+		{
+			TIME_LIMITER.callWithTimeout ( 
+				Executors.callable ( action ), traverserTimeoutMins, TimeUnit.MINUTES, true 
+			);
+		}
+		catch ( UncheckedTimeoutException|InterruptedException ex )
+		{
+			ExceptionUtils.throwEx ( 
+				UncheckedTimeoutException.class, 
+				"The Cypher graph traverser timed out after %d minutes",
+				traverserTimeoutMins
+			);
+		} 
+		catch ( Exception ex )
+		{
+			throw new RuntimeException ( 
+				"Internal error while running the Cypher graph traverser: " + ex.getMessage (),
+				ex 
+			);
+		}
+	}
+	
 	
 	
 	@Override

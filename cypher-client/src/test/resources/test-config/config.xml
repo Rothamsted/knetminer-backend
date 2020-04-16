@@ -96,12 +96,12 @@
   <bean name = "queryPageSize" class = "java.lang.Long"><constructor-arg value = "5" /></bean>
     
     
-  <!-- 
-  	Queries that take longer than this time are aborted and their partial results ignored. 
-  	This is important in order to avoid that some troubling query hangs the whole traversal
-  	job 
+  <!--
+  	This is the total time that the traverser has to complete its query job. It's a guard to ensure it terminates
+  	someout. If it takes more than this time, an exception occurs and the typically applications like Knetminer
+  	fail to start. A value of -1 disable this feature completely (we don't recommend it).
   -->
-	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "20000"/></bean> -->
+	<!-- <bean name = "traverserTimeoutMins" class = "java.lang.Long"><constructor-arg value = "480"/></bean> -->
 	
 	<!-- 
 		This is mostly for debug purposes. The graph traverser has a performance tracker, which periodically logs the 

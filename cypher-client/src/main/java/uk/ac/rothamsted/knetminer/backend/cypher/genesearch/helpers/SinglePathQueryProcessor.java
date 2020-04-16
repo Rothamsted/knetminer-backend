@@ -71,10 +71,6 @@ class SinglePathQueryProcessor
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = DEFAULT_QUERY_BATCH_SIZE;
 	
-	/** This is a configurable parameter */
-	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
-	private long queryTimeoutMs = 20 * 1000;
-
 	
 	/**
 	 * The pool size used by the query processor to send semantic motif queries in parallel to
@@ -117,9 +113,6 @@ class SinglePathQueryProcessor
    */
   private static ExecutorService SHARED_EXECUTOR;
   
-  /** Used by {@link #timedQuery(Runnable, long, List, String)}. */
-	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
-
 	private boolean isInterrupted = false; 
 	
 
@@ -195,9 +188,9 @@ class SinglePathQueryProcessor
 		// querying the batches of concepts is parallel anyway.
 		boolean wasInterrupted[] = new boolean[] { false };
 		super.process (
-			conceptConsumer -> wasInterrupted [ 0 ] = 
+			conceptProcessor -> wasInterrupted [ 0 ] = 
 				!concepts.stream ()
-				.peek ( conceptConsumer )
+				.peek ( conceptProcessor )
 				.allMatch ( concept -> !this.isInterrupted )
 		);
 		if ( wasInterrupted [ 0 ] ) log.debug ( "Query processor was interrupted, query is:\n  {}", this.pathQuery );
@@ -231,7 +224,7 @@ class SinglePathQueryProcessor
 		Runnable queryAction = () -> this.doQuery ( startGeneIris, queryResultIris, performanceCounters );
 
 		// Don't allow it to run too long (if queryTimeoutMs != -1)
-		Runnable timedQueryAction = () -> timedQuery ( queryAction, startGeneIris ); 
+		// Runnable timedQueryAction = () -> timedQuery ( queryAction, startGeneIris ); 
 
 		
 		// Wrap it further with the machinery that accumulates query performance-related stats
@@ -241,7 +234,7 @@ class SinglePathQueryProcessor
 			this.cyTraverserPerformanceTracker.track
 			( 
 				pathQuery, 
-				timedQueryAction,
+				queryAction,
 				() -> performanceCounters [ 0 ],
 				() -> performanceCounters [ 1 ] 
 			);			
@@ -289,53 +282,7 @@ class SinglePathQueryProcessor
 			}
 		);
 	}
-	
-	
-	/**
-	 * Runs a query action with time restrictions (if queryTimeOutMs != -1).
-	 * 
-	 * if the query can't run within its time limits, #UncheckedTimeoutException is thrown. This is possibly
-	 * intercepted by {@link CyTraverserPerformanceTracker}.
-	 * 
-	 */
-	private void timedQuery ( Runnable queryAction, List<String> startGeneIris )
-	{
-		try
-		{
-			// No timeout wanted
-			if ( this.queryTimeoutMs == -1l ) {
-				queryAction.run ();
-				return;
-			}
-						
-			TIME_LIMITER.callWithTimeout ( 
-				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
-			);
-		}
-		catch ( UncheckedTimeoutException|InterruptedException ex ) 
-		{
-			// Don't wrap it with other exception types, but let it flow to the performance tracker
-			throw ExceptionUtils.buildEx ( 
-				UncheckedTimeoutException.class,
-				ex,
-				"Timed out query: %s. First gene IRI is: <%s>. Query is: \"%s\"",
-				ex.getMessage (),
-				startGeneIris.get ( 0 ),
-				escapeJava ( this.pathQuery )
-			);
-		}
-		catch ( Exception ex )
-		{
-			throw ExceptionUtils.buildEx ( 
-				GenericNeo4jException.class,
-				ex,
-				"Error while traversing Neo4j gene graph: %s. First gene IRI is: <%s>. Query is: \"%s\"",
-				ex.getMessage (),
-				startGeneIris.get ( 0 ),
-				escapeJava ( this.pathQuery )
-			);
-		}			
-	}		
+
 		
 	
 	/**

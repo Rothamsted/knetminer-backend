@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,9 +35,8 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
  * <p>An helper for {@link CypherGraphTraverser}, which tracks the performance of multiple queries, during the execution 
  * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.</p>
  * 
- * <p>Note that, because queries are run against batches of starting genes, as per {@link SinglePathQueryProcessor}, many
- * of the figures reported by this component refer to the performance per single batch, not per single gene. 
- * TODO: add the batch size as parameter and change the reporting.</p>
+ * <p>Note that, because queries are run against batches of starting genes, as per {@link SinglePathQueryProcessor}, 
+ * many of the figures reported by this component refer to the performance per single batch, not per single gene.</p>
  */
 @Component
 public class CyTraverserPerformanceTracker 
@@ -64,10 +62,7 @@ public class CyTraverserPerformanceTracker
 
 	/** No of query invocations ({@code #invocations = #queries x #genes}) **/
 	private Map<String, Integer> query2Invocations = Collections.synchronizedMap ( new HashMap<> () );
-	
-	/** No. of queries that timed out */
-	private Map<String, Integer> query2Timeouts = Collections.synchronizedMap ( new HashMap<> () );
-	
+		
 	/** Sums of returned path lengths for the each query **/
 	private Map<String, Long> query2PathLens = Collections.synchronizedMap ( new HashMap<> () );
 	
@@ -90,7 +85,6 @@ public class CyTraverserPerformanceTracker
 		
 		this.query2ExecTimes.clear ();
 		this.query2Invocations.clear ();
-		this.query2Timeouts.clear ();
 		this.query2PathLens.clear ();
 		this.query2Results.clear ();
 		
@@ -98,7 +92,6 @@ public class CyTraverserPerformanceTracker
 		{
 			this.query2ExecTimes.put ( q, 0l );
 			this.query2Invocations.put ( q, 0 );
-			this.query2Timeouts.put ( q, 0 );
 			this.query2PathLens.put ( q, 0l );
 			this.query2Results.put ( q, 0 );
 		});
@@ -126,13 +119,6 @@ public class CyTraverserPerformanceTracker
 			this.query2ExecTimes.compute ( query, (k, t) -> t + time );
 			this.query2Results.compute ( query, (k, n) -> n + pathsCounter.get () );
 			this.query2PathLens.compute ( query, (k, l) -> l + pathLensCounter.get () );
-		}
-		catch ( UncheckedTimeoutException ex ) {
-			// Track the query timed out, the other updates above are skipped by the exec flow.
-			this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
-			// Don't wrap it with other exception types, but let it flow to the invoker, which 
-			// needs to know it, in order to perform cancelling operations
-			throw ex;
 		}
 		finally
 		{
@@ -176,7 +162,7 @@ public class CyTraverserPerformanceTracker
 		if ( nTotQueries == 0 ) return statsSW.toString ();
 		
 		out.println (   
-			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len\tTot Time(min)" 
+			"Query\tTot Invocations\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len\tTot Time(min)" 
 		);
 		
 		SortedSet<String> queries = new TreeSet<> ( query2Invocations.keySet () );
@@ -184,19 +170,16 @@ public class CyTraverserPerformanceTracker
 		{
 			int nresults = query2Results.get ( query );
 			int nqueries = query2Invocations.get ( query );
-			int ntimeouts = query2Timeouts.get ( query );
-			int ncompleted = nqueries - ntimeouts;
 							
 			out.printf (
-				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
+				"\"%s\"\t%d\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
 				escapeJava ( query ),
 				nqueries,
-				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
 				nresults,
-				ncompleted == 0 ? 0d : 1d * nresults / ( ncompleted * this.queryBatchSize ),
-				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted,
+				nqueries == 0 ? 0d : 1d * nresults / ( nqueries * this.queryBatchSize ),
+				nqueries == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / nqueries,
 				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults,
-				ncompleted == 0 ? 0 : query2ExecTimes.get ( query ) / ( 1000d * 60 )
+				query2ExecTimes.get ( query ) / ( 1000d * 60 )
 			);
 		}
 		out.println ( "" );
