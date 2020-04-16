@@ -157,10 +157,10 @@ public class PathQueryProcessor implements ApplicationContextAware
 		}
 		catch ( UncheckedTimeoutException|InterruptedException ex )
 		{
-			ExceptionUtils.throwEx ( 
-				UncheckedTimeoutException.class, 
-				"The Cypher graph traverser timed out after %d minutes",
-				traverserTimeoutMins
+			log.error ( 
+				"The Cypher graph traverser timed out after " + traverserTimeoutMins + " minutes, " +
+				"some results might be missing, see the traverser report in the logs for details",
+				ex 
 			);
 		} 
 		catch ( Exception ex )

@@ -98,8 +98,8 @@
     
   <!--
   	This is the total time that the traverser has to complete its query job. It's a guard to ensure it terminates
-  	someout. If it takes more than this time, an exception occurs and the typically applications like Knetminer
-  	fail to start. A value of -1 disable this feature completely (we don't recommend it).
+  	someout. If it takes more than this time, an exception occurs, the traverser stops and partial results are returned.
+  	A value of -1 disables this feature completely (we don't recommend it).
   -->
 	<!-- <bean name = "traverserTimeoutMins" class = "java.lang.Long"><constructor-arg value = "480"/></bean> -->
 	
