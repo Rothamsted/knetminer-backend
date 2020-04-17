@@ -158,10 +158,11 @@ public class PathQueryProcessor implements ApplicationContextAware
 		catch ( UncheckedTimeoutException|InterruptedException ex )
 		{
 			log.error ( 
-				"The Cypher graph traverser timed out after " + traverserTimeoutMins + " minutes, " +
+				"The Cypher graph traverser timed out after {} minutes, " +
 				"some results might be missing, see the traverser report in the logs for details",
-				ex 
+				traverserTimeoutMins
 			);
+			log.debug ( "timeout exception details are:", ex );
 		} 
 		catch ( Exception ex )
 		{

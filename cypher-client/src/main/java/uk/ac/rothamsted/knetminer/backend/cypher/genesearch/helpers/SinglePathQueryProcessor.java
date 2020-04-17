@@ -1,6 +1,5 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
-import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.buildEx;
 import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
@@ -11,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -24,8 +21,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
@@ -48,7 +43,6 @@ import uk.ac.ebi.utils.threading.batchproc.BatchProcessor;
 import uk.ac.ebi.utils.threading.batchproc.processors.ListBasedBatchProcessor;
 import uk.ac.rothamsted.knetminer.backend.cypher.CypherClient;
 import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
-import uk.ac.rothamsted.neo4j.utils.GenericNeo4jException;
 
 /**
  * An helper (used by {@link SinglePathQueryProcessor}) to traverse a list of genes with a single query. 
