@@ -46,15 +46,14 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
 @Component
 public class PathQueryProcessor implements ApplicationContextAware
 {
-	// Protected allows inner classes to access without synthetic methods
-	protected ApplicationContext springContext;
-	
+	/** This is a configurable parameter */
 	@Resource( name = "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 
 	@Autowired
 	private CyTraverserPerformanceTracker cyTraverserPerformanceTracker;
 
+	/** This is a configurable parameter */
 	@Autowired ( required = false) @Qualifier ( "queryBatchSize" ) 
 	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
 
@@ -73,10 +72,13 @@ public class PathQueryProcessor implements ApplicationContextAware
 			} 
 		});
 	
-	private PercentProgressLogger queryProgressLogger = null;
-		
+	// Protected allows inner classes to access without synthetic methods
+	protected ApplicationContext springContext;
+	
 	private boolean isInterrupted = false; 
 	
+	private PercentProgressLogger queryProgressLogger = null;
+			
 	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	

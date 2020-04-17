@@ -42,7 +42,6 @@
   <modules>
     <module>test-data-server</module>
     <module>cypher-client</module>
-    <module>backend-utils</module>
   </modules>
 
 	<dependencyManagement>

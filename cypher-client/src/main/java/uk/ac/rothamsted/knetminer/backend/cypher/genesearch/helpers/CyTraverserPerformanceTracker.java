@@ -37,8 +37,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
  * of the {@link CypherGraphTraverser#traverseGraph(ONDEXGraph, Set, FilterPaths) multi-gene traversal}.</p>
  * 
  * <p>Note that, because queries are run against batches of starting genes, as per {@link SinglePathQueryProcessor}, many
- * of the figures reported by this component refer to the performance per single batch, not per single gene. 
- * TODO: add the batch size as parameter and change the reporting.</p>
+ * of the figures reported by this component refer to the performance per single batch, not per single gene.</p> 
  */
 @Component
 public class CyTraverserPerformanceTracker 

@@ -195,9 +195,9 @@ class SinglePathQueryProcessor
 		// querying the batches of concepts is parallel anyway.
 		boolean wasInterrupted[] = new boolean[] { false };
 		super.process (
-			conceptConsumer -> wasInterrupted [ 0 ] = 
+			conceptProcessor -> wasInterrupted [ 0 ] = 
 				!concepts.stream ()
-				.peek ( conceptConsumer )
+				.peek ( conceptProcessor )
 				.allMatch ( concept -> !this.isInterrupted )
 		);
 		if ( wasInterrupted [ 0 ] ) log.debug ( "Query processor was interrupted, query is:\n  {}", this.pathQuery );

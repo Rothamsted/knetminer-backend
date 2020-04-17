@@ -67,6 +67,18 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	
 	private void init ()
 	{
+		this.initSpring ();
+		
+		// Sometimes this is set via options for debugging purposes 
+		Integer reportFrequency = this.getOption ( "performanceReportFrequency" );
+		if ( reportFrequency != null )
+			springContext
+				.getBean ( CyTraverserPerformanceTracker.class )
+				.setReportFrequency ( reportFrequency );
+	}
+	
+	private void initSpring ()
+	{
 		// Double-check lazy init (https://www.geeksforgeeks.org/java-singleton-design-pattern-practices-examples/)
 		if ( springContext != null ) return;
 		
