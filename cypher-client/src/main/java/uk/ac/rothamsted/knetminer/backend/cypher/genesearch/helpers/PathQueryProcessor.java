@@ -103,7 +103,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 		);
 			
 		this.semanticMotifsQueries
-		.parallelStream ()
+		.stream ()
 		.forEach ( query -> 
 		{
 			if ( isInterrupted ) return;
