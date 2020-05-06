@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,7 @@ import net.sourceforge.ondex.core.ONDEXGraph;
 import net.sourceforge.ondex.core.ONDEXRelation;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
+import uk.ac.ebi.utils.runcontrol.MultipleAttemptsExecutor;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.ebi.utils.threading.HackedBlockingQueue;
 import uk.ac.ebi.utils.threading.ThreadUtils;
@@ -300,16 +302,23 @@ class SinglePathQueryProcessor
 	 */
 	private void timedQuery ( Runnable queryAction, List<String> startGeneIris )
 	{
+		// No timeout wanted
+		if ( this.queryTimeoutMs == -1l ) {
+			queryAction.run ();
+			return;
+		}
+
+		MultipleAttemptsExecutor attempter = new MultipleAttemptsExecutor ( 
+			10, 1 * 60 * 1000, 5 * 60 * 1000,
+			UncheckedTimeoutException.class, InterruptedException.class, GenericNeo4jException.class
+		); 
+
 		try
 		{
-			// No timeout wanted
-			if ( this.queryTimeoutMs == -1l ) {
-				queryAction.run ();
-				return;
-			}
-						
-			TIME_LIMITER.callWithTimeout ( 
-				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
+			attempter.executeChecked ( () ->
+				TIME_LIMITER.callWithTimeout ( 
+					Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
+				)
 			);
 		}
 		catch ( UncheckedTimeoutException|InterruptedException ex ) 
@@ -318,7 +327,7 @@ class SinglePathQueryProcessor
 			throw ExceptionUtils.buildEx ( 
 				UncheckedTimeoutException.class,
 				ex,
-				"Timed out query: %s. First gene IRI is: <%s>. Query is: \"%s\"",
+				"Timed out query (after multiple attempts): %s. First gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIris.get ( 0 ),
 				escapeJava ( this.pathQuery )
