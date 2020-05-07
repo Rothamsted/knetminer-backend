@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -308,17 +307,20 @@ class SinglePathQueryProcessor
 			return;
 		}
 
-		MultipleAttemptsExecutor attempter = new MultipleAttemptsExecutor ( 
-			10, 1 * 60 * 1000, 5 * 60 * 1000,
-			UncheckedTimeoutException.class, InterruptedException.class, GenericNeo4jException.class
-		); 
+//		MultipleAttemptsExecutor attempter = new MultipleAttemptsExecutor ( 
+//			10, 1 * 60 * 1000, 5 * 60 * 1000,
+//			UncheckedTimeoutException.class, InterruptedException.class, GenericNeo4jException.class
+//		); 
 
 		try
 		{
-			attempter.executeChecked ( () ->
-				TIME_LIMITER.callWithTimeout ( 
-					Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
-				)
+//			attempter.executeChecked ( () ->
+//				TIME_LIMITER.callWithTimeout ( 
+//					Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
+//				)
+//			);
+			TIME_LIMITER.callWithTimeout ( 
+				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);
 		}
 		catch ( UncheckedTimeoutException|InterruptedException ex ) 
