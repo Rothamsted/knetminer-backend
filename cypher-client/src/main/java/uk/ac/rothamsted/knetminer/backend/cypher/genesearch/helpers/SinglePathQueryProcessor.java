@@ -244,7 +244,8 @@ class SinglePathQueryProcessor
 				pathQuery, 
 				timedQueryAction,
 				() -> performanceCounters [ 0 ],
-				() -> performanceCounters [ 1 ] 
+				() -> performanceCounters [ 1 ],
+				batch
 			);			
 		}
 		catch ( UncheckedTimeoutException ex ) 

@@ -2,8 +2,12 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +16,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
+import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +35,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 import net.sourceforge.ondex.algorithm.graphquery.FilterPaths;
+import net.sourceforge.ondex.core.ONDEXConcept;
 import net.sourceforge.ondex.core.ONDEXGraph;
 import uk.ac.ebi.utils.time.XStopWatch;
 import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser;
@@ -54,6 +65,12 @@ public class CyTraverserPerformanceTracker
 	@Resource( name = "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 	
+	/** TODO: comment me*/
+	@Autowired(required = false) @Qualifier ( "timeoutReportFilesPathPrefix" )
+	private String timeoutReportFilesPathPrefix = 
+		Optional.ofNullable ( System.getenv ( "CATALINA_HOME" ) )
+		.map ( base -> base += "/logs/knetminer-cy-timeout-report-%s.txt.gz" )
+		.orElse ( null );
 	
 	/** Times to fetch all the results **/
 	private Map<String, Long> query2ExecTimes = Collections.synchronizedMap ( new HashMap<> () );
@@ -73,6 +90,9 @@ public class CyTraverserPerformanceTracker
 	/** Total no. of invocations, ie #queries x #genes / {@link #queryBatchSize} **/ 
 	private AtomicInteger invocations = new AtomicInteger ( 0 );
 
+	/** Used by {@link #logTimedOutQuery(String, List)}  */
+	private AtomicLong currentTime = new AtomicLong ( 0 );
+	
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
@@ -113,7 +133,11 @@ public class CyTraverserPerformanceTracker
 	 * the timeout counter is update instead. This is useful when the query action makes use of {@link TimeLimiter}</p>
 	 * 
 	 */
-	void track ( String query, Runnable queryAction, Supplier<Integer> pathsCounter, Supplier<Integer> pathLensCounter )
+	void track ( 
+		String query, Runnable queryAction, 
+		Supplier<Integer> pathsCounter, Supplier<Integer> pathLensCounter, 
+		List<ONDEXConcept> startGenes 
+	)
 	{
 		if ( this.reportFrequency < 0 ) {
 			// tracking is disabled
@@ -129,6 +153,7 @@ public class CyTraverserPerformanceTracker
 		catch ( UncheckedTimeoutException ex ) {
 			// Track the query timed out, the other updates above are skipped by the exec flow.
 			this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
+			this.logTimedOutQuery ( query, startGenes );
 			// Don't wrap it with other exception types, but let it flow to the invoker, which 
 			// needs to know it, in order to perform cancelling operations
 			throw ex;
@@ -140,6 +165,32 @@ public class CyTraverserPerformanceTracker
 			if ( this.reportFrequency > 0 && invocations.get () % this.reportFrequency == 0 ) logStats ();
 		}
 	}
+	
+	
+	private void logTimedOutQuery ( String query, List<ONDEXConcept> startGenes )
+	{
+		if ( this.timeoutReportFilesPathPrefix == null ) return;
+		
+		// To have different file names below
+		Uninterruptibles.sleepUninterruptibly ( 1, TimeUnit.MILLISECONDS );
+		
+		long ts = this.currentTime.updateAndGet ( prev -> System.currentTimeMillis () );
+		String tsStr = DateFormatUtils.format ( ts, "yyyyMMddHHmmss.SSS" );
+		String outPath = String.format ( this.timeoutReportFilesPathPrefix, tsStr );
+		
+		try ( PrintStream out = new PrintStream ( new GZIPOutputStream ( new FileOutputStream ( outPath ), 2<<20 ) ) )
+		{
+			out.println ( StringEscapeUtils.escapeJava ( query ) );
+			startGenes
+			.stream ()
+			.map ( ONDEXConcept::getPID )
+			.forEach ( out::println );
+		}
+		catch ( IOException ex ) {
+			throw new UncheckedIOException ( "Error while saving timed out query: " + ex.getMessage (), ex );
+		}
+	}
+	
 
 	/**
 	 * Sends {@link #getStats()} to the logging system.

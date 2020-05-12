@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Resource;
 
-import org.neo4j.driver.v1.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -95,7 +95,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 		this.isInterrupted = false;
 		doLogConfig ();
 		
-		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
+		Map<ONDEXConcept, List<EvidencePathNode>> result = new ConcurrentHashMap<> ();
 		this.cyTraverserPerformanceTracker.reset ();
 		
 		queryProgressLogger = new PercentProgressLogger ( 
