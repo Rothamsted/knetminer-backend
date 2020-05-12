@@ -101,8 +101,6 @@ public class CypherClient implements AutoCloseable
 	/**
 	 * A low-level version of {@link #findPaths(ONDEXGraph, String, Value), which just returns path IRIs
 	 * for every path achievable from the query.
-	 *  
-	 * <p>This is based on {@link #queryToStream(String, Value)}, see the note there about parallelism.</p>
 	 * 
 	 */
 	public static Stream<List<ONDEXEntity>> findPathsFromIris ( ONDEXGraph graph, Stream<List<String>> pathsAsIris )
