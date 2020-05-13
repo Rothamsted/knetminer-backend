@@ -112,22 +112,26 @@ public class PathQueryProcessor implements ApplicationContextAware
 			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
 		});
 		
+		this.cyTraverserPerformanceTracker.logStats ();
+		
 		// Let's redo it until all timed out succeed
-		// TODO: introduce max attempts
-		while ( true )
+		int attempts = 5;
+		for ( ; true; attempts-- )
 		{
-			Map<String, Collection<ONDEXConcept>> timedOutQueries = this.cyTraverserPerformanceTracker.getTimedOutQueries ();
+			Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
 			if ( timedOutQueries.isEmpty () ) break;
-			
+			if ( attempts == 0 ) break;
+
+			cyTraverserPerformanceTracker.reset ();
 			int nqueries = timedOutQueries.size ();
-			log.info ( "Re-attempting {} timed out queries/batches", nqueries );
+			log.info ( "Re-attempting {} timed out queries/batches, {} remaining attempt(s)", nqueries, attempts );
 
 			int ngenes = timedOutQueries.values ()
 			  .stream ()
 			  .collect ( Collectors.summingInt ( Collection::size ) );
 			
 			queryProgressLogger = new PercentProgressLogger ( 
-				"{}% of graph traversing queries processed (timed out cases)",
+				"{}% of graph traversing queries processed (time out cases)",
 				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ) * nqueries,
 				10
 			);
@@ -138,9 +142,11 @@ public class PathQueryProcessor implements ApplicationContextAware
 				SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
 				thisQueryProc.process ( graph, genes, result, queryProgressLogger ); 
 			});
+			
+			cyTraverserPerformanceTracker.logStats ();
 		}
 		
-		this.cyTraverserPerformanceTracker.logStats ();
+		if ( attempts == 0 ) log.info ( "Some queries are still timing out, returning partial results" );
 		return result;
 	}
 	
