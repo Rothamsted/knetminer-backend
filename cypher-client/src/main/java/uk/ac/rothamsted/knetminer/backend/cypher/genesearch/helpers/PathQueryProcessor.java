@@ -3,12 +3,11 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 import static java.lang.Math.ceil;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -112,6 +111,34 @@ public class PathQueryProcessor implements ApplicationContextAware
 			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
 			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
 		});
+		
+		// Let's redo it until all timed out succeed
+		// TODO: introduce max attempts
+		while ( true )
+		{
+			Map<String, Collection<ONDEXConcept>> timedOutQueries = this.cyTraverserPerformanceTracker.getTimedOutQueries ();
+			if ( timedOutQueries.isEmpty () ) break;
+			
+			int nqueries = timedOutQueries.size ();
+			log.info ( "Re-attempting {} timed out queries/batches", nqueries );
+
+			int ngenes = timedOutQueries.values ()
+			  .stream ()
+			  .collect ( Collectors.summingInt ( Collection::size ) );
+			
+			queryProgressLogger = new PercentProgressLogger ( 
+				"{}% of graph traversing queries processed (timed out cases)",
+				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ) * nqueries,
+				10
+			);
+			
+			timedOutQueries.forEach ( (query, genes) -> 
+			{
+				if ( isInterrupted ) return;
+				SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
+				thisQueryProc.process ( graph, genes, result, queryProgressLogger ); 
+			});
+		}
 		
 		this.cyTraverserPerformanceTracker.logStats ();
 		return result;

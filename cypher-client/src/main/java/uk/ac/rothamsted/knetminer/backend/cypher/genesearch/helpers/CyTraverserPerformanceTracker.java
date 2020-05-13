@@ -1,5 +1,6 @@
 package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 
+import static org.apache.commons.lang3.time.DateFormatUtils.format;
 import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
 import java.io.FileOutputStream;
@@ -9,7 +10,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,8 +29,10 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -54,7 +61,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
  */
 @Component
 public class CyTraverserPerformanceTracker 
-{
+{	
 	/** This is a configurable parameter */
 	@Autowired(required = false) @Qualifier ( "performanceReportFrequency" )
 	private int reportFrequency = 0;
@@ -95,8 +102,8 @@ public class CyTraverserPerformanceTracker
 	/** Used by {@link #trackTimedOutQuery(String, List)}  */
 	private AtomicLong currentTime = new AtomicLong ( 0 );
 	
-	private List<Pair<String, String>> timedOutQueries = Collections.synchronizedList ( new ArrayList<> () );
-	
+	private List<Triple<String, Long, List<ONDEXConcept>>> timedOutQueries =
+		Collections.synchronizedList ( new ArrayList<> () );
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
@@ -175,24 +182,13 @@ public class CyTraverserPerformanceTracker
 	
 	private void trackTimedOutQuery ( String query, List<ONDEXConcept> startGenes )
 	{
-		if ( this.timeoutsReportFilePath == null ) return;
 		
 		// To have different time stamps
 		Uninterruptibles.sleepUninterruptibly ( 1, TimeUnit.MILLISECONDS );
 		
 		long tstamp = this.currentTime.updateAndGet ( prev -> System.currentTimeMillis () );
-		String tstampStr = DateFormatUtils.format ( tstamp, "yyyy-MM-dd HH:mm:ss.SSS" );
-		
-		// Genes are reported as Cypher array syntax, so that they can easily be reused
-		String geneList = startGenes
-		.stream ()
-		.map ( ONDEXConcept::getPID )
-		.sorted ()
-		.collect ( Collectors.joining ( "[", ",", "]" ) );
-				
-		this.timedOutQueries.add ( 
-			Pair.of ( StringEscapeUtils.escapeJava ( query ), tstampStr + '\t' + geneList ) 
-		);
+
+		this.timedOutQueries.add ( Triple.of ( query, tstamp, startGenes ));
 	}
 	
 
@@ -219,12 +215,30 @@ public class CyTraverserPerformanceTracker
 		try ( PrintStream out = new PrintStream ( new FileOutputStream ( timeoutsReportFilePath ) ) ) 
 		{
 			out.println ( "Query\tTimestamp\tGenes" );
-	 		
+			
 			this.timedOutQueries
 			.stream ()
+			.map ( e ->
+			{
+				String query = e.getLeft ();
+				Long tstamp = e.getMiddle ();
+				List<ONDEXConcept> genes = e.getRight ();
+								
+				String geneList = 
+					genes
+					.stream ()
+					.map ( ONDEXConcept::getPID )
+					.sorted ()
+					.collect ( Collectors.joining ( "[", ",", "]" ) );
+				
+				return Triple.of ( 
+					escapeJava ( query ), 
+					format ( tstamp, "yyyy-MM-dd HH:mm:ss.SSS" ),
+					geneList
+				);
+			})
 			.sorted ()
-			.map ( pair -> pair.getLeft () + '\t' + pair.getRight () )
-			.forEach ( out::println );
+			.forEach ( e -> out.printf ( "%s\t%s%s\n", e.getLeft (), e.getMiddle (), e.getRight () ) );
 		}
 		catch ( IOException ex ) {
 			throw new UncheckedIOException ( "Error while saving time out report: " + ex.getMessage (), ex );
@@ -282,6 +296,23 @@ public class CyTraverserPerformanceTracker
 	}
 
 
+	public Map<String, Collection<ONDEXConcept>> getTimedOutQueries ()
+	{
+		Map<String, Collection<ONDEXConcept>> result = new HashMap<> ();
+		
+		this.timedOutQueries.forEach ( e ->
+		{
+			String query = e.getLeft ();
+			List<ONDEXConcept> genes = e.getRight ();
+			result
+			  .computeIfAbsent ( query, q -> new ArrayList<> () )
+			  .addAll ( genes ); 
+		});
+		
+		return result;
+	}
+	
+	
 	public int getReportFrequency () {
 		return reportFrequency;
 	}
@@ -301,5 +332,5 @@ public class CyTraverserPerformanceTracker
 	{
 		this.semanticMotifsQueries = semanticMotifsQueries;
 		this.reset ();
-	}	
+	}
 }
