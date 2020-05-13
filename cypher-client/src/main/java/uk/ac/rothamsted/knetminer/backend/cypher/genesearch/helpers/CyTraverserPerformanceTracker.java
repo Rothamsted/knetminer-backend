@@ -10,7 +10,6 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -31,14 +29,12 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
-import org.apache.commons.text.diff.StringsComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -184,17 +180,18 @@ public class CyTraverserPerformanceTracker
 		// To have different time stamps
 		Uninterruptibles.sleepUninterruptibly ( 1, TimeUnit.MILLISECONDS );
 		
-		long ts = this.currentTime.updateAndGet ( prev -> System.currentTimeMillis () );
-		String tsStr = DateFormatUtils.format ( ts, "yyyy-MM-dd HH:mm:ss.SSS" );
+		long tstamp = this.currentTime.updateAndGet ( prev -> System.currentTimeMillis () );
+		String tstampStr = DateFormatUtils.format ( tstamp, "yyyy-MM-dd HH:mm:ss.SSS" );
 		
+		// Genes are reported as Cypher array syntax, so that they can easily be reused
 		String geneList = startGenes
 		.stream ()
 		.map ( ONDEXConcept::getPID )
 		.sorted ()
-		.collect ( Collectors.joining ( "|" ) );
-
+		.collect ( Collectors.joining ( "[", ",", "]" ) );
+				
 		this.timedOutQueries.add ( 
-			Pair.of ( StringEscapeUtils.escapeJava ( query ), tsStr + '\t' + geneList ) 
+			Pair.of ( StringEscapeUtils.escapeJava ( query ), tstampStr + '\t' + geneList ) 
 		);
 	}
 	
@@ -221,7 +218,7 @@ public class CyTraverserPerformanceTracker
 		
 		try ( PrintStream out = new PrintStream ( new FileOutputStream ( timeoutsReportFilePath ) ) ) 
 		{
-			out.println ( "Query\tTime\tGenes" );
+			out.println ( "Query\tTimestamp\tGenes" );
 	 		
 			this.timedOutQueries
 			.stream ()
