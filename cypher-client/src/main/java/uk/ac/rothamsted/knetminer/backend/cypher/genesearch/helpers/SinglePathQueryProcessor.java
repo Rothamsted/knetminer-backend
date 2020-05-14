@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,6 @@ import net.sourceforge.ondex.core.ONDEXGraph;
 import net.sourceforge.ondex.core.ONDEXRelation;
 import net.sourceforge.ondex.core.util.ONDEXGraphUtils;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
-import uk.ac.ebi.utils.runcontrol.MultipleAttemptsExecutor;
 import uk.ac.ebi.utils.runcontrol.PercentProgressLogger;
 import uk.ac.ebi.utils.threading.HackedBlockingQueue;
 import uk.ac.ebi.utils.threading.ThreadUtils;
@@ -268,8 +268,9 @@ class SinglePathQueryProcessor
 			// Do it before the following, it checks the first entity is a concept.
 			EvidencePathNode path = this.buildEvidencePath ( pathEntities );
 			ONDEXConcept firstGene = (ONDEXConcept) pathEntities.get ( 0 );
-			
-			result.computeIfAbsent ( firstGene, k -> Collections.synchronizedList ( new ArrayList<> () ) )
+						
+			result
+				.computeIfAbsent ( firstGene, k -> new Vector<> () )
 				.add ( path );
 		});
 	}
@@ -308,18 +309,8 @@ class SinglePathQueryProcessor
 			return;
 		}
 
-//		MultipleAttemptsExecutor attempter = new MultipleAttemptsExecutor ( 
-//			10, 1 * 60 * 1000, 5 * 60 * 1000,
-//			UncheckedTimeoutException.class, InterruptedException.class, GenericNeo4jException.class
-//		); 
-
 		try
 		{
-//			attempter.executeChecked ( () ->
-//				TIME_LIMITER.callWithTimeout ( 
-//					Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
-//				)
-//			);
 			TIME_LIMITER.callWithTimeout ( 
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);

@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -96,8 +97,7 @@ public class CyTraverserPerformanceTracker
 	/** Used by {@link #trackTimedOutQuery(String, List)}  */
 	private AtomicLong currentTime = new AtomicLong ( 0 );
 	
-	private List<Triple<String, Long, List<ONDEXConcept>>> timedOutQueries =
-		Collections.synchronizedList ( new ArrayList<> () );
+	private List<Triple<String, Long, List<ONDEXConcept>>> timedOutQueries = new Vector<> ();
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
@@ -221,9 +221,9 @@ public class CyTraverserPerformanceTracker
 				String geneList = 
 					genes
 					.stream ()
-					.map ( ONDEXConcept::getPID )
+					.map ( concept -> '\'' + concept.getPID () + '\'' )
 					.sorted ()
-					.collect ( Collectors.joining ( "[", ",", "]" ) );
+					.collect ( Collectors.joining ( ",", "[", "]" ) );
 				
 				return Triple.of ( 
 					escapeJava ( query ), 
@@ -232,7 +232,7 @@ public class CyTraverserPerformanceTracker
 				);
 			})
 			.sorted ()
-			.forEach ( e -> out.printf ( "%s\t%s%s\n", e.getLeft (), e.getMiddle (), e.getRight () ) );
+			.forEach ( e -> out.printf ( "%s\t%s\t%s\n", e.getLeft (), e.getMiddle (), e.getRight () ) );
 		}
 		catch ( IOException ex ) {
 			throw new UncheckedIOException ( "Error while saving time out report: " + ex.getMessage (), ex );

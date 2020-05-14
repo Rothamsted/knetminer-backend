@@ -121,7 +121,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 			Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
 			if ( timedOutQueries.isEmpty () ) break;
 			if ( attempts == 0 ) break;
-
+			
 			cyTraverserPerformanceTracker.reset ();
 			int nqueries = timedOutQueries.size ();
 			log.info ( "Re-attempting {} timed out queries/batches, {} remaining attempt(s)", nqueries, attempts );
@@ -132,7 +132,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 			
 			queryProgressLogger = new PercentProgressLogger ( 
 				"{}% of graph traversing queries processed (time out cases)",
-				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ) * nqueries,
+				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ),
 				10
 			);
 			
