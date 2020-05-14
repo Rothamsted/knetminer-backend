@@ -70,10 +70,10 @@ public class CyTraverserPerformanceTracker
 	private List<String> semanticMotifsQueries; 
 	
 	/** TODO: comment me*/
-	@Autowired(required = false) @Qualifier ( "timeoutsReportFilePath" )
-	private String timeoutsReportFilePath = 
+	@Autowired(required = false) @Qualifier ( "timeoutReportFilesPathPrefix" )
+	private String timeoutReportFilesPathPrefix = 
 		Optional.ofNullable ( System.getenv ( "CATALINA_HOME" ) )
-		.map ( base -> base += "/logs/knetminer-cy-timeout-report.tsv" )
+		.map ( base -> base += "/logs/knetminer-cy-timeout-report-%s.tsv" )
 		.orElse ( null );
 	
 	/** Times to fetch all the results **/
@@ -201,12 +201,15 @@ public class CyTraverserPerformanceTracker
 	
 	private void logTimeOuts ()
 	{
-		if ( this.timeoutsReportFilePath == null ) return;
+		if ( this.timeoutReportFilesPathPrefix == null ) return;
 		
-		log.info ( "Writing timeout report to '{}'", timeoutsReportFilePath );
-
+		String reportPath = String.format (
+			timeoutReportFilesPathPrefix,
+			format ( System.currentTimeMillis (), "yyyyMMddHHmmss" )
+		);
+		log.info ( "Writing timeout report to '{}'", reportPath );
 		
-		try ( PrintStream out = new PrintStream ( new FileOutputStream ( timeoutsReportFilePath ) ) ) 
+		try ( PrintStream out = new PrintStream ( new FileOutputStream ( reportPath ) ) ) 
 		{
 			out.println ( "Query\tTimestamp\tGenes" );
 			
