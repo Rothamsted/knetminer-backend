@@ -155,16 +155,11 @@ class SinglePathQueryProcessor
 				this.setExecutor ( SHARED_EXECUTOR );
 			else
 			{
-				if ( this.threadPoolSize == -1 && this.threadQueueSize == -1 )
-					SHARED_EXECUTOR = this.getExecutor ();
-				else
-				{
-					this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
-					int queueSize = this.threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
-					this.setExecutor ( 
-						SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, queueSize )
-					);
-				}
+				this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
+				int queueSize = this.threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
+				this.setExecutor ( 
+					SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, queueSize )
+				);
 				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
 			}
 		}
