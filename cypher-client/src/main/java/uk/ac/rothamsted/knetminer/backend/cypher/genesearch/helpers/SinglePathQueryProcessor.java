@@ -159,10 +159,10 @@ class SinglePathQueryProcessor
 					SHARED_EXECUTOR = this.getExecutor ();
 				else
 				{
-					int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
-					int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
+					this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
+					int queueSize = this.threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
 					this.setExecutor ( 
-						SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize )
+						SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, queueSize )
 					);
 				}
 				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
@@ -261,8 +261,7 @@ class SinglePathQueryProcessor
 		
 		// And eventually, let's collect the results
 		//
-		CypherClient.findPathsFromIris ( graph, queryResultIris.parallelStream () )
-		.parallel ()
+		CypherClient.findPathsFromIris ( graph, queryResultIris.stream () )
 		.forEach ( pathEntities ->
 		{
 			// Do it before the following, it checks the first entity is a concept.
@@ -404,4 +403,7 @@ class SinglePathQueryProcessor
 		this.isInterrupted = true;
 	}
 
+	int getThreadPoolSize () {
+		return threadPoolSize;
+	}
 }

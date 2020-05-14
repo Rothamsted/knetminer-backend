@@ -92,9 +92,21 @@ public class PathQueryProcessor implements ApplicationContextAware
 	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
 		this.isInterrupted = false;
+
+		if ( this.semanticMotifsQueries == null || this.semanticMotifsQueries.isEmpty () ) {
+			log.warn ( "We don't have any configured Cypher query to run the traverser! Returning empty result" );
+			return new ConcurrentHashMap<> ( 0 );
+		}
+		
+		int threadPoolSize = 
+			this.processorCache.getUnchecked ( this.semanticMotifsQueries.iterator ().next () )
+			.getThreadPoolSize ();
+
 		doLogConfig ();
 		
-		Map<ONDEXConcept, List<EvidencePathNode>> result = new ConcurrentHashMap<> ();
+		int nconcepts = concepts.size ();
+		
+		Map<ONDEXConcept, List<EvidencePathNode>> result = new ConcurrentHashMap<> ( nconcepts, 0.75f, threadPoolSize );
 		this.cyTraverserPerformanceTracker.reset ();
 		
 		queryProgressLogger = new PercentProgressLogger ( 
