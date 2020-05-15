@@ -11,7 +11,6 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +68,9 @@ public class CyTraverserPerformanceTracker
 	@Resource( name = "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 	
-	/** TODO: comment me*/
-	@Autowired(required = false) @Qualifier ( "timeoutReportFilesPathPrefix" )
-	private String timeoutReportFilesPathPrefix = 
+	/** This is a configurable option, see the sample config file for details. */
+	@Autowired(required = false) @Qualifier ( "timeoutReportPathTemplate" )
+	private String timeoutReportPathTemplate = 
 		Optional.ofNullable ( System.getenv ( "CATALINA_HOME" ) )
 		.map ( base -> base += "/logs/knetminer-cy-timeout-report-%s.tsv" )
 		.orElse ( null );
@@ -97,6 +96,11 @@ public class CyTraverserPerformanceTracker
 	/** Used by {@link #trackTimedOutQuery(String, List)}  */
 	private AtomicLong currentTime = new AtomicLong ( 0 );
 	
+	/**
+	 * This used by {@link #trackTimedOutQuery()} to keep track of the queries that couldn't complete within the configured
+	 * time out. The structure contains triples of: Cypher query, timestamp (the usual ms from epoch), batch of genes
+	 * that caused the query to fail at that timestamp.
+	 */
 	private List<Triple<String, Long, List<ONDEXConcept>>> timedOutQueries = new Vector<> ();
 	
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
@@ -173,7 +177,11 @@ public class CyTraverserPerformanceTracker
 		}
 	}
 	
-	
+	/**
+	 * Keeps track of the queries that timed out, together with 
+	 * the genes/concepts that caused this. The field {@link #timedOutQueries}
+	 * is used for that.
+	 */
 	private void trackTimedOutQuery ( String query, List<ONDEXConcept> startGenes )
 	{
 		
@@ -198,13 +206,19 @@ public class CyTraverserPerformanceTracker
 		this.logTimeOuts ();
 	}
 	
-	
+	/**
+	 * Reports the data about timed out queries, collected by {@link #trackTimedOutQuery(String, List)}, into the file
+	 * {@link #timeoutReportPathTemplate}, if this is non null and there is any timed out query. 
+	 * 
+	 * This is invoked by {@link #logStats()}
+	 */
 	private void logTimeOuts ()
 	{
-		if ( this.timeoutReportFilesPathPrefix == null ) return;
+		if ( this.timeoutReportPathTemplate == null ) return;
+		if ( this.timedOutQueries.size () == 0 ) return;
 		
 		String reportPath = String.format (
-			timeoutReportFilesPathPrefix,
+			timeoutReportPathTemplate,
 			format ( System.currentTimeMillis (), "yyyyMMddHHmmss" )
 		);
 		log.info ( "Writing timeout report to '{}'", reportPath );
@@ -220,7 +234,8 @@ public class CyTraverserPerformanceTracker
 				String query = e.getLeft ();
 				Long tstamp = e.getMiddle ();
 				List<ONDEXConcept> genes = e.getRight ();
-								
+							
+				// Use a format that can easily be reused in a Cypher browser or something.
 				String geneList = 
 					genes
 					.stream ()
@@ -293,6 +308,12 @@ public class CyTraverserPerformanceTracker
 	}
 
 
+	/**
+	 * This reports a variant of {@link #timedOutQueries}, where its raw results are translated into
+	 * query -> all the ONDEX concepts that caused the query to fail. Note that this results misses the detail 
+	 * about the gene batches where a query invocation has timed out: all the batches about a query are put together
+	 * here.
+	 */
 	public Map<String, Collection<ONDEXConcept>> getTimedOutQueries ()
 	{
 		Map<String, Collection<ONDEXConcept>> result = new HashMap<> ();

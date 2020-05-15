@@ -254,6 +254,8 @@ class SinglePathQueryProcessor
 		
 		
 		// And eventually, let's collect the results
+		// A parallel stream doesn't seem worth here, since there are a lot of
+		// synch writings into the result Map.
 		//
 		CypherClient.findPathsFromIris ( graph, queryResultIris.stream () )
 		.forEach ( pathEntities ->

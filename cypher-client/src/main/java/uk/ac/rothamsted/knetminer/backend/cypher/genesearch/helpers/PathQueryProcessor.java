@@ -124,13 +124,24 @@ public class PathQueryProcessor implements ApplicationContextAware
 			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
 		});
 		
+		
+		log.info ( "Cypher traverser finished" );
+		Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
+		if ( !timedOutQueries.isEmpty () )
+			log.warn ( "Some queries couldn't complete, see the summary statistics (must be enabled)" );
 		this.cyTraverserPerformanceTracker.logStats ();
+
+		
+		if ( true ) return result;
+		
+		// TODO: remove, the problem is caused by too little memory and repeating this doesn't help
+		//
 		
 		// Let's redo it until all timed out succeed
 		int attempts = 5;
 		for ( ; true; attempts-- )
 		{
-			Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
+			timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
 			if ( timedOutQueries.isEmpty () ) break;
 			if ( attempts == 0 ) break;
 			
