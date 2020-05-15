@@ -73,7 +73,7 @@ class SinglePathQueryProcessor
 	
 	/** This is a configurable parameter */
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
-	private long queryTimeoutMs = 20 * 1000;
+	private long queryTimeoutMs = 60 * 1000;
 
 	
 	/**
