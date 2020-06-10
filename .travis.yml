@@ -14,8 +14,16 @@ install:
   - wget "$TRAVIS_DIR_URL/install.sh" -O travis/install.sh
   - bash ./travis/install.sh
 
+before_script:
+  - echo -e "\n\n\tInitialising test resources (data server etc)\n"
+  - ./resources-init.sh
+
 script:
   - bash ./travis/travis.sh
+
+after_script:
+  - echo -e "\n\n\tTerminating test resources\n"
+  - ./resources-shutdown.sh
 
 cache:
   directories:
