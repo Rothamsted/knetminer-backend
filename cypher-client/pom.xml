@@ -16,6 +16,10 @@
 
   <dependencies>
 		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>uk.ac.rothamsted.rdf.neo4j</groupId>
 			<artifactId>neo4j-utils</artifactId>
 		</dependency>

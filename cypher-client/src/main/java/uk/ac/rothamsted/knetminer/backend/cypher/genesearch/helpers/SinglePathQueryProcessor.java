@@ -6,10 +6,10 @@ import static uk.ac.ebi.utils.exceptions.ExceptionUtils.throwEx;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +73,7 @@ class SinglePathQueryProcessor
 	
 	/** This is a configurable parameter */
 	@Autowired ( required = false ) @Qualifier ( "queryTimeoutMs" )
-	private long queryTimeoutMs = 20 * 1000;
+	private long queryTimeoutMs = 60 * 1000;
 
 	
 	/**
@@ -154,16 +154,11 @@ class SinglePathQueryProcessor
 				this.setExecutor ( SHARED_EXECUTOR );
 			else
 			{
-				if ( this.threadPoolSize == -1 && this.threadQueueSize == -1 )
-					SHARED_EXECUTOR = this.getExecutor ();
-				else
-				{
-					int poolSize = this.threadPoolSize != -1 ? this.threadPoolSize : Runtime.getRuntime().availableProcessors();
-					int queueSize = this.threadQueueSize != -1 ? this.threadQueueSize : poolSize * 2;
-					this.setExecutor ( 
-						SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( poolSize, queueSize )
-					);
-				}
+				this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
+				int queueSize = this.threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
+				this.setExecutor ( 
+					SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, queueSize )
+				);
 				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
 			}
 		}
@@ -243,7 +238,8 @@ class SinglePathQueryProcessor
 				pathQuery, 
 				timedQueryAction,
 				() -> performanceCounters [ 0 ],
-				() -> performanceCounters [ 1 ] 
+				() -> performanceCounters [ 1 ],
+				batch
 			);			
 		}
 		catch ( UncheckedTimeoutException ex ) 
@@ -258,16 +254,18 @@ class SinglePathQueryProcessor
 		
 		
 		// And eventually, let's collect the results
+		// A parallel stream doesn't seem worth here, since there are a lot of
+		// synch writings into the result Map.
 		//
-		CypherClient.findPathsFromIris ( graph, queryResultIris.parallelStream () )
-		.parallel ()
+		CypherClient.findPathsFromIris ( graph, queryResultIris.stream () )
 		.forEach ( pathEntities ->
 		{
 			// Do it before the following, it checks the first entity is a concept.
 			EvidencePathNode path = this.buildEvidencePath ( pathEntities );
 			ONDEXConcept firstGene = (ONDEXConcept) pathEntities.get ( 0 );
-			
-			result.computeIfAbsent ( firstGene, k -> Collections.synchronizedList ( new ArrayList<> () ) )
+						
+			result
+				.computeIfAbsent ( firstGene, k -> new Vector<> () )
 				.add ( path );
 		});
 	}
@@ -300,14 +298,14 @@ class SinglePathQueryProcessor
 	 */
 	private void timedQuery ( Runnable queryAction, List<String> startGeneIris )
 	{
+		// No timeout wanted
+		if ( this.queryTimeoutMs == -1l ) {
+			queryAction.run ();
+			return;
+		}
+
 		try
 		{
-			// No timeout wanted
-			if ( this.queryTimeoutMs == -1l ) {
-				queryAction.run ();
-				return;
-			}
-						
 			TIME_LIMITER.callWithTimeout ( 
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
 			);
@@ -318,7 +316,7 @@ class SinglePathQueryProcessor
 			throw ExceptionUtils.buildEx ( 
 				UncheckedTimeoutException.class,
 				ex,
-				"Timed out query: %s. First gene IRI is: <%s>. Query is: \"%s\"",
+				"Timed out query (after multiple attempts): %s. First gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIris.get ( 0 ),
 				escapeJava ( this.pathQuery )
@@ -401,4 +399,7 @@ class SinglePathQueryProcessor
 		this.isInterrupted = true;
 	}
 
+	int getThreadPoolSize () {
+		return threadPoolSize;
+	}
 }

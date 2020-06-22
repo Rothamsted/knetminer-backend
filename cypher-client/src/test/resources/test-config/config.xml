@@ -101,7 +101,7 @@
   	This is important in order to avoid that some troubling query hangs the whole traversal
   	job 
   -->
-	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "20000"/></bean> -->
+	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "60000"/></bean> -->
 	
 	<!-- 
 		This is mostly for debug purposes. The graph traverser has a performance tracker, which periodically logs the 
@@ -114,4 +114,20 @@
 	-->
 	<!--   <bean name = "performanceReportFrequency" class = "java.lang.Long"><constructor-arg value = "0" /></bean> -->
 	
+	<!-- 
+	  If this is non-null, queries that cannot complete within the configured timeout will be reported in this file, 
+	  with details like the list of genes that failed. This require that the performance tracking features are enabled.
+	  
+	  In general, this is a template, ie, you can use a printf-style format (String.format), and the first parameter of 
+	  type string (ie, '%s') will be filled with a timestamp tag, so that you'll be able to avoid multiple report 
+	  overriding. A fixed path is used if you don't use any parameter specification like '%s'.
+	  
+	  You can use your own path if you don't want to use the standard Tomcat logs directory (the default).
+
+	  Note that the default value below is assigned ONLY if the environment variable CATALINA_HOME is set, otherwise
+	  it is null and no report is generated.
+	-->
+	<!-- <bean name = "timeoutReportPathTemplate" class = "Java.lang.String">
+	  <constructor-arg value = "#{systemProperties [ 'CATALINA_HOME' ] + '/logs/knetminer-cy-timeout-report-%s.tsv' }" / >
+	 </bean> -->
 </beans>

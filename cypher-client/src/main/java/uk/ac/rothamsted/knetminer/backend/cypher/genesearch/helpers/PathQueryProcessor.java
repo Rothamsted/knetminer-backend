@@ -3,15 +3,14 @@ package uk.ac.rothamsted.knetminer.backend.cypher.genesearch.helpers;
 import static java.lang.Math.ceil;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.neo4j.driver.v1.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -93,9 +92,21 @@ public class PathQueryProcessor implements ApplicationContextAware
 	public Map<ONDEXConcept, List<EvidencePathNode>> process ( ONDEXGraph graph, Collection<ONDEXConcept> concepts )
 	{
 		this.isInterrupted = false;
+
+		if ( this.semanticMotifsQueries == null || this.semanticMotifsQueries.isEmpty () ) {
+			log.warn ( "We don't have any configured Cypher query to run the traverser! Returning empty result" );
+			return new ConcurrentHashMap<> ( 0 );
+		}
+		
+		int threadPoolSize = 
+			this.processorCache.getUnchecked ( this.semanticMotifsQueries.iterator ().next () )
+			.getThreadPoolSize ();
+
 		doLogConfig ();
 		
-		Map<ONDEXConcept, List<EvidencePathNode>> result = Collections.synchronizedMap ( new HashMap<> () );
+		int nconcepts = concepts.size ();
+		
+		Map<ONDEXConcept, List<EvidencePathNode>> result = new ConcurrentHashMap<> ( nconcepts, 0.75f, threadPoolSize );
 		this.cyTraverserPerformanceTracker.reset ();
 		
 		queryProgressLogger = new PercentProgressLogger ( 
@@ -113,7 +124,52 @@ public class PathQueryProcessor implements ApplicationContextAware
 			thisQueryProc.process ( graph, concepts, result, queryProgressLogger ); 
 		});
 		
+		
+		log.info ( "Cypher traverser finished" );
+		Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
+		if ( !timedOutQueries.isEmpty () )
+			log.warn ( "Some queries couldn't complete, see the summary statistics (must be enabled)" );
 		this.cyTraverserPerformanceTracker.logStats ();
+
+		
+		if ( true ) return result;
+		
+		// TODO: remove, the problem is caused by too little memory and repeating this doesn't help
+		//
+		
+		// Let's redo it until all timed out succeed
+		int attempts = 5;
+		for ( ; true; attempts-- )
+		{
+			timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
+			if ( timedOutQueries.isEmpty () ) break;
+			if ( attempts == 0 ) break;
+			
+			cyTraverserPerformanceTracker.reset ();
+			int nqueries = timedOutQueries.size ();
+			log.info ( "Re-attempting {} timed out queries/batches, {} remaining attempt(s)", nqueries, attempts );
+
+			int ngenes = timedOutQueries.values ()
+			  .stream ()
+			  .collect ( Collectors.summingInt ( Collection::size ) );
+			
+			queryProgressLogger = new PercentProgressLogger ( 
+				"{}% of graph traversing queries processed (time out cases)",
+				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ),
+				10
+			);
+			
+			timedOutQueries.forEach ( (query, genes) -> 
+			{
+				if ( isInterrupted ) return;
+				SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
+				thisQueryProc.process ( graph, genes, result, queryProgressLogger ); 
+			});
+			
+			cyTraverserPerformanceTracker.logStats ();
+		}
+		
+		if ( attempts == 0 ) log.info ( "Some queries are still timing out, returning partial results" );
 		return result;
 	}
 	
