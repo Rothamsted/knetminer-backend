@@ -27,7 +27,7 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
 		<java.version>${maven.compiler.source}</java.version>
-
+		<jutils.version>10.0-SNAPSHOT</jutils.version>
 		<ondex.version>4.0-SNAPSHOT</ondex.version>
 		
 		<neo4j.server.version>3.5.12</neo4j.server.version>
@@ -155,11 +155,6 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
 				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>uk.ac.ebi</groupId>
-				<artifactId>jutils-io</artifactId>
-				<version>10.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<!-- Utilities for lambdas and collections -->
