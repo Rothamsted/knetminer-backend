@@ -1,7 +1,9 @@
 # TODO: check for requirements
 
+set -e
+
 export JENA_HOME=/Applications/local/dev/semantic_web/apache-jena-3.4.0
-export ODX2RDF_HOME=/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-full/ondex-knet-builder/modules/rdf-export-2-cli/target/rdf-export-2-cli_2.1.1-SNAPSHOT
+export ODX2RDF_HOME=/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-full/ondex-knet-builder/modules/rdf-export-2-cli/target/rdf-export-2-cli_4.0-SNAPSHOT
 export RDF2NEO_HOME=/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-full/ondex-knet-builder/modules/neo4j-export/target/neo4j-exporter
 
 cd "$(dirname "$0")"
