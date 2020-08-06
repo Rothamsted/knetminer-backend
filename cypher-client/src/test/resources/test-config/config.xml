@@ -104,6 +104,23 @@
 	<!-- <bean name = "queryTimeoutMs" class = "java.lang.Long"><constructor-arg value = "60000"/></bean> -->
 	
 	<!-- 
+	  These impacts the degree of parallelism used by the traverser. This will have at most queryThreadPoolSize active
+	  threads at any time (each processes one query and one batch), while keeping a queue of query jobs of 
+	  queryThreadQueueSize jobs. '-1' is the default for these two, which instructs the traverser to compute an initial
+	  default value. 
+	  
+	  For queryThreadPoolSize such computed default is the number of cores available on the server. This was widely tested
+	  and should be fine in most cases. You might want to change it if you're using the enterpise edition of the Neo4j
+	  server, which exploits all its available cores without commercial restrictions.
+	  
+	  For the queue size is set to queryThreadPoolSize * 2 by default. You should be fine with most the latter in most cases
+	-->
+	<!-- bean name = "queryThreadPoolSize" class = "java.lang.Integer"><constructor-arg value = "-1" /></bean -->
+	<!-- bean name = "queryThreadQueueSize" class = "java.lang.Integer"><constructor-arg value = "-1" /></bean -->
+
+	
+	
+	<!-- 
 		This is mostly for debug purposes. The graph traverser has a performance tracker, which periodically logs the 
 		measured performance of the semantic motif queries it submits to Neo4j.
 		
