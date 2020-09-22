@@ -130,46 +130,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 		if ( !timedOutQueries.isEmpty () )
 			log.warn ( "Some queries couldn't complete, see the summary statistics (must be enabled)" );
 		this.cyTraverserPerformanceTracker.logStats ();
-
 		
-		if ( true ) return result;
-		
-		// TODO: remove, the problem is caused by too little memory and repeating this doesn't help
-		//
-		
-		// Let's redo it until all timed out succeed
-		int attempts = 5;
-		for ( ; true; attempts-- )
-		{
-			timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
-			if ( timedOutQueries.isEmpty () ) break;
-			if ( attempts == 0 ) break;
-			
-			cyTraverserPerformanceTracker.reset ();
-			int nqueries = timedOutQueries.size ();
-			log.info ( "Re-attempting {} timed out queries/batches, {} remaining attempt(s)", nqueries, attempts );
-
-			int ngenes = timedOutQueries.values ()
-			  .stream ()
-			  .collect ( Collectors.summingInt ( Collection::size ) );
-			
-			queryProgressLogger = new PercentProgressLogger ( 
-				"{}% of graph traversing queries processed (time out cases)",
-				(long) ceil ( 1.0 * ngenes / this.queryBatchSize ),
-				10
-			);
-			
-			timedOutQueries.forEach ( (query, genes) -> 
-			{
-				if ( isInterrupted ) return;
-				SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
-				thisQueryProc.process ( graph, genes, result, queryProgressLogger ); 
-			});
-			
-			cyTraverserPerformanceTracker.logStats ();
-		}
-		
-		if ( attempts == 0 ) log.info ( "Some queries are still timing out, returning partial results" );
 		return result;
 	}
 	
