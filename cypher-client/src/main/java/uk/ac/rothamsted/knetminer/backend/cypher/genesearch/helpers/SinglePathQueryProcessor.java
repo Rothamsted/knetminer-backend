@@ -147,6 +147,9 @@ class SinglePathQueryProcessor
 	private void init ()
 	{
 		this.getBatchCollector ().setMaxBatchSize ( this.queryBatchSize );
+
+		this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
+		this.threadQueueSize = threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
 				
 		synchronized ( SinglePathQueryProcessor.class ) 
 		{
@@ -154,10 +157,8 @@ class SinglePathQueryProcessor
 				this.setExecutor ( SHARED_EXECUTOR );
 			else
 			{
-				this.threadPoolSize = threadPoolSize != -1 ? threadPoolSize : Runtime.getRuntime().availableProcessors();
-				int queueSize = this.threadQueueSize != -1 ? threadQueueSize : threadPoolSize * 2;
 				this.setExecutor ( 
-					SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, queueSize )
+					SHARED_EXECUTOR = HackedBlockingQueue.createExecutor ( threadPoolSize, threadQueueSize )
 				);
 				ThreadUtils.setNamingThreadFactory ( SinglePathQueryProcessor.class, SHARED_EXECUTOR );
 			}
