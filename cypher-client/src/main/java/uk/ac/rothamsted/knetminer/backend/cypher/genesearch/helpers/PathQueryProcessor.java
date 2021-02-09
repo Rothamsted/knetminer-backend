@@ -46,7 +46,7 @@ import uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser
 public class PathQueryProcessor implements ApplicationContextAware
 {
 	/** This is a configurable parameter */
-	@Resource( name = "semanticMotifsQueries" )
+	@Autowired @Qualifier ( "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 
 	@Autowired

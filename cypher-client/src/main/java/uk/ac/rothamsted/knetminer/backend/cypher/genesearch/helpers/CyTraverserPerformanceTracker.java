@@ -65,7 +65,7 @@ public class CyTraverserPerformanceTracker
 	private long queryBatchSize = SinglePathQueryProcessor.DEFAULT_QUERY_BATCH_SIZE;
 
 	/** This is a configurable parameter */
-	@Resource( name = "semanticMotifsQueries" )
+	@Autowired @Qualifier ( "semanticMotifsQueries" )
 	private List<String> semanticMotifsQueries; 
 	
 	/** This is a configurable option, see the sample config file for details. */

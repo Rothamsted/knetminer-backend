@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CypherClientProvider
 {
-	@Resource ( name = "neoDriver" )
+	@Autowired @Qualifier ( "neoDriver" )
 	private Driver neoDriver;
 	
 	CypherClientProvider () {

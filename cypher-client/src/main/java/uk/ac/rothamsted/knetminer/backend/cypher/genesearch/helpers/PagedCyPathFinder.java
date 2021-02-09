@@ -50,7 +50,7 @@ class PagedCyPathFinder implements Iterator<List<String>>, AutoCloseable
 	private List<String> startGeneIris;
 	private String query;
 	
-	@Resource
+	@Autowired
 	private CypherClientProvider cypherClientProvider;
 	
 	
