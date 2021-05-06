@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;

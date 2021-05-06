@@ -10,13 +10,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.neo4j.driver.v1.AccessMode;
-import org.neo4j.driver.v1.AuthTokens;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Values;
+import org.neo4j.driver.AccessMode;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +60,12 @@ public class KnetminerCypherTest
 	
 	private List<String> getInputGeneUris ()
 	{
-		try ( Session session = neoDriver.session ( AccessMode.READ ) )
+		var sc = SessionConfig.builder ()
+			.withDefaultAccessMode ( AccessMode.READ )
+			.build ();
+		try ( Session session = neoDriver.session ( sc ) )
 		{
-			StatementResult res = session.run ( "MATCH (g:Gene{TAXID:'4565'}) RETURN g.iri LIMIT 100" );
+			Result res = session.run ( "MATCH (g:Gene{TAXID:'4565'}) RETURN g.iri LIMIT 100" );
 			return res.list ( r -> r.get ( 0 ).asString () );
 		}
 	}

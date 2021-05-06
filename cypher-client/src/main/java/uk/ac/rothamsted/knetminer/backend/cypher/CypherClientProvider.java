@@ -1,7 +1,7 @@
 package uk.ac.rothamsted.knetminer.backend.cypher;
 
-import static org.neo4j.driver.v1.AccessMode.READ;
-import static org.neo4j.driver.v1.AccessMode.WRITE;
+import static org.neo4j.driver.AccessMode.READ;
+import static org.neo4j.driver.AccessMode.WRITE;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -9,8 +9,9 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.Session;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.SessionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -47,8 +48,12 @@ public class CypherClientProvider
 	}
 
 	
-	public CypherClient newClient ( boolean writeAccessMode ) {
-		return new CypherClient ( neoDriver.session ( writeAccessMode ? WRITE : READ ) );
+	public CypherClient newClient ( boolean writeAccessMode )
+	{
+		var scfg = SessionConfig.builder ()
+			.withDefaultAccessMode ( writeAccessMode ? WRITE : READ  )
+			.build ();
+		return new CypherClient ( neoDriver.session ( scfg ) );
 	}
 
 	/**

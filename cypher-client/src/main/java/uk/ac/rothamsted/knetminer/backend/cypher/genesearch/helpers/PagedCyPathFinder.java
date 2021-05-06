@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
-import org.neo4j.driver.v1.Value;
-import org.neo4j.driver.v1.Values;
+import org.neo4j.driver.Value;
+import org.neo4j.driver.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

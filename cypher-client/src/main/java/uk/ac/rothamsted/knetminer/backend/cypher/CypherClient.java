@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Transaction;
-import org.neo4j.driver.v1.Value;
-import org.neo4j.driver.v1.types.Entity;
-import org.neo4j.driver.v1.types.Path;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
+import org.neo4j.driver.Value;
+import org.neo4j.driver.types.Entity;
+import org.neo4j.driver.types.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,7 +167,7 @@ public class CypherClient implements AutoCloseable
 	protected Stream<Record> queryToStream ( String query, Value params )
 	{
 		this.checkOpen ();
-		StatementResult cursor = params == null 
+		Result cursor = params == null 
 			? this.tx.run ( query )
 			: this.tx.run ( query, params );
 				
@@ -254,7 +254,7 @@ public class CypherClient implements AutoCloseable
 	 */
 	public synchronized void fail ()
 	{
-		tx.failure ();
+		tx.rollback ();
 	}
 		
 	/**

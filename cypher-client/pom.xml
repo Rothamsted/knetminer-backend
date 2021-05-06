@@ -11,16 +11,13 @@
   <artifactId>cypher-client</artifactId>
   <name>cypher-client -- KnetMiner Cypher client</name>
 
-	<properties>
-	</properties>
-
   <dependencies>
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>uk.ac.rothamsted.rdf.neo4j</groupId>
+			<groupId>uk.ac.rothamsted.kg.neo4j</groupId>
 			<artifactId>neo4j-utils</artifactId>
 		</dependency>
 		<dependency>
@@ -113,9 +110,9 @@
 				</configuration>
 	 		</plugin>
 		  		
-			<plugin>
-	      <artifactId>maven-failsafe-plugin</artifactId>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 	      <artifactId>maven-failsafe-plugin</artifactId> -->
+<!-- 			</plugin> -->
 
 		</plugins>
 		

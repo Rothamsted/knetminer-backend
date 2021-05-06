@@ -5,7 +5,7 @@
 	<parent>
 	  <groupId>uk.ac.rothamsted.knetminer</groupId>
 	  <artifactId>knetminer-common</artifactId>
-	  <version>2.0-SNAPSHOT</version>
+	  <version>2.0.1-SNAPSHOT</version>
 	</parent>  
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
@@ -26,11 +26,9 @@
     
 		<ondex.version>4.0-SNAPSHOT</ondex.version>
 		
-		<neo4j.server.version>3.5.12</neo4j.server.version>
-		<neo4j.server.boltPort>17690</neo4j.server.boltPort>
-		<neo4j.server.httpPort>17490</neo4j.server.httpPort>
 		<!-- update-sources.sh needs to override this -->
 		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
+		<neo4j.server.serverReadyAttempts>120</neo4j.server.serverReadyAttempts>
 		
 		<slf4j.version>1.7.25</slf4j.version>
 					
@@ -45,9 +43,9 @@
 	<dependencyManagement>
 	  <dependencies>
 			<dependency>
-				<groupId>uk.ac.rothamsted.rdf.neo4j</groupId>
+				<groupId>uk.ac.rothamsted.kg.neo4j</groupId>
 				<artifactId>neo4j-utils</artifactId>
-    		<version>3.0-SNAPSHOT</version>
+    		<version>4.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.ondex.core</groupId>
@@ -161,62 +159,15 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-			  <!-- 
-					A small plug-in that starts Neo4j. 
-					
-					1.1 is the official version that integrated our improvements at
-					at https://github.com/Rothamsted/neo4j-server-maven-plugin 
-			  -->		  
-		    <plugin>
-			    <groupId>com.github.harti2006</groupId>
-				  <artifactId>neo4j-server-maven-plugin</artifactId>
-				  <version>1.2</version>
-					<configuration>
-						<version>${neo4j.server.version}</version>
-						<port>${neo4j.server.httpPort}</port>
-						<boltPort>${neo4j.server.boltPort}</boltPort>
-						<deleteDb>${neo4j.server.deleteDb}</deleteDb><!-- We populate it with our own test DB -->
-						<serverReadyAttempts>120</serverReadyAttempts>
-					</configuration>
-					<executions>
-						<execution>
-							<id>start-neo4j-server</id>
-							<goals><goal>start</goal></goals>
-						</execution>
-						<execution>
-							<id>stop-neo4j-server</id>
-							<goals><goal>stop</goal></goals>
-						</execution>
-					</executions>		        
-		    </plugin>	
 	
 				<plugin>
 		      <artifactId>maven-failsafe-plugin</artifactId>
-		      <version>3.0.0-M1</version>
 		      <configuration>
-		        <trimStackTrace>false</trimStackTrace>
 		        <systemPropertyVariables>
 		        	<!-- Integration tests needing to connect the test Neo4j might need this -->
 		          <neo4j.server.boltPort>${neo4j.server.boltPort}</neo4j.server.boltPort>
 		        </systemPropertyVariables>
-			      <properties>
-			        <property>
-			        	<!-- Prints out spaces and test name before/after every test method and automatically -->
-			          <name>listener</name>
-			          <value>uk.ac.ebi.utils.test.junit.TestOutputDecorator</value>
-			        </property>
-			       </properties>
 		      </configuration>      
-					<executions>
-	          <execution>
-	          	<id>failsafe-test</id>
-	            <goals><goal>integration-test</goal></goals>
-	          </execution>
-	          <execution>
-		      		<id>failsafe-verify</id>
-		      		<goals><goal>verify</goal></goals>
-	          </execution>
-	        </executions>	      
 				</plugin>			
 			</plugins>
 		</pluginManagement>
@@ -232,20 +183,6 @@
 		      </execution>
 		    </executions>
 	    </plugin>
-
-		  <plugin>
-		    <groupId>org.apache.maven.plugins</groupId>
-		    <artifactId>maven-surefire-plugin</artifactId>
-		    <configuration>
-		      <properties>
-		        <property>
-		        	<!-- Prints out spaces and test name before/after every test method and automatically -->
-		          <name>listener</name>
-		          <value>uk.ac.ebi.utils.test.junit.TestOutputDecorator</value>
-		        </property>
-		       </properties>
-		    </configuration>
-			</plugin>
 
 		</plugins>
 		
