@@ -118,7 +118,7 @@ class SinglePathQueryProcessor
   private static ExecutorService SHARED_EXECUTOR;
   
   /** Used by {@link #timedQuery(Runnable, long, List, String)}. */
-	private static final TimeLimiter TIME_LIMITER = new SimpleTimeLimiter ();
+	private static final TimeLimiter TIME_LIMITER = SimpleTimeLimiter.create ( Executors.newCachedThreadPool () );
 
 	private boolean isInterrupted = false; 
 	
@@ -308,7 +308,7 @@ class SinglePathQueryProcessor
 		try
 		{
 			TIME_LIMITER.callWithTimeout ( 
-				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS, true 
+				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS 
 			);
 		}
 		catch ( UncheckedTimeoutException|InterruptedException ex ) 
