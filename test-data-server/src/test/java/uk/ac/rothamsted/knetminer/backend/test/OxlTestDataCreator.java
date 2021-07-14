@@ -62,7 +62,7 @@ public class OxlTestDataCreator
 		
 		graph.createRelation ( g1, testEnt1, testRel, Collections.singleton ( impdEv )  );
 		
-		Export.exportOXL ( graph, outOxlPath, true, true );
+		Export.exportOXL ( graph, outOxlPath, true, true );		
 	}
 
 }
