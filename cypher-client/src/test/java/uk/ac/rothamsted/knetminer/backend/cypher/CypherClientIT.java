@@ -82,19 +82,19 @@ public class CypherClientIT
 			log.info ( "\t#{}: [{}]", i++, String.join ( ", ", pathIris ) );
 		
 		
-		verifyResultIris ( "Expected Result about at1g29170 not found!", iris,
-			"gene_at1g29170_locus_2030000", 0,
+		verifyResultIris ( "Expected Result about traescs1d02g284700 not found!", iris,
+			"gene_traescs1d02g284700", 0,
 			"enc_", 1,
 			"h_s_s_", 3,							
-			"publication_24280374", 6
+			"publication_16407447", 6
 		);
 		
-		verifyResultIris ( "Expected at1g63650 not found!", iris,
-			"gene_at1g63650_locus_2026629", 0,
+		verifyResultIris ( "Expected os11g0569733 not found!", iris,
+			"gene_os11g0569733", 0,
 			"enc_", 1,
-			"protein_e3sxu5", 4,
+			"protein_g7jik2", 4,
 			"pub_in_", 5,
-			"publication_20949001", 6
+			"publication_22399647", 6
 		);
 	}
 	
@@ -138,10 +138,10 @@ public class CypherClientIT
 				BiFunction<String, Integer, Boolean> oeChecker = (label, idx) -> 
 					ONDEXGraphUtils.getString ( pathIris.get ( idx ) ).startsWith ( label );
 					
-				return oeChecker.apply ( "C{Gene:AT1G63650;locus:2026629", 0 )
+				return oeChecker.apply ( "C{Gene:ZM00001EB205480", 0 )
 					&& oeChecker.apply ( "R{h_s_s", 3 )
-					&& oeChecker.apply ( "C{Protein:P13027", 4 )
-					&& oeChecker.apply ( "C{Publication", 6 );
+					&& oeChecker.apply ( "C{Protein:Q8GU88", 4 )
+					&& oeChecker.apply ( "C{Publication:16506311", 6 );
 			})
 		);
 	}
@@ -164,8 +164,8 @@ public class CypherClientIT
 			"LIMIT 100\n"; // Normally not needed, it's just for safety in this test 
 		
 		List<String> probeIris = Arrays.asList (
-			iri ( "bkr", "gene_at1g29170_locus_2030000" ),
-			iri ( "bkr", "gene_at1g63650_locus_2026629" )
+			iri ( "bkr", "gene_traescs1d02g284700" ),
+			iri ( "bkr", "gene_zm00001eb009240" )
 		);
 		
 		
@@ -181,19 +181,19 @@ public class CypherClientIT
 		for ( List<String> pathIris: iris )
 			log.info ( "\t#{}: [{}]", i++, String.join ( ", ", pathIris ) );
 		
-		verifyResultIris ( "Expected Result about at1g29170 not found!", iris,
-			"gene_at1g29170_locus_2030000", 0,
+		verifyResultIris ( "Expected Result about traescs1d02g284700 not found!", iris,
+			"gene_traescs1d02g284700", 0,
 			"enc_", 1,
 			"h_s_s_", 3,							
-			"publication_24280374", 6
+			"publication_16407447", 6
 		);
 		
-		verifyResultIris ( "Expected at1g63650 not found!", iris,
-			"gene_at1g63650_locus_2026629", 0,
+		verifyResultIris ( "Expected zm00001eb009240 not found!", iris,
+			"gene_zm00001eb009240", 0,
 			"enc_", 1,
-			"protein_e3sxu5", 4,
+			"protein_q94g17", 4,
 			"pub_in_", 5,
-			"publication_20949001", 6
+			"publication_11457457", 6
 		);
 	}
 	

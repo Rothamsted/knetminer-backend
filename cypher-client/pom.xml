@@ -94,7 +94,7 @@
 							<groupId>${project.groupId}</groupId>
 							<artifactId>test-data-server</artifactId>
 							<version>${project.version}</version>
-							<includes>ara-tiny.oxl</includes>
+							<includes>poaceae-sample.oxl</includes>
 	       		</artifactItem>
 	       		<!-- Used by the SM/Cypher translator -->
            	<artifactItem>
@@ -109,6 +109,16 @@
 	       	</artifactItems>  						
 				</configuration>
 	 		</plugin>
+	 		
+			<plugin>
+	      <artifactId>maven-failsafe-plugin</artifactId>
+	      <configuration>
+	        <systemPropertyVariables>
+	        	<!-- Integration tests needing to connect the test Neo4j might need this -->
+	          <neo4j.server.boltPort>${neo4j.server.boltPort}</neo4j.server.boltPort>
+	        </systemPropertyVariables>
+	      </configuration>      
+			</plugin>			
 		  		
 		</plugins>
 		

@@ -22,7 +22,7 @@ public class TestGraphResource extends ExternalResource
 	protected synchronized void before ()
 	{
 		if ( graph == null )
-			graph = Parser.loadOXL ( "target/dependency/ara-tiny.oxl" );
+			graph = Parser.loadOXL ( "target/dependency/poaceae-sample.oxl" );
 		//GraphMemIndex.getInstance ( graph ).updateIndex ();
 	}
 

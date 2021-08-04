@@ -57,32 +57,30 @@
 		  
 		  	<plugins>		  	
 					<!-- 
-						Unzip test files. This happens after neo4j-server-maven-plugin has downladed the 
-						Neo4j distribution, see below. 
+						Restore Neo4j test DB dump. This happens after neo4j-server-maven-plugin has downladed the 
+						server distribution, see below. 
 					-->
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>process-test-resources</phase>
-								<goals><goal>run</goal></goals>
-								<configuration>
-									<tasks>
-										<!--
-											A test Neo4j database, based on ara-tiny.oxl
-											Both are created manually via update-resources.sh 
-										-->
-										<untar 
-											src = "src/main/resources/ara-tiny-neo4j.tar.bz2" 
-											dest = "target/neo4j-server/neo4j-community-${neo4j.server.version}/data/databases"
-											compression = "bzip2"
-										/>
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>	
+					  <artifactId>exec-maven-plugin</artifactId>
+					  <groupId>org.codehaus.mojo</groupId>
+					  <executions>
+					    <execution>
+					    	<id>Setup Neo4j test DB</id>
+					      <phase>process-test-resources</phase>
+					      <goals>
+					        <goal>exec</goal>
+					      </goals>
+					      <configuration>
+					        <executable>target/neo4j.server/neo4j-community-${neo4j.server.version}/bin/neo4j-admin</executable>
+					        <arguments>
+					        	<argument>load</argument>
+					        	<argument>--force</argument>
+										<argument>--from=src/main/resources/poaceae-sample-neo4j.dump</argument>
+									</arguments>
+					      </configuration>
+					    </execution>
+					  </executions>
+					</plugin>
 					
 					
 				  <!-- 

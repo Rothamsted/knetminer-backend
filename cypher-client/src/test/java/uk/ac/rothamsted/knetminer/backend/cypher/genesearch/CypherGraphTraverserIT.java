@@ -76,7 +76,7 @@ public class CypherGraphTraverserIT
 		
 		ONDEXConcept startConcept = graph.getConcepts ()
 			.parallelStream ()
-			.filter ( c -> "AT1G63650;locus:2026629".equals ( c.getPID () ) )
+			.filter ( c -> "TRAESCS6D02G119900".equals ( c.getPID () ) )
 			.findAny ()
 			.orElseThrow ( () -> new IllegalStateException ( "Couldn't find the test start concept" ) );
 		
@@ -109,8 +109,8 @@ public class CypherGraphTraverserIT
 			"Expected result not found (Evidence Path)!",
 			checkPathEntities ( paths,
 				"R{h_s_s", 3,
-				"C{Protein:P13027", 4,
-				"C{Publication", 6
+				"C{Protein:G7JIK2", 4,
+				"C{Publication:22399647", 6
 		));
 		
 		// ------ And also check the StateMachine components that were attached to the path
@@ -131,10 +131,10 @@ public class CypherGraphTraverserIT
 	public void testMultipleStartConcepts ()
 	{
 		Stream<String> conceptIris = Stream.of ( 
-			iri ( "bkr:gene_at4g26080_locus_2005488"	),
-			iri ( "bkr:gene_at5g35550_locus_2169538"	),
-			iri ( "bkr:gene_at2g40220_locus_2005490" ),
-			iri ( "bkr:gene_at1g63650_locus_2026629" )
+			iri ( "bkr:gene_at2g27250_locus_2005502" ),
+			iri ( "bkr:gene_at3g54220_locus_2080345" ),
+			iri ( "bkr:gene_traescs2b02g349500" ),
+			iri ( "bkr:gene_traescs1d02g284700" )
 		);
 				
 		ONDEXGraph graph = graphResource.getGraph ();
@@ -175,7 +175,7 @@ public class CypherGraphTraverserIT
 			checkPathEvidences ( probePaths, 
 				State.class, "Gene", 0,
 				Transition.class, "cooc_wi", 1,
-				State.class, "TO", 2,
+				State.class, "Trait", 2,
 				Transition.class, "cooc_wi", 3,
 				State.class, "Gene", 4,
 				Transition.class, "participates_in", 5,
@@ -235,15 +235,18 @@ public class CypherGraphTraverserIT
 	}
 	
 	
+	/**
+	 * Tests {@link CypherGraphTraverser#isInterrupted()}. 
+	 */
 	@Test
 	@SuppressWarnings ( "rawtypes" )
 	public void testInterruption () throws InterruptedException, ExecutionException
 	{
 		Stream<String> conceptIris = Stream.of ( 
-			iri ( "bkr:gene_at4g26080_locus_2005488"	),
-			iri ( "bkr:gene_at5g35550_locus_2169538"	),
-			iri ( "bkr:gene_at2g40220_locus_2005490" ),
-			iri ( "bkr:gene_at1g63650_locus_2026629" )
+			iri ( "bkr:gene_at2g27250_locus_2005502" ),
+			iri ( "bkr:gene_at3g54220_locus_2080345" ),
+			iri ( "bkr:gene_traescs2b02g349500" ),
+			iri ( "bkr:gene_traescs1d02g284700" )
 		);
 				
 		ONDEXGraph graph = graphResource.getGraph ();
@@ -265,7 +268,7 @@ public class CypherGraphTraverserIT
 		// We need some slow query to keep it busy while we interrupt it.
 		List<String> queries = new ArrayList<> ( cytraverser.getSemanticMotifsQueries () );
 		queries.add (
-			"MATCH path = (g:Gene) -[r*1..2]-> (c:Concept)\n"
+			"MATCH path = (g:Gene) -[r*1..25]-> (c:Concept)\n"
 			+ "WHERE NONE ( rr IN relationships(path) WHERE TYPE(rr) = 'relatedConcept' )\n"
 			+ "  AND g.iri IN $startGeneIris\n"
 			+ "RETURN path"
@@ -275,7 +278,7 @@ public class CypherGraphTraverserIT
 		ExecutorService executor = Executors.newSingleThreadExecutor ();
 		Future<Map<ONDEXConcept, List<EvidencePathNode>>> pathsMapFuture
 			= executor.submit ( () -> cytraverser.traverseGraph ( graph, new HashSet<> ( startConcepts ), null ) );
-		Thread.sleep ( 500 ); // It needs sometime to startup and set interrupted flag to false 
+		Thread.sleep ( 300 ); // It needs sometime to startup and set interrupted flag to false 
 		cytraverser.interrupt ();
 		assertTrue ( "Interruption flag isn't set!", cytraverser.isInterrupted () );
 		assertEquals ( "Interruption didn't work!", 0, pathsMapFuture.get ().size () );
