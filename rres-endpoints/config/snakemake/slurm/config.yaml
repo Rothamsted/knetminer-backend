@@ -1,0 +1,2 @@
+jobs: 16
+cluster: "sbatch --chdir=/home/data/knetminer/software/knetminer-backend/rres-endpoints --mem=65g -o .snakemake/log/slurm-{rule}-{wildcards}.out -e .snakemake/log/slurm-{rule}-{wildcards}.out"
