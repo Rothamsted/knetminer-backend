@@ -1,10 +1,12 @@
-param_file="$1"
+param_prefix="$1"
 
-if [[ -z "$param_file" ]]; then
-	echo -e "\n\n\tUsage: $0 <dataset-params in datasets/>\n\n"
+if [[ -z "$param_prefix" ]]; then
+	echo -e "\n\n\tUsage: $0 <param-file-prefix in config/datasets/>\n\n"
 	exit 1
 fi
 
-. "config/datasets/$param_file"
-. "config/common-cfg.sh"
-. "config/datasets/${PARAM_DATASET_ID}.sh"
+common_cfg_file=${KNET_CFG-config/common-cfg.sh}
+
+. "config/datasets/${param_prefix}-params.sh"
+. "$common_cfg_file"
+. "config/datasets/${PARAM_DATASET_ID}-cfg.sh"
