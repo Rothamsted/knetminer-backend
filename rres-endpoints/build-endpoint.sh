@@ -7,5 +7,7 @@ cd "$MY_HOME"
 # TODO: remove
 # nextflow run ./build-endpoint.nf -resume --param_file="$param_file" 
 
-snakemake --cores --snakefile build-endpoint.snakefile --config param_prefix="$param_prefix" $SNAKE_OPTS
-
+snakemake --cores \
+  --snakefile build-endpoint.snakefile \
+  --config param_prefix="$param_prefix" \
+  $KNET_SNAKE_OPTS
