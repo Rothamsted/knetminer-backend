@@ -1,8 +1,6 @@
 
-envvars:
-	"CFG_OXL_SRC",
-	"CFG_DATASET_TARGET"
-
+# TODO: envvars doesn't work in SLURM, check them manually
+#
 CFG_OXL_SRC = os.environ [ "CFG_OXL_SRC" ]
 CFG_DATASET_TARGET = os.environ [ "CFG_DATASET_TARGET" ]
 	
