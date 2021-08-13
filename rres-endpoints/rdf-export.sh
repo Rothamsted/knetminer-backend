@@ -2,8 +2,9 @@ set -e
 cd "$KNET_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh
 
-mkdir -p "$KNET_DATASET_TARGET"
-outf="$KNET_DATASET_TARGET/knowledge-graph.ttl"
+rdf_target="$KNET_DATASET_TARGET/rdf"
+mkdir -p "$rdf_target"
+outf="$rdf_target/knowledge-graph.ttl"
 
 echo -e "\n\nRDF Exporting '$KNET_DATASET_TARGET/knowledge-graph-uris.oxl' to '${outf}.bz2'"
 rm -f "${outf}.fifo"
