@@ -9,7 +9,11 @@ dataset_version = config [ "dataset_version" ]
 
 rule all:
 	input:
-		f"{KNET_DATASET_TARGET}/knowledge-graph.ttl.bz2"
+		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl",
+		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2",
+		f"{KNET_DATASET_TARGET}/rdf/ontologies",
+		f"{KNET_DATASET_TARGET}/neo4j.dump",
+		f"{KNET_DATASET_TARGET}/tmp/tdb"
 
 rule add_uris:
 	input:
@@ -23,6 +27,16 @@ rule rdf_export:
 	input:
 		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl"
 	output:
-		f"{KNET_DATASET_TARGET}/knowledge-graph.ttl.bz2"
+		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2"
 	shell:
 		f"./rdf-export.sh '{dataset_id}' '{dataset_version}'"
+
+rule neo_export:
+	input:
+		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2"
+	output:
+		directory ( f"{KNET_DATASET_TARGET}/rdf/ontologies" ),
+		f"{KNET_DATASET_TARGET}/neo4j.dump",
+		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+	shell:
+		f"./neo-export.sh '{dataset_id}' '{dataset_version}'"

@@ -8,31 +8,33 @@ config/neo4j/neo-start$KNET_ENV_POSTFIX.sh
 
 cd "$KNET_SCRIPTS_HOME"
 rdf_target="$KNET_DATASET_TARGET/rdf"
-tdb="$rdf_target/tdb"
-if [[ ! -e "$tdb" ]]; then
+tdb="$KNET_DATASET_TARGET/tmp/tdb"
+if [[ ! -d "$tdb" ]]; then
   # If it exists, we assume it's already populated and the command below takes it as-is when no RDF is 
   # given.
-  # Also, the operations below are done once only
   
-  # Same for this
-  echo "Downloading Ontologies"
-  mkdir -p "$rdf_target/ontologies"
-  "$KNET_NEOEXPORT_HOME/get_ontologies.sh" "$rdf_target/ontologies"
-  
-  rdf_files="$KNET_DATASET_TARGET/rdf/knowledge-graph.ttl.bz2"
- 	rdf_files="$rdf_files ontologies/*"
+  rdf_files=""$rdf_target/knowledge-graph.ttl.bz2""
 fi
 
-export KNET_NEO_URL="bolt://localhost:7687"
-export KNET_NEO_USR="neo4j"
-export KNET_NEO_PWD="test"
+# Same for this
+if [[ ! -d "$rdf_target/ontologies" ]]; then
 
-# TODO: wrong, need to be passed as Java opts, and the rdf2neo.sh script need to be
-# reviewed.
-export neo4j.boltUrl="$KNET_NEO_URL"
-export neo4j.user="$KNET_NEO_USR"
-export neo4j.password="$KNET_NEO_PWD"
+  echo -e "\n\tDownloading Ontologies\n"
+  
+  mkdir -p "$rdf_target/ontologies"
+  "$KNET_NEOEXPORT_HOME/get_ontologies.sh" "$rdf_target/ontologies"
+	rdf_files="$rdf_files "$rdf_target/ontologies/"*.*"
+fi
 
-"$KNET_NEOEXPORT_HOME/ondex2neo.sh" --tdb "$KNET_DATASET_TARGET/tdb" "$rdf_files"
+export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$KNET_NEO_URL'"
+export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.user='$KNET_NEO_USR'"
+export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KNET_NEO_PWD'"
+
+
+echo -e "\n\tStarting neo4j-export\n"
+"$KNET_NEOEXPORT_HOME/ondex2neo.sh" --tdb "$tdb" $rdf_files
 
 config/neo4j/neo-stop$KNET_ENV_POSTFIX.sh
+
+echo -e "\n\tNeo4j Dump to '$KNET_DATASET_TARGET/neo4j.dump'\n"
+"$NEO4J_HOME/bin/neo4j-admin" dump --to="$KNET_DATASET_TARGET/neo4j.dump"

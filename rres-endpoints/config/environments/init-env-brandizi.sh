@@ -13,7 +13,7 @@ export KNET_RDFEXP_HOME="$ondex_mods/rdf-export-2-cli/target/rdf-export-2-cli_4.
 export KNET_NEOEXPORT_HOME="$ondex_mods/neo4j-export/target/neo4j-exporter"
 export NEO4J_HOME="$ondex_mods/neo4j-export/target/neo4j.server/neo4j-community-4.3.2"
 
-export KNET_NEO_URL="bolt://localhost:7687"
+export KNET_NEO_URL="bolt://localhost:17690"
 export KNET_NEO_USR="neo4j"
 export KNET_NEO_PWD="test"
 
