@@ -1,9 +1,7 @@
 set -e
-export MY_HOME=`realpath "$0"`
-export MY_HOME=`dirname "$MY_HOME"`
-cd "$MY_HOME"
-. config/init-config.sh
+cd "$KNET_SCRIPTS_HOME"
+. config/init-dataset-cfg.sh
 
-mkdir -p "$CFG_DATASET_TARGET"
-echo -e "\n\nAdding URIs to '$CFG_OXL_SRC' and saving to '$CFG_DATASET_TARGET/knowledge-graph-uris.oxl'"
-"$CFG_RDFEXP_HOME/add-uris.sh" "$CFG_OXL_SRC" "$CFG_DATASET_TARGET/knowledge-graph-uris.oxl"
+mkdir -p "$KNET_DATASET_TARGET"
+echo -e "\n\nAdding URIs to '$KNET_SRC_OXL' and saving to '$KNET_DATASET_TARGET/knowledge-graph-uris.oxl'"
+"$KNET_RDFEXP_HOME/add-uris.sh" "$KNET_SRC_OXL" "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl"

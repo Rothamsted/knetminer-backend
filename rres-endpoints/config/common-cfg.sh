@@ -1,7 +1,13 @@
-export CFG_DATA_HOME=/home/data/knetminer
+export KNET_DATA_HOME="${KNET_DATA_HOME-/home/data/knetminer}"
 
-export CFG_SOFTWARE_HOME="$CFG_DATA_HOME/software"
-export CFG_RDFEXP_HOME="$CFG_SOFTWARE_HOME/rdf-export-2-cli"
+export KNET_DATA_TARGET="${KNET_DATA_TARGET-$KNET_DATA_HOME/pub/endpoints}"
 
-export CFG_DATA_TARGET="${CFG_DATA_TARGET-/home/data/knetminer/pub/endpoints}"
-export CFG_DATASET_TARGET="$CFG_DATA_TARGET/$PARAM_DATASET_ID/$PARAM_DATASET_VERSION"
+export KNET_SOFTWARE_HOME="${KNET_DATA_HOME-$KNET_DATA_HOME/software}"
+export KNET_RDFEXP_HOME="${KNET_RDFEXP_HOME-KNET_SOFTWARE_HOME/rdf-export-2-cli}"
+export KNET_NEOEXPORT_HOME="${KNET_NEOEXPORT_HOME-$KNET_SOFTWARE_HOME/_TODO_}"
+
+export KNET_NEO_URL="${KNET_NEO_URL-bolt://localhost:7687}"
+export KNET_NEO_USR="${KNET_NEO_USR-neo4j}"
+export KNET_NEO_PWD="${KNET_NEO_PWD-test}"
+
+export KNET_CONDA_ENV="${KNET_CONDA_ENV-snakemake}"

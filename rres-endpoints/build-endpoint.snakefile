@@ -1,27 +1,28 @@
 
 # TODO: envvars doesn't work in SLURM, check them manually
 #
-CFG_OXL_SRC = os.environ [ "CFG_OXL_SRC" ]
-CFG_DATASET_TARGET = os.environ [ "CFG_DATASET_TARGET" ]
+KNET_SRC_OXL = os.environ [ "KNET_SRC_OXL" ]
+KNET_DATASET_TARGET = os.environ [ "KNET_DATASET_TARGET" ]
 	
-param_prefix = config [ "param_prefix" ]
+dataset_id = config [ "dataset_id" ]
+dataset_version = config [ "dataset_version" ]
 
 rule all:
 	input:
-		f"{CFG_DATASET_TARGET}/knowledge-graph.ttl.bz2"
+		f"{KNET_DATASET_TARGET}/knowledge-graph.ttl.bz2"
 
 rule add_uris:
 	input:
-		CFG_OXL_SRC
+		KNET_SRC_OXL
 	output:
-		f"{CFG_DATASET_TARGET}/knowledge-graph-uris.oxl"
+		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl"
 	shell:
-		f"./add-uris.sh '{param_prefix}'"
+		f"./add-uris.sh '{dataset_id}' '{dataset_version}'"
 
 rule rdf_export:
 	input:
-		f"{CFG_DATASET_TARGET}/knowledge-graph-uris.oxl"
+		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl"
 	output:
-		f"{CFG_DATASET_TARGET}/knowledge-graph.ttl.bz2"
+		f"{KNET_DATASET_TARGET}/knowledge-graph.ttl.bz2"
 	shell:
-		f"./rdf-export.sh '{param_prefix}'"
+		f"./rdf-export.sh '{dataset_id}' '{dataset_version}'"
