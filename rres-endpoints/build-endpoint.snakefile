@@ -31,12 +31,19 @@ rule rdf_export:
 	shell:
 		f"./rdf-export.sh '{dataset_id}' '{dataset_version}'"
 
-rule neo_export:
+rule tdb_load:
 	input:
 		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2"
 	output:
 		directory ( f"{KNET_DATASET_TARGET}/rdf/ontologies" ),
-		f"{KNET_DATASET_TARGET}/neo4j.dump",
 		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+	shell:
+		f"./tdb-load.sh '{dataset_id}' '{dataset_version}'"	
+
+rule neo_export:
+	input:
+		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+	output:
+		f"{KNET_DATASET_TARGET}/neo4j.dump"
 	shell:
 		f"./neo-export.sh '{dataset_id}' '{dataset_version}'"

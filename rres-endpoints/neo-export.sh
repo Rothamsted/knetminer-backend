@@ -5,28 +5,12 @@ cd "$KNET_SCRIPTS_HOME"
 config/neo4j/neo-stop$KNET_ENV_POSTFIX.sh
 echo -e "\nClearing Neo4j at '$NEO4J_HOME'"
 rm -Rf "$NEO4J_HOME/data/databases/"* "$NEO4J_HOME/data/transactions/"*
-"$NEO4J_HOME/bin/neo4j-admin" set-initial-password test
+"$NEO4J_HOME/bin/neo4j-admin" set-initial-password "$KNET_NEO_PWD"
 config/neo4j/neo-start$KNET_ENV_POSTFIX.sh
 
 cd "$KNET_SCRIPTS_HOME"
 rdf_target="$KNET_DATASET_TARGET/rdf"
 tdb="$KNET_DATASET_TARGET/tmp/tdb"
-if [[ ! -d "$tdb" ]]; then
-  # If it exists, we assume it's already populated and the command below takes it as-is when no RDF is 
-  # given.
-  
-  rdf_files=""$rdf_target/knowledge-graph.ttl.bz2""
-fi
-
-# Same for this
-if [[ ! -d "$rdf_target/ontologies" ]]; then
-
-  echo -e "\n\tDownloading Ontologies\n"
-  
-  mkdir -p "$rdf_target/ontologies"
-  "$KNET_NEOEXPORT_HOME/get_ontologies.sh" "$rdf_target/ontologies"
-	rdf_files="$rdf_files "$rdf_target/ontologies/"*.*"
-fi
 
 # Under SLURM, this is where Neo is running
 [[ -e "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host" ]] && is_slurm=true || is_slurm=false 
@@ -41,7 +25,7 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KNET_NEO_PWD'"
 
 
 echo -e "\n\tStarting neo4j-export\n"
-"$KNET_NEOEXPORT_HOME/ondex2neo.sh" --tdb "$tdb" $rdf_files
+"$KNET_NEOEXPORT_HOME/ondex2neo.sh" --tdb "$tdb"
 
 config/neo4j/neo-stop$KNET_ENV_POSTFIX.sh
 
