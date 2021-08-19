@@ -10,7 +10,7 @@ job=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"`
 host=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host"`
 
 # --signal doesn't work and without it, KILL seems to be sent
-#scancel --signal=TERM $job
+# scancel --signal=TERM --full $job
 
 srun -w "$host" pkill -u $USER -f 'org.neo4j.server.CommunityEntryPoint' || true
 
