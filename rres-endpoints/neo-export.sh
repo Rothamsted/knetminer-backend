@@ -32,6 +32,8 @@ config/neo4j/neo-stop$KNET_ENV_POSTFIX.sh
 if `$is_slurm_neo`; then
   # It seems it's needed
   echo -e "\nOne more restart, needed under SLURM"
+  
+  sleep 60
   config/neo4j/neo-start$KNET_ENV_POSTFIX.sh
   sleep 60
   config/neo4j/neo-stop$KNET_ENV_POSTFIX.sh
