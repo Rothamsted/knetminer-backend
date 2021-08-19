@@ -7,16 +7,19 @@ if [[ ! -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid" ]]; then
 fi
 
 job=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"`
-scancel $job
+host=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host"`
+
+# --signal doesn't work and without it, KILL seems to be sent
+#scancel --signal=TERM $job
+
+srun -w "$host" pkill -u $USER -f 'org.neo4j.server.CommunityEntryPoint' || true
 
 # Wait until done
 while true; do
-  status=`squeue -j $job --noheader`
-  [[ -z "$status" ]] && break;
+  status=`squeue -j $job --noheader` || err=$?
+  [[ $err != 0 ||-z "$status" ]] && break
   sleep 5
 done
-# It seems it still needs some synching
-sleep 20
 
 rm -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"
 rm -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host"
