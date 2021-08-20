@@ -17,7 +17,7 @@ export KNET_NEO_PWD="${KNET_NEO_PWD-test}"
 # To synch resources after the Snakemake file generation
 # 
 export KNET_SECRETS_DIR=/home/data/knetminer/software/secrets
-export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_HOME/web-data"
+export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_DIR/web-data"
 
 # This is used with rsync/ssh, without user or auth credentials, so you need to have 
 # a user with proper rights (ie, authorized_keys in the target host) 
@@ -31,7 +31,7 @@ export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial 
 # Backup options, the only things not preserved are devices and owner. This is
 # because we have a regular user doing this, not necessarily the root.
 #
-export RSYNC_BKP_OPTS="--recursive --links --times --crtimes --perms --group --specials"
+export RSYNC_BKP_OPTS="--recursive --links --times --perms --group --specials"
 
 # Mirror options, as usually, the destination is synched with the source, but not vice-versa
 # (you need to run a dest->source synch too in this case)

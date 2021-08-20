@@ -13,7 +13,8 @@ rule all:
 		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2",
 		f"{KNET_DATASET_TARGET}/rdf/ontologies",
 		f"{KNET_DATASET_TARGET}/neo4j.dump",
-		f"{KNET_DATASET_TARGET}/tmp/tdb"
+		f"{KNET_DATASET_TARGET}/tmp/tdb",
+		f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
 
 rule add_uris:
 	input:
@@ -42,7 +43,7 @@ rule tdb_load:
 
 rule neo_export:
 	input:
-		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+		f"{KNET_DATASET_TARGET}/tmp/tdb"
 	output:
 		f"{KNET_DATASET_TARGET}/neo4j.dump"
 	shell:
@@ -50,7 +51,7 @@ rule neo_export:
 
 rule tdb_zip:
 	input:
-		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+		f"{KNET_DATASET_TARGET}/tmp/tdb"
 	output:
 		f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
 	shell:
