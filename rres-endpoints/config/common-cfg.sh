@@ -24,6 +24,7 @@ export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_HOME/web-data"
 export KNET_DOWNLOAD_HOST=babvs59
 export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
 
+export KNET_NEO_SERVER_DATA_DIR=/opt/data
 
 # Default rsync options. --inplace or --append are dangerous when rsync is interruped
 export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse"
