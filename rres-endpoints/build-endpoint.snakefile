@@ -47,3 +47,11 @@ rule neo_export:
 		f"{KNET_DATASET_TARGET}/neo4j.dump"
 	shell:
 		f"./neo-export.sh '{dataset_id}' '{dataset_version}'"
+
+rule tdb_zip:
+	input:
+		directory ( f"{KNET_DATASET_TARGET}/tmp/tdb" )
+	output:
+		f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
+	shell:
+		f"./tdb-zip.sh '{dataset_id}' '{dataset_version}'"
