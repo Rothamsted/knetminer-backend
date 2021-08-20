@@ -22,8 +22,11 @@ export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_DIR/web-data"
 # This is used with rsync/ssh, without user or auth credentials, so you need to have 
 # a user with proper rights (ie, authorized_keys in the target host) 
 export KNET_DOWNLOAD_HOST=babvs59
+export KNET_DOWNLOAD_SSH=brandizim@$KNET_DOWNLOAD_HOST
 export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
 
+export KNET_NEO_SERVER=babvs65
+export KNET_NEO_SERVER_SSH=neo4j@$KNET_NEO_SERVER
 export KNET_NEO_SERVER_DATA_DIR=/opt/data
 
 # Default rsync options. --inplace or --append are dangerous when rsync is interruped
