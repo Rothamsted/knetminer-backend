@@ -13,3 +13,27 @@ export KNET_NEO_PWD="${KNET_NEO_PWD-test}"
 
 # TODO: remove, we use SLURM for Snakemake
 #export KNET_CONDA_ENV="${KNET_CONDA_ENV-snakemake}"
+
+# To synch resources after the Snakemake file generation
+# 
+export KNET_SECRETS_DIR=/home/data/knetminer/software/secrets
+export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_HOME/web-data"
+
+# This is used with rsync/ssh, without user or auth credentials, so you need to have 
+# a user with proper rights (ie, authorized_keys in the target host) 
+export KNET_DOWNLOAD_HOST=babvs59
+export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
+
+
+# Default rsync options. --inplace or --append are dangerous when rsync is interruped
+export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse"
+
+# Backup options, the only things not preserved are devices and owner. This is
+# because we have a regular user doing this, not necessarily the root.
+#
+export RSYNC_BKP_OPTS="--recursive --links --times --crtimes --perms --group --specials"
+
+# Mirror options, as usually, the destination is synched with the source, but not vice-versa
+# (you need to run a dest->source synch too in this case)
+#
+export RSYNC_MIRROR_OPTS="$RSYNC_BKP_OPTS --delete --delete-during"
