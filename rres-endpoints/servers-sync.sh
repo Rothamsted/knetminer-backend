@@ -26,5 +26,12 @@ echo -e "\n\n\tSynchronising OXL data on KnetMiner app servers (requires manual 
 for host in $KNET_TEST_SERVERS
 do
   echo -e "\nSynchronising OXL dump with '$host' Knetminer server\n"
-  rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl" "$KNET_SSH_USER@$host:$KNET_TEST_DATA_DIR/knowledge-network.oxl"
+  rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS \
+        "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl" \
+        "$KNET_SSH_USER@$host:$KNET_TEST_DATA_DIR/knowledge-network.oxl" | tee /dev/tty`
+
+  [[ "$rsout" =~ 'Number of regular files transferred: 0' ]] && continue
+
+  ./utils/knet-server-restart.sh $host
+
 done
