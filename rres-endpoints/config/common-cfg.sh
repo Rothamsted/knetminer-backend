@@ -21,13 +21,21 @@ export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_DIR/web-data"
 
 # This is used with rsync/ssh, without user or auth credentials, so you need to have 
 # a user with proper rights (ie, authorized_keys in the target host) 
+#
+export KNET_SSH_USER=brandizim # unless overridden
+
 export KNET_DOWNLOAD_HOST=babvs59
-export KNET_DOWNLOAD_SSH=brandizim@$KNET_DOWNLOAD_HOST
+export KNET_DOWNLOAD_SSH=$KNET_SSH_USER@$KNET_DOWNLOAD_HOST
 export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
 
 export KNET_NEO_SERVER=babvs65
 export KNET_NEO_SERVER_SSH=neo4j@$KNET_NEO_SERVER
 export KNET_NEO_SERVER_DATA_DIR=/opt/data
+
+# Test servers like babvs73
+export KNET_TEST_DATA_DIR=/opt/data/knetminer-datasets/wheat-ci/data
+export KNET_TEST_SERVERS="babvs73 babvs72"
+
 
 # Default rsync options. --inplace or --append are dangerous when rsync is interruped
 export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse"
