@@ -18,7 +18,7 @@ rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/neo4j.dump" 
 if [[ ! "$rsout" =~ 'Number of regular files transferred: 0' ]]; then 
 
   echo -e "\n\n\tRe-populating the Neo4j Server\n"
-  #./config/neo4j/neo-server-update-$KNET_DATASET_ID.sh
+  ./config/neo4j/neo-server-update-$KNET_DATASET_ID.sh
 
 fi
 

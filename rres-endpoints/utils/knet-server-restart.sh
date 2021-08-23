@@ -7,6 +7,7 @@ if [[ -z "$host" ]]; then
   exit 1
 fi
 
+echo -e "\nRestarting $host\n"
 ssh "$KNET_SSH_USER@$host" 'bash -il' << EOT
 
 set -e
