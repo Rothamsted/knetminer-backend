@@ -123,6 +123,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 		
 		
 		log.info ( "Cypher traverser finished" );
+		
 		Map<String, Collection<ONDEXConcept>> timedOutQueries = cyTraverserPerformanceTracker.getTimedOutQueries ();
 		if ( !timedOutQueries.isEmpty () )
 			log.warn ( "Some queries couldn't complete, see the summary statistics (must be enabled)" );

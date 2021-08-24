@@ -152,6 +152,7 @@ public class CyTraverserPerformanceTracker
 		if ( this.reportFrequency < 0 ) {
 			// tracking is disabled
 			queryAction.run ();
+			return;
 		}
 
 		try {
@@ -162,7 +163,6 @@ public class CyTraverserPerformanceTracker
 		}
 		catch ( UncheckedTimeoutException ex ) {
 			// Track the query timed out, the other updates above are skipped by the exec flow.
-			this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
 			this.trackTimedOutQuery ( query, startGenes );
 			// Don't wrap it with other exception types, but let it flow to the invoker, which 
 			// needs to know it, in order to perform cancelling operations
@@ -183,13 +183,14 @@ public class CyTraverserPerformanceTracker
 	 */
 	private void trackTimedOutQuery ( String query, List<ONDEXConcept> startGenes )
 	{
+		this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
 		
 		// To have different time stamps
 		Uninterruptibles.sleepUninterruptibly ( 1, TimeUnit.MILLISECONDS );
 		
 		long tstamp = this.currentTime.updateAndGet ( prev -> System.currentTimeMillis () );
 
-		this.timedOutQueries.add ( Triple.of ( query, tstamp, startGenes ));
+		this.timedOutQueries.add ( Triple.of ( query, tstamp, startGenes ) );
 	}
 	
 
@@ -293,13 +294,13 @@ public class CyTraverserPerformanceTracker
 			out.printf (
 				"\"%s\"\t%d\t%#6.2f\t%d\t%#6.2f\t%#6.2f\t%#6.2f\t%#6.2f\n",
 				escapeJava ( query ),
-				nqueries,
-				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries,
-				nresults,
-				ncompleted == 0 ? 0d : 1d * nresults / ( ncompleted * this.queryBatchSize ),
-				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted,
-				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults,
-				ncompleted == 0 ? 0 : query2ExecTimes.get ( query ) / ( 1000d * 60 )
+				nqueries, // tot invocations
+				nqueries == 0 ? 0d : 100d * ntimeouts  / nqueries, // % timeouts
+				nresults, // tot returned paths
+				ncompleted == 0 ? 0d : 1d * nresults / ( ncompleted * this.queryBatchSize ), // avg ret paths x gene
+				ncompleted == 0 ? 0d : 1d * query2ExecTimes.get ( query ) / ncompleted, // avg time
+				nresults == 0 ? 0d : 1d * query2PathLens.get ( query ) / nresults, // avg path len
+				ncompleted == 0 ? 0 : query2ExecTimes.get ( query ) / ( 1000d * 60 ) // tot time
 			);
 		}
 		out.println ( "" );

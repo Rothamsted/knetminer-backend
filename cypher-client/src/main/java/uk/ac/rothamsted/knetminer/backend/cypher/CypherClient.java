@@ -217,6 +217,7 @@ public class CypherClient implements AutoCloseable
   public Stream<List<String>> findPathIris ( String query ) {
   	return findPathIris ( query, null );
   }
+
   
   /**
    * Begins a new transaction in the session this client is based upon, using the 
@@ -228,7 +229,7 @@ public class CypherClient implements AutoCloseable
 	public synchronized void begin () 
 	{
 		tx = neoSession.beginTransaction ();
-
+		
 		// There are more opened transactions than the expected degree of parallelism.
 		// This shouldn't happen, this limits are expected when using of ForkJoinPool. 
 		if ( openTxsCount.incrementAndGet () > 256 || openTxsCount.get () > Runtime.getRuntime ().availableProcessors () )
