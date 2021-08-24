@@ -13,6 +13,7 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -311,13 +312,13 @@ class SinglePathQueryProcessor
 				Executors.callable ( queryAction ), queryTimeoutMs, TimeUnit.MILLISECONDS 
 			);
 		}
-		catch ( UncheckedTimeoutException|InterruptedException ex ) 
+		catch ( TimeoutException|UncheckedTimeoutException|InterruptedException ex ) 
 		{
 			// Don't wrap it with other exception types, but let it flow to the performance tracker
 			throw ExceptionUtils.buildEx ( 
 				UncheckedTimeoutException.class,
 				ex,
-				"Timed out query (after multiple attempts): %s. First gene IRI is: <%s>. Query is: \"%s\"",
+				"Timed out query: %s. First gene IRI is: <%s>. Query is: \"%s\"",
 				ex.getMessage (),
 				startGeneIris.get ( 0 ),
 				escapeJava ( this.pathQuery )
