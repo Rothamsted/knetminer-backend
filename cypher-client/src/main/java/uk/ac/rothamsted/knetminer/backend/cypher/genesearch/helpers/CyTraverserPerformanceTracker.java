@@ -155,10 +155,7 @@ public class CyTraverserPerformanceTracker
 			return;
 		}
 
-		try {
-			// TODO: remove
-			// if ( Math.random () < 0.5 ) throw new UncheckedTimeoutException ();
-			
+		try {			
 			long time = XStopWatch.profile ( queryAction );
 			this.query2ExecTimes.compute ( query, (k, t) -> t + time );
 			this.query2Results.compute ( query, (k, n) -> n + pathsCounter.get () );
@@ -187,9 +184,6 @@ public class CyTraverserPerformanceTracker
 	private void trackTimedOutQuery ( String query, List<ONDEXConcept> startGenes )
 	{
 		this.query2Timeouts.compute ( query, (q, n) -> n + 1 );
-
-		// TODO: remove
-		// log.info ( "query2Timeouts updated, q: {}, count: {}", escapeJava ( query ), query2Timeouts.get ( query ) ); 
 		
 		// To have different time stamps
 		Uninterruptibles.sleepUninterruptibly ( 1, TimeUnit.MILLISECONDS );
@@ -284,12 +278,7 @@ public class CyTraverserPerformanceTracker
 		final int nTotQueries = invocations.get ();
 		out.printf ( "Total queries issued: %s\n", nTotQueries );
 		if ( nTotQueries == 0 ) return statsSW.toString ();
-		
-		// TODO: remove
-//		query2Timeouts.forEach ( (q, n) -> 
-//			log.info ( "query2Timeouts, q: {}, count: {}", escapeJava ( q ), n )
-//		);
-		
+				
 		out.println (   
 			"Query\tTot Invocations\t% Timeouts\tTot Returned Paths\tAvg Ret Paths x Gene\tAvg Time(ms)\tAvg Path Len\tTot Time(min)" 
 		);
