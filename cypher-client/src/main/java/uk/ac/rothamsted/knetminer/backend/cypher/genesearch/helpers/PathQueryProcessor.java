@@ -185,7 +185,7 @@ public class PathQueryProcessor implements ApplicationContextAware
 	{
 		this.isInterrupted = true;
 		log.warn ( "Traversal was interrupted, stopping everything" );
-
+		
 		this.semanticMotifsQueries.forEach ( query ->
 		{
 			SinglePathQueryProcessor thisQueryProc = this.processorCache.getUnchecked ( query );
