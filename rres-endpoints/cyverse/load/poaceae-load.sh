@@ -1,1 +1,2 @@
-echo "$CY_DATASET_GRAPH"
+set -e
+"$CY_SCRIPTS_HOME/load/generic-load.sh"
