@@ -1,5 +1,5 @@
 if [[ $# != 2 ]]; then
-	echo -e "\n\n\tUsage: $0 dataset-id dataset-version\n\n"
+	echo -e "\n\n\tUsage: $0 <dataset-id> <dataset-version>\n\n"
 	exit 1
 fi
 
