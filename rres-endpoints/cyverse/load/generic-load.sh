@@ -14,10 +14,11 @@ echo -e "\n\n\tDownloading Ontologies"
 onto_dir="$CY_DATA_DIR/ontologies"
 mkdir -p "$onto_dir"
 
-wget_cmd="wget --recursive --no-parent --continue --no-host-directories --cut-dirs=7 --reject 'index.html*'"
-wget_cmd="$wget_cmd -e robots=off --directory-prefix"
+lftp="set ssl:verify-certificate no;"
+lftp="$lftp mirror -v --continue $data_url/ontologies/ '$onto_dir';"
+lftp="$lftp exit"
 
-$wget_cmd "$onto_dir" "$data_url/ontologies/"
+echo lftp -e "$lftp"
 
 echo -e "\n\n\tReloading Ontologies"
 echo "$VIRTUOSO_UTILS_HOME/virt_load.sh" -r "$onto_dir" "${CY_DATASET_GRAPH_PREFIX}ontologies"
