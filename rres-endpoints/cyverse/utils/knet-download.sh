@@ -11,6 +11,7 @@ set -e
 	exit 1 
 }
 
+is_multi='false'
 if [[ "$1" == '-m' ]] || [[ "$1" == '--multi' ]]; then
 	is_multi='true'
 	shift
