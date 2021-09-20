@@ -5,7 +5,7 @@ echo -e "\n\n\tDownloading Ontologies\n"
 onto_dir="$CY_DATA_DIR/ontologies"
 mkdir -p "$onto_dir"
 
-"$CY_SCRIPTS_HOME/utils/knet-download.sh" "rdf/ontologies/" "$onto_dir"
+"$CY_SCRIPTS_HOME/utils/knet-download.sh" --multi "rdf/ontologies/" "$onto_dir"
 
 echo -e "\n\n\tReloading Ontologies\n"
 "$VIRTUOSO_UTILS_HOME/virt_load.sh" -r "$onto_dir" "${CY_DATASET_GRAPH_PREFIX}ontologies"
