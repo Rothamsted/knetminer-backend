@@ -20,8 +20,6 @@ wkey_file="$CY_WEB_SECRETS_DIR/$CY_DATASET_ID-$CY_DATASET_VERSION.key"
 [[ -z "$secret" ]] && data_url="$CY_DATA_URL/$CY_DATASET_ID/$CY_DATASET_VERSION" \
 || data_url="$CY_PRIVATE_DATA_URL/$CY_DATASET_ID/$CY_DATASET_VERSION/$secret"
 
-data_url="$data_url"
-
 lftp="set ssl:verify-certificate no;"
 lftp="$lftp mirror -v --continue '$data_url/$url_path' '$out_path';"
 lftp="$lftp exit"
