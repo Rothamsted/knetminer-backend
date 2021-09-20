@@ -36,7 +36,7 @@ wkey_file="$CY_WEB_SECRETS_DIR/$CY_DATASET_ID-$CY_DATASET_VERSION.key"
 lftp="set ssl:verify-certificate no;"
 
 $is_multi && lftp="$lftp mirror -v --continue '$data_url/$url_path' '$out_path'" \
-  || lftp="$lftp get --continue '$data_url/$url_path' '$out_path'"
+  || lftp="$lftp get --continue '$data_url/$url_path' -o '$out_path'"
 
 lftp="$lftp;exit"
 lftp -e "$lftp"
