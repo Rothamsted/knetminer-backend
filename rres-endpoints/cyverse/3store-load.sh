@@ -7,5 +7,5 @@ set -e
 cd "$CY_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh
 
-./load/$CY_DATASET_ID-load.sh
+./load/$CY_DATASET_ID-3sload.sh
 
