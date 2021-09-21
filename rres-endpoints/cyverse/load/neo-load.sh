@@ -29,7 +29,7 @@ dump_path=/tmp/neo4j.dump
 "$CY_SCRIPTS_HOME/utils/knet-download.sh" "neo4j.dump" "$dump_path"
 
 echo -e "Uploading Neo4j\n"
-./bin/neo4j-admin load --force --from="dump_path"
+./bin/neo4j-admin load --force --from="$dump_path"
 
 echo -e "Restarting Neo4j\n"
 ulimit -n 40000
