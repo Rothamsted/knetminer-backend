@@ -22,7 +22,7 @@ echo -e "\n\n\tUpgrading Neo4j instance\n"
 cd "$NEO4J_HOME"
 
 echo -e "Downloading the dump\n"
-dump_path=/tmp/neo4j.dump
+dump_path="$CY_TMP/neo4j.dump"
 "$CY_SCRIPTS_HOME/utils/knet-download.sh" "neo4j.dump" "$dump_path"
 
 echo -e "Stopping Neo4j\n"

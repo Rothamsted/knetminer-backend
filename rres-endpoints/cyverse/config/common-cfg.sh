@@ -1,5 +1,5 @@
 export CY_DATA_DIR=/opt/data/rdf
-export CY_TMP="$CY_DATA_DIR/tmp"
+[[ -z "$CY_TMP" ]]&& export CY_TMP="$CY_DATA_DIR/tmp"
 
 export CY_CONTAINER_DATA_DIR="$CY_DATA_DIR"
 
