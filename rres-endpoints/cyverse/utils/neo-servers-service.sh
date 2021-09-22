@@ -16,18 +16,16 @@ fi
 
 sw=/opt/software
 NEO_HOMES="$sw/neo4j"
-[[ `hostname -a` == 'arabidopsis' ]] && NEO_HOMES="$NEO_HOMES $sw/neo4j-covid19"
+[[ `hostname -a` == 'arabidopsis' ]] && NEO_HOMES="$sw/neo4j-covid19"
 
-[[ "cmd" == 'start' ]] && ulimit -n 40000
+[[ "$cmd" == 'start' ]] && ulimit -n 40000
 
 for neo_home in $NEO_HOMES 
 do
-
-  echo -e "\n---- Running '$cmd' at '$neo_home'"
+  echo -e "\n\n---- Running '$cmd' at '$neo_home' ----\n"
 
   cd "$neo_home"
   ./bin/neo4j $cmd
-
 done
 
 echo -e "\n\n\tThe End\n"
