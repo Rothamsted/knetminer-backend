@@ -24,7 +24,7 @@ if [[ -z "$CY_SCRIPTS_HOME" ]]; then
 fi 
 
 neo_homes="$2"
-if [[ -z "$neo_homes"]]; then
+if [[ -z "$neo_homes" ]]; then
 	neo_homes="$CY_SOFTWARE_DIR/neo4j"
 	[[ `hostname -a` == 'arabidopsis' ]] && neo_homes="$CY_SOFTWARE_DIR/neo4j-covid19"
 fi
