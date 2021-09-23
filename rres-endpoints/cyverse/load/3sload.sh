@@ -1,8 +1,13 @@
+
+# TODO: document that Docker scripts are at /opt/software/virtuoso-docker
+# and can't be put into a public repo due to passwords
+#
+
 set -e
 
 echo -e "\n\n\tDownloading Ontologies\n"
 
-onto_dir="$CY_DATA_DIR/ontologies"
+onto_dir="$CY_DATA_DIR/rdf/ontologies"
 mkdir -p "$onto_dir"
 
 "$CY_SCRIPTS_HOME/utils/knet-download.sh" --multi "rdf/ontologies/" "$onto_dir"
@@ -13,7 +18,7 @@ echo -e "\n\n\tReloading Ontologies\n"
 
 echo -e "\n\n\tDownloading Dataset\n"
 
-data_dir="$CY_DATA_DIR/$CY_DATASET_ID"
+data_dir="$CY_DATA_DIR/rdf/$CY_DATASET_ID"
 mkdir -p "$data_dir"
 
 "$CY_SCRIPTS_HOME/utils/knet-download.sh" "rdf/knowledge-graph.ttl.bz2" "$data_dir/${CY_DATASET_ID}.ttl.bz2"
