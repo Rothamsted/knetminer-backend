@@ -9,12 +9,12 @@ dump_path="$CY_TMP/neo4j.dump"
 "$CY_SCRIPTS_HOME/utils/knet-download.sh" "neo4j.dump" "$dump_path"
 
 # Stop it
-"$CY_SCRIPTS_HOME/utils/neo-servers-service.sh stop "$CY_DATASET_NEO_HOME"
+"$CY_SCRIPTS_HOME/utils/neo-servers-service.sh" stop "$CY_DATASET_NEO_HOME"
 
 echo -e "Uploading Neo4j\n"
 ./bin/neo4j-admin load --force --from="$dump_path"
 
 # Restart
-"$CY_SCRIPTS_HOME/utils/neo-servers-service.sh start "$CY_DATASET_NEO_HOME"
+"$CY_SCRIPTS_HOME/utils/neo-servers-service.sh" start "$CY_DATASET_NEO_HOME"
 
 echo -e "\n\n\tNeo4j Updated\n"
