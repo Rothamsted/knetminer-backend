@@ -7,14 +7,16 @@ echo -e "Please, beware, logs from this command report hashed dirs\n"
 
 secret=`cat "$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"`
 web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
+chmod -R ugo+rX "$KNET_DATASET_TARGET"
 rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DATASET_TARGET/" "$web_target"
 
+exit
 
 echo -e "\n\n\tSynchronising file dump with Neo4j server\n"
 rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/neo4j.dump" \
              "$KNET_NEO_SERVER_SSH:$KNET_NEO_SERVER_DATA_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
     
-# Only if the dump was actually updated         
+# Synch Neo4j only if the dump was actually updated         
 if [[ ! "$rsout" =~ 'Number of regular files transferred: 0' ]]; then 
 
   echo -e "\n\n\tRe-populating the Neo4j Server\n"
