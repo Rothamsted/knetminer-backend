@@ -5,12 +5,23 @@ cd "$KNET_SCRIPTS_HOME"
 echo -e "\n\n\tSynchronising file dumps with their web publishing location\n"
 echo -e "Please, beware, logs from this command report hashed dirs\n"
 
-secret=`cat "$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"`
-web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
+web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR/$KNET_DATASET_ID/$KNET_DATASET_VERSION"
+secret_path="$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"
+
+if [[ -e "$secret_path" ]]; then
+	secret=`cat "$secret_path"`
+	web_target="$web_target/$secret"
+fi
+
 chmod -R ugo+rX "$KNET_DATASET_TARGET"
 rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DATASET_TARGET/" "$web_target"
 
-exit
+
+# The Neo4j stuff
+#
+
+[[ -z "$KNET_DATASET_HAS_NEO4J" ]] && exit
+
 
 echo -e "\n\n\tSynchronising file dump with Neo4j server\n"
 rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/neo4j.dump" \

@@ -26,7 +26,7 @@ export KNET_SSH_USER=brandizim # unless overridden
 
 export KNET_DOWNLOAD_HOST=babvs59
 export KNET_DOWNLOAD_SSH=$KNET_SSH_USER@$KNET_DOWNLOAD_HOST
-export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
+[[-z "$KNET_DOWNLOAD_DIR" ]] && export KNET_DOWNLOAD_DIR=/var/www/html/knetminer/downloads/reserved
 
 export KNET_NEO_SERVER=babvs65
 export KNET_NEO_SERVER_SSH=neo4j@$KNET_NEO_SERVER

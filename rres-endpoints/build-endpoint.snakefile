@@ -7,14 +7,22 @@ KNET_DATASET_TARGET = os.environ [ "KNET_DATASET_TARGET" ]
 dataset_id = config [ "dataset_id" ]
 dataset_version = config [ "dataset_version" ]
 
+all_results = [
+	f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl",
+	f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2",
+	f"{KNET_DATASET_TARGET}/rdf/ontologies",
+	f"{KNET_DATASET_TARGET}/tmp/tdb",
+	f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
+]
+
+# TODO: possibly, we need a similar trick for ontologies, TDB, etc
+if os.environ [ "KNET_DATASET_HAS_NEO4J" ]:
+	all_results += f"{KNET_DATASET_TARGET}/neo4j.dump"
+
+
 rule all:
 	input:
-		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl",
-		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2",
-		f"{KNET_DATASET_TARGET}/rdf/ontologies",
-		f"{KNET_DATASET_TARGET}/neo4j.dump",
-		f"{KNET_DATASET_TARGET}/tmp/tdb",
-		f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
+		all_results
 
 rule add_uris:
 	input:
@@ -56,3 +64,4 @@ rule tdb_zip:
 		f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
 	shell:
 		f"./tdb-zip.sh '{dataset_id}' '{dataset_version}'"
+		
