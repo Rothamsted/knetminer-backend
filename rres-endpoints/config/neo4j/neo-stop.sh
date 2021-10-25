@@ -1,3 +1,5 @@
+# Stops the server launched via neo-start.sh
+#
 set -e
 echo -e "\n\tStopping Neo4j\n"
 

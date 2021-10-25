@@ -1,3 +1,10 @@
+# Endpoint building step to create a Jena TDB triple store, using the dataset RDF obtained from
+# the OXL and other static files (eg, ontologies).
+# 
+# This is essentially a wrapper of the Ondex Neo4j exporter, which is invoked with the -l option
+# (ie, TDB loading-only mode). The Neo4j population is split into these two steps, in order to make 
+# the pipeline more incremental.
+# 
 set -e
 cd "$KNET_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh

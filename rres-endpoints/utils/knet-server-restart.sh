@@ -1,4 +1,5 @@
-# Restart one of the KnetMiner server instances, ie, redeploys the Docker container and relaunch it 
+# Restart one of the KnetMiner server instances, ie, redeploys the Docker container and relaunches it.
+#
 set -e
 host="$1"
 

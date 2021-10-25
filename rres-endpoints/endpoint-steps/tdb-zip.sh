@@ -1,3 +1,7 @@
+# Endpoint building step to prepare the zipped TDB triple store and place it in the pipeline's output
+# directory, ready for the dataset's downloadings.
+#
+
 set -e
 cd "$KNET_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh

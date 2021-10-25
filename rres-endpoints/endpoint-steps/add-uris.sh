@@ -1,3 +1,9 @@
+
+# Endpoint building step to add URIs to an OXL. 
+#
+# This is a wrapper of the corresponding tool in the Ondex RDF exporter (TODO: link).
+#   
+
 set -e
 cd "$KNET_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh

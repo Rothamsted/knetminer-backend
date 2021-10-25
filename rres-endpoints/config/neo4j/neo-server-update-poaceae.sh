@@ -1,6 +1,9 @@
 set -e
 
 echo -e "\n\n\tUpdating and restarting $KNET_DATASET_ID  Neo4j server at '$KNET_NEO_SERVER_SSH'"
+
+# As you can see, it issue SSH commands to stop the Neo4j service, load from the dupm, restart it.
+#
 ssh "$KNET_NEO_SERVER_SSH" 'bash -il' << EOT
 
 set -e

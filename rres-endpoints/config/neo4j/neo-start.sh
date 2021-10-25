@@ -1,4 +1,10 @@
+# Helper used by the dataset build pipeline to wrap the Neo4j server controller
+# and launch on a SLURM node. 
+#
 set -e
+
+# These .jobid and .host files track the job details where the server is launched 
+# 
 
 if [[ -e "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid" ]]; then
   job=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"`
