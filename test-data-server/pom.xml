@@ -92,6 +92,8 @@
 			    <plugin>
 				    <groupId>com.github.harti2006</groupId>
 					  <artifactId>neo4j-server-maven-plugin</artifactId>
+					  <!-- TODO: Move 2.0 to knetminer-common -->
+					  <version>2.0RC</version>
 						<executions>
 							<!-- This is just to download it before the ant/untar task above -->
 							<execution>
