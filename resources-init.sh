@@ -2,5 +2,5 @@
 # sample data.
 #
 set -e
-cd `$(dirname $0)`
+cd "`dirname $0`"
 mvn --projects test-data-server -P server-mode pre-integration-test
