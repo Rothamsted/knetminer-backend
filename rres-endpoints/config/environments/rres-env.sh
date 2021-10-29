@@ -8,6 +8,7 @@ export KNET_SNAKE_OPTS="--profile config/snakemake/slurm"
 
 . config/common-cfg.sh
 
+# TODO: remove it from both here and my home
 #conda activate "$KNET_DATA_HOME/software/conda/mamba/envs/snakemake"
 
 module load snakemake/6.1.0-foss-2020b

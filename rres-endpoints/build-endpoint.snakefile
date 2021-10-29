@@ -1,5 +1,5 @@
 
-# TODO: env vars doesn't work in SLURM, check them manually
+# TODO: env vars don't work in SLURM?
 #
 KNET_SRC_OXL = os.environ [ "KNET_SRC_OXL" ]
 KNET_DATASET_TARGET = os.environ [ "KNET_DATASET_TARGET" ]
