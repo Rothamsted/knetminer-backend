@@ -6,6 +6,8 @@ export KNET_SCRIPTS_HOME="`pwd`"
 export JAVA_TOOL_OPTIONS="-Xmx64G"
 export KNET_SNAKE_OPTS="--profile config/snakemake/slurm"
 
+# TODO: fix config/neo4j scripts to accept KNET_ENV_POSTFIX=rres
+
 . config/common-cfg.sh
 
 # TODO: remove it from both here and my home
