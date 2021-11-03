@@ -17,7 +17,7 @@ all_results = [
 
 # TODO: possibly, we need a similar trick for ontologies, TDB, etc
 if os.environ [ "KNET_DATASET_HAS_NEO4J" ]:
-	all_results += f"{KNET_DATASET_TARGET}/neo4j.dump"
+	all_results.append ( f"{KNET_DATASET_TARGET}/neo4j.dump" )
 
 
 # The usual umbrella, which possibly triggers everything else
