@@ -10,7 +10,7 @@ cd "$KNET_SCRIPTS_HOME"
 echo -e "\n\n\tSynchronising file dumps with their web publishing location\n"
 echo -e "Please, beware, logs from this command report hashed dirs\n"
 
-web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR/$KNET_DATASET_ID/$KNET_DATASET_VERSION"
+web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR"
 
 # If the dataset isn't public, it is published on the same target, but under an obfuscated
 # directory, which is based on this hash code.
@@ -18,8 +18,12 @@ web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR/$KNET_DATASET_ID/$KNET_DATASET
 secret_path="$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"
 if [[ -e "$secret_path" ]]; then
 	secret=`cat "$secret_path"`
+	web_target="$web_target/reserved/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
 	web_target="$web_target/$secret"
+else
+	web_target="$web_target/$KNET_DATASET_ID/$KNET_DATASET_VERSION"
 fi
+
 
 chmod -R ugo+rX "$KNET_DATASET_TARGET"
 rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DATASET_TARGET/" "$web_target"
