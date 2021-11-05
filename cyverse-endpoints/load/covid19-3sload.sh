@@ -1,7 +1,5 @@
-# TODO: document that Docker scripts are at /opt/software/virtuoso-docker
-# and can't be put into a public repo due to passwords
+# We don't use knet-3load.sh, cause we have our peculiarities.
 #
-
 set -e
 
 data_dir="$CY_DATA_DIR/rdf/$CY_DATASET_ID"

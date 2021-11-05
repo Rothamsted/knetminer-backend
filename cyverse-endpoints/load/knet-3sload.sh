@@ -1,3 +1,12 @@
+# Reloads a dataset into the Cyverse server instance.
+#
+# This is usually based on downloading the RDF dump that was created by the RRes pipeline and
+# loading it on the right named graph (previous one is deleted/overwritten). 
+# 
+# This is a generic version of this script, having dataset-specific variables set by specific
+# *-3load.sh scripts, in this same directory.
+# 
+
 
 # TODO: document that Docker scripts are at /opt/software/virtuoso-docker
 # and can't be put into a public repo due to passwords
