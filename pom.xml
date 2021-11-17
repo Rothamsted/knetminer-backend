@@ -5,7 +5,7 @@
 	<parent>
 	  <groupId>uk.ac.rothamsted.knetminer</groupId>
 	  <artifactId>knetminer-common</artifactId>
-	  <version>2.0RC7</version>
+	  <version>2.0</version>
 	</parent>  
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
@@ -24,7 +24,7 @@
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-		<ondex.version>4.0RC2</ondex.version>
+		<ondex.version>5.0</ondex.version>
 		
 		<!-- update-sources.sh needs to override this -->
 		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
@@ -45,7 +45,7 @@
 			<dependency>
 				<groupId>uk.ac.rothamsted.kg.neo4j</groupId>
 				<artifactId>neo4j-utils</artifactId>
-    		<version>4.0RC</version>
+    		<version>4.0RC1</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.ondex.core</groupId>
