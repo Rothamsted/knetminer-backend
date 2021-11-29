@@ -1,3 +1,6 @@
+# Maintenance script to backup configuration files.
+# Data files don't quite need backup, cause they can been rebuilt from   
+
 set -e
 bkp_name=`hostname -a`
 bkp_dir="bkp-$bkp_name"

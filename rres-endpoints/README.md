@@ -1,6 +1,6 @@
 **This is still a draft**
 
-# The Knetminer Open Data Pipelines
+# The Knetminer Raw Data Pipelines
 
 The script you find in the hereby folder and [/cyverse-endpoints](../cyverse-endpoints) are used to
 produce machine-readable data from the Knetminer datasets, when these are shipped in our custom
@@ -148,6 +148,8 @@ destination web server for knetminer.com.
 
 
 # Cyverse Endpoints
+
+Part of the RDF and Neo4j dumps produced at Rothamsed are 
 
 * Intro (where we pick up)
 * Configuration and Alike

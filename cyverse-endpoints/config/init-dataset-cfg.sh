@@ -1,5 +1,5 @@
-# Brings up that part of Cyverse pipeline configuration that depends on a working
-# dataset. This is usually invoked as first step by the main script in the CY_SCRIPTS_HOME root 
+# Brings up that part of the Cyverse pipeline configuration that depends on a working
+# dataset. This is usually invoked as first step by some of the main scripts in the CY_SCRIPTS_HOME root. 
 #
 
 if [[ $# != 2 ]]; then
