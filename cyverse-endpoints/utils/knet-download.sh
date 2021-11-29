@@ -1,7 +1,10 @@
+# Utility to manage web downloads from knetiminer.com
+#
+
 set -e
 
 [[ "$#" < 2 ]] && {
-	echo -e "\n\nDownloads from The Knetminer data download URL\n"
+	echo -e "\n\nDownloads files from The Knetminer data download URL (knetminer.com/downloads)\n"
 	echo -e "\t$0 [-m|--multi] <url path within the dataset dir> <local path>\n"
 
 	echo -e "\nFor URL directories, use a final '/',\n"

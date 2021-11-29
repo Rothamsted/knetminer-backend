@@ -20,7 +20,7 @@ if [[ -z "$CY_SCRIPTS_HOME" ]]; then
   mydir=`dirname "$mydir"`
 
 	cd "$mydir/.."
-	. config/environments/init-env.sh  
+	. config/environments/cyverse-env.sh  
 fi 
 
 neo_homes="$2"

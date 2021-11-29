@@ -147,9 +147,14 @@ directories (which are only accessible to users knowing the hash). These directo
 destination web server for knetminer.com.
 
 
-# Cyverse Endpoints
+# CyVerse Endpoints
 
-Part of the RDF and Neo4j dumps produced at Rothamsed are 
+Part of the RDF and Neo4j dumps produced at Rothamsed are used on our CyVerse servers, in order 
+to expose our data to the world, via our [SPARQL and Neo4j endpoints][10].
+
+[10]: https://knetminer.com/data
+
+See [here](../cyverse-endpoints) for details.
 
 * Intro (where we pick up)
 * Configuration and Alike
