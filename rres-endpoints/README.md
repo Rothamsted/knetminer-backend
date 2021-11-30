@@ -16,7 +16,7 @@ against our SLURM cluster.
 
 ## Configuration and alike
 
-### Requirements
+### Requirements
 
 * The pipeline uses [SnakeMake][10]. The RRes environment (see below), loads SnakeMake from the 
   available SLURM modules.
