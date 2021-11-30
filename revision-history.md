@@ -1,7 +1,10 @@
 # Revision History
 
+*This file was latest reviewed on 2021-11-30.*
+
 ## 2.0.1-SNAPSHOT
-* Current snapshot
+* Documentation for raw data pipelines added
+
 
 ## 2.0
 * First Java 11 version. **No former JDK versions supported since this**.

@@ -156,8 +156,3 @@ to expose our data to the world, via our [SPARQL and Neo4j endpoints][10].
 
 See [here](../cyverse-endpoints) for details.
 
-* Intro (where we pick up)
-* Configuration and Alike
-* Loading RDF Data
-* Loading Neo4j
-
