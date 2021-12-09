@@ -11,7 +11,7 @@ In this document, we explain a few details.
 
 The raw data pipelines in the Cyverse servers picks up from the data dumps spawned by the RRes 
 pipeline and published on [knetminer.com](http://knetminer.com/downloads). The scripts described
-below a [dedicated utility](utils/knet-download.sh) for the download part.  
+below use a [dedicated utility](utils/knet-download.sh) for the download part.  
 
 ## Main scripts
 
@@ -23,17 +23,17 @@ See below for a list of data services available via CyVerse and the server hosts
 
 ## Configuration
 
-As in the case of the [RRes pipelines](../rres-endpoints), most of the scripts for CyVerse requires that an enviroment
-is set manually, by bash-sourcing one of the scripts into [config/environments](config/environments) (only one is 
-available at the moment). Scripts of this type usually invokes [config/common-cfg.sh](config/common-cfg.sh), in order 
-to define general settings, after environment-specific ones.  
+As in the case of the [RRes pipelines](../rres-endpoints), most of the scripts for CyVerse requires that an environment
+is set manually, by [bash-sourcing](https://linuxize.com/post/bash-source-command/) one of the scripts into 
+[config/environments](config/environments) (only one is available at the moment). Scripts of this type usually invokes
+[config/common-cfg.sh](config/common-cfg.sh), in order to define general settings, after environment-specific ones.  
   
-Morover, the `3store-load.sh` and `neo4j-load.sh` scrips mentioned above requires a dataset-id and version parameter 
+Morover, the `3store-load.sh` and `neo4j-load.sh` scrips mentioned above require a dataset-id and version parameter 
 pair, in order to do some dataset-specific configuration. This is started by [config/init-dataset.sh](config/init-dataset.sh),
 which first lookup for dataset-specific scripts into [config/datasets](config/datasets). For instance, the invocation
 `./3store-load.sh poaceae 51` will cause the search for [config/datasets/poaceae-51-cfg.sh](config/datasets/poaceae-51-cfg.sh) 
-and `config/datasets/poaceae-common-cfg.sh`. Both are optional and, of course, should contain configuration options 
-valid for all versions of a dataset or those valid for a specific version.  
+and `config/datasets/poaceae-common-cfg.sh`. Both are optional and, of course, they should contain configuration options 
+valid for all versions of a dataset, or those valid for a specific version.  
 
 As a last step, the configuration sources [config/dataset-cfg.sh](config/dataset-cfg.sh), which has configuration options
 to be set after dataset-specific settings have been defined.
@@ -45,8 +45,9 @@ As said above, the [3store-load.sh](3store-load.sh) invokes a dataset-specific l
 the generic [load/knet-3sload.sh](load/knet-3sload.sh). This has these steps:
 
 1. it downloads the RDF dump for the dataset into `/opt/data` (if not already there).
+
 1. Using [virtuoso-utils][20], it loads the dataset into Virtuoso, putting it into the configured
-   named graph for the dataset.
+   [named graph][22] for the dataset.
    
 The steps above are repeated for those datasets that have an [AgriSchemas](https://github.com/Rothamsted/agri-schemas) 
 mapping (ie, additional RDF that maps our data to bioschemas-based standards).  
@@ -58,18 +59,19 @@ conflicting files (only new files are downloaded anyway).
 
 in [load](load) you can find other dataset-specific loading scripts that don't use the procedure above, since they
 have their own peculiar characteristics. For instance, the [GXA data loader](load/gxa-3sload.sh) uses data produced
-by the [AgriSchemas scripts][30], which are already based on the standards, and therefore the schema mappings aren't
+by the [AgriSchemas scripts][30], which are already based on the standards, so that the schema mappings aren't
 used and the corresponding step isn't necessary. 
 
 
 [20]: https://github.com/marco-brandizi/rdfutils/tree/master/virtuoso-utils
+[22]: https://en.wikipedia.org/wiki/Named_graph
 [30]: https://github.com/Rothamsted/agri-schemas/tree/master/dfw-dataset/gxa
 
 
 ## Loading Neo4j data
 
 This should be done in the respective host (see below), using the [neo4j-load.sh](neo4j-load.sh) script.
-This also uses a [generi Neo4j uploading script](load/neo-load.sh).  
+This also uses a [generic Neo4j uploading script](load/neo-load.sh).  
 
 **Note that we don't have (as yet) any Neo4j-dedicated script to update the COVID-19 dataset.**   
 
@@ -95,7 +97,7 @@ It contains the services.
 The Tomcat web server serves both the [data entry page](https://knetminer.com/data) and
 the [SPARQL browser][520]. The latter is based on a [customisation][530] of our own of the 
 [LODEStar browser][540]. This software has several good features: a nice, customisable interface to play with SPARQL, 
-a SPARQL and URI resolver, which can serve data in various formats, using [content negotiation][550]. [Example][560].    
+a SPARQL and URI resolver, which can serve data in various formats, using [content negotiation][550] ([example][560]).    
   
 This is deployed on `/opt/software/tomcat` (all the non-OS, non-packaged software is put under `/opt/software`).  
   
@@ -142,3 +144,5 @@ As above, the Neo4j server is deployed on `/opt/software/neo4j-covid19` and the 
 This host has also a Neo4j server for the old Arabidopsis dataset, since this is embedded into the poaceae dataset 
 mentioned above, we have turned off this Neo4j instance.
  
+TODO: other scripts under `/opt/software`, eg, system backup.
+

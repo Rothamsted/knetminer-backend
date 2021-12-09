@@ -1,25 +1,17 @@
-**This is still a draft**
-
 # The Knetminer Raw Data Pipelines
 
 The script you find in the hereby folder and [/cyverse-endpoints](../cyverse-endpoints) are used to
 produce machine-readable data from the Knetminer datasets, when these are shipped in our custom
 OXL format.  
 
-Note that files in these directories are independent on the main POM project.
+Note that files in these directories are independent on the main POM project, they're included in the same
+git repository due to their conceptually-similar function.
 
 
 # RRes Endpoints 
 
-For the RRes pipeline, the data are built mostly via SnakeMake and running SnakeMake steps (rules)
-against our SLURM cluster.
-
-## Configuration and alike
-
-### Requirements
-
-* The pipeline uses [SnakeMake][10]. The RRes environment (see below), loads SnakeMake from the 
-  available SLURM modules.
+For the RRes pipeline, the data are built mostly via [SnakeMake][10] and running SnakeMake steps (rules)
+against our SLURM cluster. The RRes environment (see below), loads SnakeMake from the available SLURM modules.
 
 [10]: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html
 
@@ -27,16 +19,16 @@ against our SLURM cluster.
 
 All the endpoint scripts and pipelines require that you manually initialise an environment.
 Essentially, an environment is a set of operating system variables (and possibly, other settings), 
-which of values are specific to the particular host/infrastructure/etc. where you are operating.
+which of values are specific to the particular host/infrastructure/etc where you are operating.
 
-Typically, we have an [environment for the Rothmasted Research](config/environments/rres-env.sh) hosts 
-(including the SLURM cluster nodes), and then each KnetMiner developer has its own environment 
-([example](config/environments/brandizi-env.sh)), which refers to his/her personal PC.
+Typically, we have an [environment for the Rothmasted Research hosts](config/environments/rres-env.sh) 
+(including the SLURM cluster nodes), and then each KnetMiner developer has its own environment, which refers to 
+his/her personal PC ([example](config/environments/brandizi-env.sh)).
 
 As you can see, environments are initialised via [`config/environments/xxx-env.sh`](config/environments/) scripts.
-You should add further environments.
+You should add further environments there.
 
-**Common configuration and defaults overriding**  
+### Common configuration and defaults overriding  
 An environment script should always [bash-source](https://linuxize.com/post/bash-source-command/) the 
 file [`config/common-cfg.sh`](config/common-cfg.sh) as final step. This initialises default and common settings, 
 which usually apply to all enviroments.  
@@ -58,15 +50,15 @@ Most of the scripts described below get their configuration from the chain descr
   
 * As a fist step, the pipeline scripts usually bash-source [`config/init-dataset-cfg.sh`](config/init-dataset-cfg.sh).
   This checks that the parent script has been called with two parameters: a dataset-id and a dataset version. 
-  The two are used to set the variables `KNET_DATASET_ID` and `KNET_DATASET_VERSION`. These two are used to seek for 
-  and run the file `config/datasets/${KNET_DATASET_ID}-${KNET_DATASET_VERSION}-cfg.sh`, for instance, 
+  The two are used to set the variables `KNET_DATASET_ID` and `KNET_DATASET_VERSION`, then the two variables are used 
+  to seek for and run the file `config/datasets/${KNET_DATASET_ID}-${KNET_DATASET_VERSION}-cfg.sh`, for instance, 
   [`config/datasets/poaceae-51-cfg.sh`](config/datasets/poaceae-51-cfg.sh). 
-  Then, [`config/dataset-cfg.sh`](config/dataset-cfg.sh) is also invoked, for defining a couple of common, 
+  Then, [`config/dataset-cfg.sh`](config/dataset-cfg.sh) is also invoked, which defines a couple of common, 
   dataset-depending settings (which rely on the above variables). So, the idea is that part of the pipeline configuration
-  depend on a dataset ID and version, this parameter pair has always to be specified upon pipeline script invocations and
-  a corresponding dataset initialisation script has to be defined in `config/datasets-$id-$ver-cfg.sh`. The latter might
-  be empty, we enforce its presence in order to have at least a placeholder that marks that a given dataset exists
-  and is supported by our pipeline.
+  depend on a dataset ID and version, hence, this parameter pair has always to be specified upon pipeline script 
+  invocations and a corresponding dataset initialisation script has to be defined in `config/datasets-$id-$ver-cfg.sh`.
+  The latter might be empty, we enforce its presence in order to have at least a placeholder that marks that a given 
+  dataset exists and is supported by our pipeline.
   
   
 ## The RDF/Neo4j Building Pipeline 
@@ -76,7 +68,7 @@ this custom knowledge graph format into RDF, uses the RDF to populate a Neo4j da
 of dump files. These are used with other scripts and pipelines (see below) to do things like re-populating our
 data servers (Virtuoso for RDF, Neo4j) and similar tasks.
 
-The RDF/Neo4j pipeline is based on the [SnakeMake](TODO) workflow system. As you can see in the 
+As said above, the RDF/Neo4j pipeline is based on the SnakeMake workflow system. As you can see in the 
 [Snakemake file](build-endpoint.snakefile), the pipeline is a chain of steps. We recommend that you invoke Snakemake
 via the [build-endpoint.sh](build-endpoint.sh) wrapper. As explained above, this should be run after having initialised
 some environment and using dataset parameters.
@@ -84,8 +76,8 @@ some environment and using dataset parameters.
 The pipeline steps are as follow.
 
 1. [add-uris](endpoint-steps/add-uris.sh): this adds URIs to the nodes/edges of the initial OXL and outputs a new OXL
-   as result. This is based on the URI adding tool available from the [OXL/RDF exporter][10]. If you already have 
-   the URIs in the OXL (typically, because the URI adder is included in the Mini workflow that generated the pipeline), 
+   as result. This is based on the URI-adding tool available from the [OXL/RDF exporter][10]. If you already have 
+   the URIs in the OXL (typically, because the URI addition is included in the Mini workflow that generated the pipeline), 
    you can skip this step by placing the URI-equipped OXL onto the path that the next step expects as input 
    (`$KNET_DATASET_TARGET/knowledge-graph-uris.oxl`). 
 
@@ -93,15 +85,15 @@ The pipeline steps are as follow.
 
 1. [tdb-load](endpoint-steps/tdb-load.sh): this takes the Knetminer's RDF produced at the previous step and uses the 
    [Ondex Neo4j exporter][20] to load that RDF, plus a number of static files (mainly, relevant ontology definitions), 
-   into a new [Jena TDB triple store](https://jena.apache.org/documentation/tdb/). This is used by the downstream steps, 
-   as well as other Rothamsted tools, such as the [AgriSchema mappers](https://github.com/Rothamsted/agri-schemas). Due
-   to that, the TDB files produced by this step are made as part of the data downloads for the dataset (see below).
+   into a new [Jena TDB triple store][22]. This is used by the downstream steps, as well as other Rothamsted tools, 
+   such as the [AgriSchema mappers][24]. Due to that, the TDB files produced by this step are made as part of the 
+   data downloads for the dataset (see below).
 
 1. [neo-export](endpoint-steps/neo-export.sh): this uses the [Ondex/Neo4j Exporter][20] to convert the TDB generated at 
 	 the previous step into a Neo4j database. In order to do that, a Neo4j database server is emptied, started, used with 
 	 the exporter, then the database is stopped and finally the Neo4j's admin command is used to produce a database dump. 
-   The Neo4j database that is used for this step is configurable on a per-environment basis, 
-   via scripts in [config/neo4j](config/neo4j). In particular, the RRes has its own Neo4j location on the file system
+   The Neo4j database that is used for this step is configurable on a per-environment basis, via scripts in 
+   [config/neo4j](config/neo4j). In particular, the RRes has its own Neo4j location on the file system
    and has special scripts for [starting](config/neo4j/neo-start.sh)/[stopping](config/neo4j/neo-stop.sh) Neo4j on top 
    of our SLURM cluster (see also [utils/neo-slurm-start.sbatch](utils/neo-slurm-start.sbatch).  
 
@@ -111,7 +103,8 @@ The pipeline steps are as follow.
  
 [10]: https://github.com/Rothamsted/knetbuilder/blob/master/ondex-knet-builder/modules/rdf-export-2/README.md 
 [20]: https://github.com/Rothamsted/knetbuilder/tree/master/ondex-knet-builder/modules/neo4j-export
-
+[22]: https://jena.apache.org/documentation/tdb/
+[24]: https://github.com/Rothamsted/agri-schemas
 
 ## The Servers Updating Pipeline
 
@@ -142,7 +135,7 @@ export KNET_SECRETS_DIR=/home/data/knetminer/software/secrets
 export KNET_WEB_SECRETS_DIR="$KNET_SECRETS_DIR/web-data"
 ```
 
-In particular, KNET_WEB_SECRETS_DIR contains hash codes that are used in the data download locations to create obfuscated
+In particular, `KNET_WEB_SECRETS_DIR` contains hash codes that are used in the data download locations to create obfuscated
 directories (which are only accessible to users knowing the hash). These directories have to be created manually on the
 destination web server for knetminer.com.
 
@@ -155,4 +148,3 @@ to expose our data to the world, via our [SPARQL and Neo4j endpoints][10].
 [10]: https://knetminer.com/data
 
 See [here](../cyverse-endpoints) for details.
-
