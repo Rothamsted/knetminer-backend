@@ -84,10 +84,7 @@
 					
 					
 				  <!-- 
-						A small plug-in that starts Neo4j. 
-						
-						1.1 is the official version that integrated our improvements at
-						at https://github.com/Rothamsted/neo4j-server-maven-plugin 
+						A small plug-in that starts/stop Neo4j. 
 				  -->		  
 			    <plugin>
 				    <groupId>com.github.harti2006</groupId>
