@@ -6,7 +6,7 @@ species_dir="$1" # $1, the dir to process
 out_dir=${2:-$species_dir} # $2, where to save Cypher files, same as $1 if null
 
 # Just a reminder to myself
-#species_dir=/Users/brandizi/Documents/Work/RRes/ondex_git/knetminer/species
+#species_dir=/Users/brandizi/Documents/Work/RRes/ondex_git/knetminer/datasets
 
 for i in "$species_dir/"* "$species_dir/fungi/"*
 do
