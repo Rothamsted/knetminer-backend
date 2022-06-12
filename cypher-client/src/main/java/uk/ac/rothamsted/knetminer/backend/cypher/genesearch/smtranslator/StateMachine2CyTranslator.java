@@ -44,7 +44,7 @@ import net.sourceforge.ondex.parser.oxl.Parser;
 import uk.ac.ebi.utils.exceptions.ExceptionUtils;
 import uk.ac.ebi.utils.exceptions.UncheckedFileNotFoundException;
 import uk.ac.ebi.utils.exceptions.UnexpectedValueException;
-import uk.ac.ebi.utils.io.IOUtils;
+import uk.ac.ebi.utils.opt.io.IOUtils;
 
 /**
  * Converts a semantic motif file (parsed via {@link StateMachineFlatFileParser2}) to a set
