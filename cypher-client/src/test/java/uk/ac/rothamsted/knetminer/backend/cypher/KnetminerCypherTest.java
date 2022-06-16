@@ -70,7 +70,7 @@ public class KnetminerCypherTest
 		}
 	}
 
-	private List<String> getQueries () throws IOException
+	private List<String> getQueries ()
 	{
 		String qpath = 
 			"/Users/brandizi/Documents/Work/RRes/ondex_git/knetminer/species/wheat-directed/ws/neo4j/state-machine-queries"; 
