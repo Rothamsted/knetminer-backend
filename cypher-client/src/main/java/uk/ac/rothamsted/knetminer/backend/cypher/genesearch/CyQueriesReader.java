@@ -46,10 +46,19 @@ public class CyQueriesReader
 			.collect ( Collectors.toList () );
 	}
 
+	/**
+	 * Defaults to false.
+	 */
 	public static List<String> readQueries ( File qfile )
 	{
+		return readQueries ( qfile, false );
+	}
+
+	public static List<String> readQueries ( File qfile, boolean ignoreMissingDir )
+	{
 		try {
-			if ( !qfile.exists () ) {
+			if ( ignoreMissingDir && !qfile.exists () )
+			{
 				log.warn ( "Ignoring non-existing Cypher query file: \"{}\"", qfile.getAbsolutePath () );
 				return new ArrayList<> ();
 			}
@@ -68,10 +77,18 @@ public class CyQueriesReader
 		}
 	}
 	
+	/**
+	 * Defaults to false.
+	 */
 	public static List<String> readQueries ( String qfileName ) {
-		return readQueries ( new File ( qfileName ) );
+		return readQueries ( qfileName, false );
 	}
 
+	public static List<String> readQueries ( String qfileName, boolean ignoreMissingDir ) {
+		return readQueries ( new File ( qfileName ), ignoreMissingDir );
+	}
+
+	
 	public static List<String> readQueriesFromString ( String queriesString ) {
 		return readQueries ( new StringReader ( queriesString ) );
 	}
