@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,10 @@ public class CyQueriesReader
 	public static List<String> readQueries ( File qfile )
 	{
 		try {
+			if ( !qfile.exists () ) {
+				log.warn ( "Ignoring non-existing Cypher query file: \"{}\"", qfile.getAbsolutePath () );
+				return new ArrayList<> ();
+			}
 			log.info ( "Loading queries from '{}'", qfile.getAbsolutePath () );
 			return readQueries ( new FileReader ( qfile ) );
 		}
