@@ -41,6 +41,17 @@ rule add_uris:
 	shell:
 		f"./endpoint-steps/add-uris.sh '{dataset_id}' '{dataset_version}'"
 
+
+# This should happen in parallel with rdf_export
+rule dataset_metadata:
+	input:
+		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl"
+	output:
+		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph-metadata.ttl"
+	shell:
+		f"./endpoint-steps/create-dataset-metadata.sh '{dataset_id}' '{dataset_version}'"
+
+
 rule rdf_export:
 	input:
 		f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl"
@@ -48,6 +59,7 @@ rule rdf_export:
 		f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2"
 	shell:
 		f"./endpoint-steps/rdf-export.sh '{dataset_id}' '{dataset_version}'"
+
 
 rule tdb_load:
 	input:
@@ -58,6 +70,7 @@ rule tdb_load:
 	shell:
 		f"./endpoint-steps/tdb-load.sh '{dataset_id}' '{dataset_version}'"	
 
+
 rule neo_export:
 	input:
 		f"{KNET_DATASET_TARGET}/tmp/tdb"
@@ -66,7 +79,8 @@ rule neo_export:
 	shell:
 		f"./endpoint-steps/neo-export.sh '{dataset_id}' '{dataset_version}'"
 
-# We deliver a zipped TDB, ready for download.This is done after we are sure it was good for Neo4j.
+
+# We deliver a zipped TDB, ready for download. This is done after we are sure it was good for Neo4j.
 # The TDB is re-used by AgriSchemas, to build the Knetminer mapping.
 #
 rule tdb_zip:

@@ -35,6 +35,7 @@ if [[ -z "$CY_DATASET_AGSCHEMA_ONLY" ]]; then
 	mkdir -p "$data_dir"
 
 	"$CY_SCRIPTS_HOME/utils/knet-download.sh" "rdf/knowledge-graph.ttl.bz2" "$data_dir/${CY_DATASET_ID}.ttl.bz2"
+	"$CY_SCRIPTS_HOME/utils/knet-download.sh" "rdf/knowledge-graph-metadata.ttl" "$data_dir/${CY_DATASET_ID}-metadata.ttl.bz2"
 
 	echo -e "\n\n\tReloading the Dataset into Virtuoso\n"
 	"$VIRTUOSO_UTILS_HOME/virt_load.sh" "$data_dir" "${CY_DATASET_GRAPH_PREFIX}${CY_DATASET_ID}"
