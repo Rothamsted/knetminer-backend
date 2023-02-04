@@ -1,8 +1,11 @@
 # Revision History
 
-*This file was last reviewed on 2023-02-03*. **Please, keep this note updated**.
+*This file was last reviewed on 2023-02-04*. **Please, keep this note updated**.
 
-## 2.0.1-SNAPSHOT
+## 2.1.1-SNAPSHOT
+* Current snapshot.
+
+## 2.1
 * Documentation for raw data pipelines added.
 * Minor options added to `CyQueriesReader`.
 
