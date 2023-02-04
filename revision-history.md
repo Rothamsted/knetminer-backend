@@ -1,10 +1,10 @@
 # Revision History
 
-*This file was latest reviewed on 2021-11-30.*
+*This file was last reviewed on 2023-02-03*. **Please, keep this note updated**.
 
 ## 2.0.1-SNAPSHOT
-* Documentation for raw data pipelines added
-
+* Documentation for raw data pipelines added.
+* Minor options added to `CyQueriesReader`.
 
 ## 2.0
 * First Java 11 version. **No former JDK versions supported since this**.

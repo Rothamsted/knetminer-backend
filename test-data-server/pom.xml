@@ -61,8 +61,10 @@
 						server distribution, see below. 
 					-->
 					<plugin>
-					  <artifactId>exec-maven-plugin</artifactId>
 					  <groupId>org.codehaus.mojo</groupId>
+					  <artifactId>exec-maven-plugin</artifactId>
+					  <!-- TODO: moved to the last snapshot of rdf-common -->
+					  <version>3.1.0</version>
 					  <executions>
 					    <execution>
 					    	<id>Setup Neo4j test DB</id>
