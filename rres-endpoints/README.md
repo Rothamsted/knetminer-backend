@@ -81,7 +81,7 @@ The pipeline steps are as follow.
    you can skip this step by placing the URI-equipped OXL onto the path that the next step expects as input 
    (`$KNET_DATASET_TARGET/knowledge-graph-uris.oxl`). 
 1. [dataset-metadata](endpoint-steps/create-dataset-metadata.sh): this invokes the [OXL metadata descriptor tool][10] to produce a schema.org-compatible RDF file, which describes the OXL as a whole.
-1. [rdf-export](endpoint-steps/rdf-export.sh): this exports the OXL to RDF, using the [OXL/RDF exporter][10].
+1. [rdf-export](endpoint-steps/rdf-export.sh): this exports the OXL to RDF, using the [OXL/RDF exporter][15].
 
 1. [tdb-load](endpoint-steps/tdb-load.sh): this takes the Knetminer's RDF produced at the previous step and uses the 
    [Ondex Neo4j exporter][20] to load that RDF, plus a number of static files (mainly, relevant ontology definitions), 
@@ -100,7 +100,7 @@ The pipeline steps are as follow.
 1. [tdb-zip](endpoint-steps/tdb-zip.sh): after a successful RDF export and Neo4j population, this step simply zips 
    the TDB files, preparing a tarball to be used as part of data downloads (see below).
  
-[10]: https://github.com/Rothamsted/knetbuilder/blob/master/ondex-knet-builder/modules/rdf-export-2/README.md 
+[15]: https://github.com/Rothamsted/knetbuilder/blob/master/ondex-knet-builder/modules/rdf-export-2/README.md 
 [20]: https://github.com/Rothamsted/knetbuilder/tree/master/ondex-knet-builder/modules/neo4j-export
 [22]: https://jena.apache.org/documentation/tdb/
 [24]: https://github.com/Rothamsted/agri-schemas
@@ -152,8 +152,8 @@ destination web server for knetminer.com.
 # CyVerse Endpoints
 
 Part of the RDF and Neo4j dumps produced at Rothamsed are used on our CyVerse servers, in order 
-to expose our data to the world, via our [SPARQL and Neo4j endpoints][10].
+to expose our data to the world, via our [SPARQL and Neo4j endpoints][100].
 
-[10]: https://knetminer.com/data
+[100]: https://knetminer.com/data
 
 See [here](../cyverse-endpoints) for details.
