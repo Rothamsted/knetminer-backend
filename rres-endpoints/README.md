@@ -105,6 +105,10 @@ The pipeline steps are as follow.
 [22]: https://jena.apache.org/documentation/tdb/
 [24]: https://github.com/Rothamsted/agri-schemas
 
+### Diagram
+
+<img src = "doc/rres-snake-pipe.png" />
+
 ## The Servers Updating Pipeline
 
 After the data are created by the RDF/Neo4j pipeline above, these are used to update a number of test servers in the
@@ -124,6 +128,12 @@ Snakemake). It contains the steps:
 
 Any above steps can be omitted, if a dataset doesn't need them. This is controlled by variables that can be unset
 by the dataset-specific configuration (see above). See the `servers-sync.sh` file for details. 
+
+### Diagram
+
+<img src = "doc/server-sync.png" />
+
+
 
 ### Secrets management
 

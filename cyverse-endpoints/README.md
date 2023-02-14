@@ -75,6 +75,11 @@ This also uses a [generic Neo4j uploading script](load/neo-load.sh).
 
 **Note that we don't have (as yet) any Neo4j-dedicated script to update the COVID-19 dataset.**   
 
+## Diagram
+
+<img src = "doc/cyverse-data-update-pipeline.png" />
+
+
 ## Other scripts
 Other scripts are in [utils](utils), including a [configuration backup script](utils/sys-bkp.sh) (at the moment it's 
 manually run as necessary), the mentioned [data downloader](utils/knet-download.sh) and 
