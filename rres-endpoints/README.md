@@ -76,11 +76,11 @@ some environment and using dataset parameters.
 The pipeline steps are as follow.
 
 1. [add-uris](endpoint-steps/add-uris.sh): this adds URIs to the nodes/edges of the initial OXL and outputs a new OXL
-   as result. This is based on the URI-adding tool available from the [OXL/RDF exporter][10]. If you already have 
+   as result. This is based on the URI-adding tool available from the [OXL/RDF exporter][15]. If you already have 
    the URIs in the OXL (typically, because the URI addition is included in the Mini workflow that generated the pipeline), 
    you can skip this step by placing the URI-equipped OXL onto the path that the next step expects as input 
    (`$KNET_DATASET_TARGET/knowledge-graph-uris.oxl`). 
-1. [dataset-metadata](endpoint-steps/create-dataset-metadata.sh): this invokes the [OXL metadata descriptor tool][10] to produce a schema.org-compatible RDF file, which describes the OXL as a whole.
+1. [dataset-metadata](endpoint-steps/create-dataset-metadata.sh): this invokes the [OXL metadata descriptor tool][15] to produce a schema.org-compatible RDF file, which describes the OXL as a whole.
 1. [rdf-export](endpoint-steps/rdf-export.sh): this exports the OXL to RDF, using the [OXL/RDF exporter][15].
 
 1. [tdb-load](endpoint-steps/tdb-load.sh): this takes the Knetminer's RDF produced at the previous step and uses the 
