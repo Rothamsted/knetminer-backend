@@ -25,12 +25,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
 		<ondex.version>5.1</ondex.version>
+
+		<slf4j.version>1.7.36</slf4j.version>
 		
 		<!-- update-sources.sh needs to override this -->
 		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
 		<neo4j.server.serverReadyAttempts>120</neo4j.server.serverReadyAttempts>
-		
-		<slf4j.version>1.7.36</slf4j.version>
 					
   </properties>
 
@@ -122,11 +122,6 @@
 				<groupId>net.sourceforge.ondex.modules</groupId>
 				<artifactId>rdf-export-2</artifactId>
 				<version>${ondex.version}</version>			
-			</dependency>
-			<dependency>
-				<groupId>info.marcobrandizi</groupId>
-				<artifactId>rdfutils-core</artifactId>
-			  <version>4.0.3</version>
 			</dependency>
 			<dependency>
 			  <groupId>net.sourceforge.ondex.modules</groupId>
