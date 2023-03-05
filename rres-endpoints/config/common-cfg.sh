@@ -11,9 +11,6 @@ export KNET_NEO_URL="${KNET_NEO_URL-bolt://localhost:7687}"
 export KNET_NEO_USR="${KNET_NEO_USR-neo4j}"
 export KNET_NEO_PWD="${KNET_NEO_PWD-test}"
 
-# TODO: remove, we use SLURM for Snakemake
-#export KNET_CONDA_ENV="${KNET_CONDA_ENV-snakemake}"
-
 # To synch resources after the Snakemake file generation
 # 
 export KNET_SECRETS_DIR=/home/data/knetminer/software/secrets
