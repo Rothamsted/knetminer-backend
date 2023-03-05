@@ -30,7 +30,7 @@ export KNET_NEO_SERVER_SSH=neo4j@$KNET_NEO_SERVER
 export KNET_NEO_SERVER_DATA_DIR=/opt/data
 
 # Test servers like babvs73
-export KNET_TEST_DATA_DIR=/opt/data/knetminer-datasets/wheat-ci/data
+export KNET_TEST_DATA_DIR=/opt/data/knetminer-datasets/poaceae-ci/data
 export KNET_TEST_SERVERS="${KNET_TEST_SERVERS-babvs73 babvs72}"
 
 
