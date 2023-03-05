@@ -69,6 +69,7 @@ if [[ ! -z "$KNET_TEST_SERVERS" ]]; then
 	        "$KNET_SSH_USER@$host:$KNET_TEST_DATA_DIR/knowledge-network.oxl" | tee /dev/tty`
 	
 	  [[ "$rsout" =~ 'Number of regular files transferred: 0' ]] && continue
+	  [[ "$rsout" =~ 'rsync error:' ]] && exit 1
 	
 	  ./utils/knet-server-restart.sh $host
 	

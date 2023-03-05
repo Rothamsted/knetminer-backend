@@ -12,5 +12,6 @@ echo -e "\nRestarting $host\n"
 ssh "$KNET_SSH_USER@$host" 'bash -il' << EOT
 
 set -e
+sudo --non-interactive /opt/software/knetminer-ci/docker/dataset-cleanup.sh '$KNET_TEST_DATASET_DIR'
 sudo --non-interactive /opt/software/knetminer-ci/rres/dockerhub-deploy.sh
 EOT
