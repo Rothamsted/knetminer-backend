@@ -41,13 +41,9 @@ export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial 
 # Backup options, the only things not preserved are devices and owner. This is
 # because we have a regular user doing this, not necessarily the root.
 #
-export RSYNC_BKP_OPTS="--recursive --links --times --specials"
+export RSYNC_BKP_OPTS="--recursive --links --times --specials --perms"
 
 # Mirror options, as usually, the destination is synched with the source, but not vice-versa
 # (you need to run a dest->source synch too in this case)
 #
 export RSYNC_MIRROR_OPTS="$RSYNC_BKP_OPTS --delete --delete-during"
-
-# Additional options to be added when you have root perms
-export RSYNC_BKP_OPTS_ROOT="--perms"
-
