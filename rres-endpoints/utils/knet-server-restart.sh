@@ -15,7 +15,7 @@ echo -e "\nRestarting $host\n"
 # If you try 'ssh docker' only, you'll get a 'password expired' message. We might have IT people 
 # fixing it, but this is quicker and less dependant on them.
 #
-sudo_cmd="docker -u docker --set-home --login --non-interactive"
+sudo_cmd="sudo -u docker --set-home --login --non-interactive"
 ssh "$KNET_SSH_USER@$host" 'bash -il' << EOT
 
 set -e
