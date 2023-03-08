@@ -5,7 +5,7 @@
 	<parent>
 	  <groupId>uk.ac.rothamsted.knetminer</groupId>
 	  <artifactId>knetminer-common</artifactId>
- 		<version>3.0.1</version>
+ 		<version>3.1</version>
 	</parent>  
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
@@ -24,7 +24,7 @@
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-		<ondex.version>5.1</ondex.version>
+		<ondex.version>5.2</ondex.version>
 
 		<slf4j.version>1.7.36</slf4j.version>
 		
