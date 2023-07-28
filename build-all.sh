@@ -1,7 +1,11 @@
 set -e
 cd "`dirname $0`"
-goal="${1-verify}"
-shift 
+
+goal=verify
+if [[ ! -z "$1" ]]; then
+  goal="$1"
+  shift 
+fi
 
 echo -e "\n\n\tInitialising resources (data server etc)\n"
 ./resources-init.sh

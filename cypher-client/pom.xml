@@ -5,7 +5,7 @@
   <parent>
     <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
     <artifactId>backend-pom</artifactId>
-    <version>2.2.1-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>cypher-client</artifactId>

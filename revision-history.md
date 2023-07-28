@@ -1,9 +1,11 @@
 # Revision History
 
-*This file was last reviewed on 2023-03-08*. **Please, keep this note updated**.
+*This file was last reviewed on 2023-07-28*. **Please, keep this note updated**.
 
-## 2.2.1-SNAPSHOT
-* Current snapshot
+## 3.0.1-SNAPSHOT
+
+## 3.0
+* Migrated to Java 17. **WARNING: no backward compatibility guaranteed**.
 
 ## 2.2
 * Documentation added (ETL diagrams).

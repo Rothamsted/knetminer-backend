@@ -3,8 +3,9 @@
 set -e
 
 odxmods=/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-knet-builder/ondex-knet-builder/modules/
-export ODX2RDF_HOME="$odxmods/rdf-export-2-cli/target/rdf-export-2-cli_4.0-SNAPSHOT"
-export RDF2NEO_HOME="$odxmods/neo4j-export/target/neo4j-exporter"
+
+[[ ! -z "$ODX2RDF_HOME" ]] || export ODX2RDF_HOME="$odxmods/rdf-export-2-cli/target/rdf-export-2-cli_4.0-SNAPSHOT"
+[[ ! -z "$RDF2NEO_HOME" ]] || export RDF2NEO_HOME="$odxmods/neo4j-export/target/neo4j-exporter"
 
 cd `dirname "$0"`
 wdir=`pwd`
@@ -34,13 +35,9 @@ echo -e "\n\n\tGenerating Test Neo4j Database\n"
 # but this script is supposed to be run by the developer on its own computer, so, this should be fine. 
 mvn neo4j-server:start -Dneo4j.server.boltPort=7687 -Dneo4j.server.deleteDb=true
 
-
   rdf2pg_path=`pwd`/target/rdf2neo-tdb
   rm -Rf "${rdf2pg_path}"
   "$RDF2NEO_HOME/ondex2neo.sh" --tdb "${rdf2pg_path}" "$data_target_dir/${sample_base}.ttl.bz2"
-	
-	#TODO: Remove echo "Pausing, as required by Neo4j"
-	#sleep 3m
 	
 echo "Shutting down Neo4j, might take a while"
 # Apparently we need this to give it time to close the indexes
@@ -50,8 +47,7 @@ mvn neo4j-server:stop
 
 rm -f "$data_target_dir/poaceae-sample-neo4j.dump"
 cd target/neo4j.server/neo4j-community-*
-bin/neo4j-admin dump --to="$data_target_dir/poaceae-sample-neo4j.dump"
-
+bin/neo4j-admin database dump --to-stdout neo4j >"$data_target_dir/poaceae-sample-neo4j.dump"
 
 echo -e "\n\n\tMoving logs to target/rdf2neo-logs\n"
 cd "$wdir"

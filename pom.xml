@@ -5,12 +5,12 @@
 	<parent>
 	  <groupId>uk.ac.rothamsted.knetminer</groupId>
 	  <artifactId>knetminer-common</artifactId>
- 		<version>3.1</version>
+ 		<version>4.0</version>
 	</parent>  
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
   <artifactId>backend-pom</artifactId>
-  <version>2.2.1-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>backend-pom -- Knetminer Backend, Top POM</name>
@@ -24,7 +24,7 @@
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-		<ondex.version>5.2</ondex.version>
+		<ondex.version>6.0</ondex.version>
 
 		<slf4j.version>1.7.36</slf4j.version>
 		
@@ -45,7 +45,7 @@
 			<dependency>
 				<groupId>uk.ac.rothamsted.kg.neo4j</groupId>
 				<artifactId>neo4j-utils</artifactId>
-    		<version>4.0</version>
+    		<version>5.0</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.ondex.core</groupId>
