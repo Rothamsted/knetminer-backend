@@ -45,7 +45,7 @@ public class CypherClientIT
 	{
 		neoDriver = GraphDatabase.driver (
 			"bolt://127.0.0.1:" + System.getProperty ( "neo4j.server.boltPort" ),
-			AuthTokens.basic ( "neo4j", "test" )
+			AuthTokens.basic ( "neo4j", "testTest" )
 		);		
 	}
 

@@ -25,7 +25,7 @@ import uk.ac.ebi.utils.opt.io.IOUtils;
 import uk.ac.ebi.utils.runcontrol.ProgressLogger;
 
 /**
- * TODO: comment me!
+ * Hacky code to be run manually, used for testing Knetminer instances.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>5 Jul 2019</dd></dl>
