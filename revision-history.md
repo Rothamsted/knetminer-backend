@@ -3,6 +3,7 @@
 *This file was last reviewed on 2023-07-28*. **Please, keep this note updated**.
 
 ## 3.0.1-SNAPSHOT
+* Current snapshot
 
 ## 3.0
 * Migrated to Java 17. **WARNING: no backward compatibility guaranteed**.
