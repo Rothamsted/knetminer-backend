@@ -238,7 +238,7 @@ public class StateMachine2CyTranslator
 
 			
 			// We need to create different departures for different states and/or different constraint lengths
-			// So, this will contain: (destination state d, maxRepeats) -> [state->d transitions]
+			// So, this will contain: (destination state, d, maxRepeats) -> [transitions]
 			Map<Tuple3<State, Boolean, Integer>, List<Transition>> byLenTrns = 
 				transitions.stream ().collect ( 
 					Collectors.groupingBy ( t ->
@@ -249,14 +249,14 @@ public class StateMachine2CyTranslator
 			)));
 				
 			
-			// See if the node has any looping edges.
+			// See if the node has any looping edge.
 			Map<Tuple3<State, Boolean, Integer>, List<Transition>> loops = byLenTrns
 				.entrySet ()
 				.stream ()
 				.filter ( e -> state.equals ( e.getKey ()._1 () ) )
 				.collect ( Collectors.toMap ( Map.Entry::getKey, Map.Entry::getValue ) );
 			
-			final boolean nextLoopMode;
+			final boolean isNextHopLoopMode;
 			
 			// If we have node loops, we need to make a recursion step that creates a hop with the loops only, and then
 			// let the recursion to continue from the loop node, as if it were another node at the loop's end.
@@ -265,16 +265,16 @@ public class StateMachine2CyTranslator
 			{
 				if ( !isLoopMode ) {
 					// First time we meet a loop on this node, we make a step with the looping transitions only 
-					// (as if the single involving  node were two different ones) and loop mode on
+					// (as if the single node at the loop ends were two different ones) and loop mode on
 					byLenTrns = loops;
-					nextLoopMode = true;
+					isNextHopLoopMode = true;
 				}
 				else {
 					// Or, if we come up to this same situation a second time, we continue with the regular
 					// transitions only (ie, from the "second node" of the loop)
 					//
 					byLenTrns.entrySet ().removeAll ( loops.entrySet () );
-					nextLoopMode = false;
+					isNextHopLoopMode = false;
 				}
 			}
 			else 
@@ -288,14 +288,14 @@ public class StateMachine2CyTranslator
 					state.getValidConceptClass ().getId (),
 					this.stateIndex.inverse ().get ( state )
 				); 
-				nextLoopMode = false;
+				isNextHopLoopMode = false;
 			}
 			
 			final String partialQueryFinal = partialQuery; // Just because lambdas want final vars
 			
 			// Loops don't contribute to the computation of the max path length, since their transition might
 			// be skipped. Else, we must include the transition and the target in the new distance.
-			final int nextDistance = nextLoopMode ? distance : distance + 2;
+			final int nextHopDistance = isNextHopLoopMode ? distance : distance + 2;
 
 			// We want them in a given order, it helps with generating multiple versions, which need to be committed
 			// into git.
@@ -328,7 +328,7 @@ public class StateMachine2CyTranslator
 				String nextPartialQuery = partialQueryFinal + "\n  " + relMatch;
 						
 				// Yeah! Let's recurse!
-				traverseStateMachine ( target, nextPartialQuery, result, resultsCount, nextDistance, nextLoopMode );
+				traverseStateMachine ( target, nextPartialQuery, result, resultsCount, nextHopDistance, isNextHopLoopMode );
 			});
 		}
 		catch ( StateMachineInvalidException ex )
@@ -386,7 +386,7 @@ public class StateMachine2CyTranslator
 		// Now let's consider a possible path length constraint.
 		// 
 		
-		// min len isn't suppoted by the SM syntax, but 0 is needed for loop transitions
+		// min len isn't supported by the SM syntax, but 0 is needed for loop transitions
 		int minLenConstraint = 1;
 		
 		Transition anyTrans = transitions.iterator ().next ();
@@ -404,7 +404,7 @@ public class StateMachine2CyTranslator
 		if ( minLenConstraint == 0 || maxRelRepeats != Integer.MAX_VALUE )
 			lenConstrStr += "*" + minLenConstraint + "..";
 		if ( maxRelRepeats != Integer.MAX_VALUE ) lenConstrStr += maxRelRepeats;
-		if ( lenConstrStr.length () == 0 || "*1..1".equals ( lenConstrStr ) )
+		if ( "*1..1".equals ( lenConstrStr ) )
 			lenConstrStr = "";
 		
 		if ( maxRelRepeats != Integer.MAX_VALUE && maxRelRepeats > 1 )
