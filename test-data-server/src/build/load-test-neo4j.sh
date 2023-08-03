@@ -10,7 +10,7 @@ mydir=`pwd`
 cd ../..
 data_target_dir="`pwd`/src/main/resources"
 
-printf "\n\n  Loading test database into test Neo4j\n\n"
+printf "\n\n  Loading the test database into the test Neo4j server\n\n"
 
 cd target/neo4j.server/neo4j-community-*
 bin/neo4j-admin database load --from-stdin --overwrite-destination=true neo4j <"$data_target_dir/poaceae-sample-neo4j.dump"
