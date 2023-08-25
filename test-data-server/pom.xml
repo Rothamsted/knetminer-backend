@@ -87,7 +87,7 @@
 				    <groupId>com.github.harti2006</groupId>
 					  <artifactId>neo4j-server-maven-plugin</artifactId>
 						<executions>
-							<!-- This is just to download it before the ant/untar task above -->
+							<!-- This is just to download it before the .sh script above -->
 							<execution>
 								<id>neo4j-server-download</id>
 								<phase>generate-test-resources</phase>
