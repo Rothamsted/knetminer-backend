@@ -72,9 +72,12 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 		// Sometimes this is set via options for debugging purposes 
 		Integer reportFrequency = this.getOption ( "performanceReportFrequency" );
 		if ( reportFrequency != null )
+		{
+			log.debug ( "Overriding performanceReportFrequency with the value {}", reportFrequency );
 			springContext
 				.getBean ( CyTraverserPerformanceTracker.class )
 				.setReportFrequency ( reportFrequency );
+		}
 	}
 	
 	private void initSpring ()
@@ -100,13 +103,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 			log.info ( "Configuring {} from <{}>", this.getClass ().getCanonicalName (), furl );
 			springContext = new FileSystemXmlApplicationContext ( furl );
 			springContext.registerShutdownHook ();
-			
-			// Sometimes this is set via options for debugging purposes 
-			Integer reportFrequency = this.getOption ( "performanceReportFrequency" );
-			if ( reportFrequency != null )
-				springContext.getBean ( CyTraverserPerformanceTracker.class )
-					.setReportFrequency ( reportFrequency );
-			
+						
 			log.info ( "{} configured", this.getClass ().getCanonicalName () );
 		}		
 	}
@@ -189,7 +186,7 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	 * this here. This is just a wrapper for {@link PathQueryProcessor#setSemanticMotifsQueries(List)}.
 	 * 
 	 * <b>WARNING</b>: duplicated queries are removed by the call to {@link #traverseGraph(ONDEXGraph, Set, FilterPaths)},
-	 * @see removeDuplicatedQueries.
+	 * @see #removeDuplicatedQueries()
 	 */
 	public List<String> getSemanticMotifsQueries ()
 	{
