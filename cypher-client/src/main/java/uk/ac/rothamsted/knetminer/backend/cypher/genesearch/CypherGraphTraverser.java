@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.neo4j.driver.Driver;
 import org.neo4j.driver.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -272,5 +273,17 @@ public class CypherGraphTraverser extends AbstractGraphTraverser
 	{
 		PathQueryProcessor qp = springContext.getBean ( PathQueryProcessor.class );
 		qp.interrupt ();
-	}	
+	}
+	
+	/**
+	 * The Neo4j driver that comes from the traverser configuration. This is useful for 
+	 * certain command line tools, such as the KnetMiner initialiser.
+	 */
+	public Driver getNeo4jDriver ()
+	{
+		init ();
+		
+		var driver = springContext.getBean ( "neoDriver", Driver.class );
+		return driver;
+	}
 }
