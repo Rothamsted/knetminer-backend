@@ -3,7 +3,7 @@
   <parent>
     <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
     <artifactId>backend-pom</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>test-data-server</artifactId>
   <name>test-data-server -- Knetminer Data Test Server</name>
