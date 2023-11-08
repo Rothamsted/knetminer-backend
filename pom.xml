@@ -10,7 +10,7 @@
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
   <artifactId>backend-pom</artifactId>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>4.0.1</version>
   <packaging>pom</packaging>
 
   <name>backend-pom -- Knetminer Backend, Top POM</name>
