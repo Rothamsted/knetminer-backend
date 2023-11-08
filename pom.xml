@@ -20,6 +20,8 @@
   	See https://doi.org/10.1515/jib-2018-0023 for details.
   </description>
 
+	<url>https://github.com/Rothamsted/knetminer-backend</url>
+
   <properties>
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
