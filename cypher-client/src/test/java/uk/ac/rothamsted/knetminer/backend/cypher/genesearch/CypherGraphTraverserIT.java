@@ -22,13 +22,13 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.vavr.Function3;
 import net.sourceforge.ondex.algorithm.graphquery.AbstractGraphTraverser;
 import net.sourceforge.ondex.algorithm.graphquery.State;
 import net.sourceforge.ondex.algorithm.graphquery.StateMachineComponent;
@@ -119,9 +119,9 @@ public class CypherGraphTraverserIT
 		assertTrue ( 
 			"Expected results not found (Evidences in Evidence Path)!",
 			checkPathEvidences ( paths,
-				Transition.class, "h_s_s", 3, 
-				State.class, "Protein", 4,
-				State.class, "Publication", 6 
+				Triple.of ( Transition.class, "h_s_s", 3 ), 
+				Triple.of ( State.class, "Protein", 4 ),
+				Triple.of ( State.class, "Publication", 6 ) 
 		));
 	}
 	
@@ -173,13 +173,13 @@ public class CypherGraphTraverserIT
 		assertTrue ( 
 			"Test path for " + probeConcept.getPID () + " not found!", 
 			checkPathEvidences ( probePaths, 
-				State.class, "Gene", 0,
-				Transition.class, "cooc_wi", 1,
-				State.class, "Trait", 2,
-				Transition.class, "cooc_wi", 3,
-				State.class, "Gene", 4,
-				Transition.class, "participates_in", 5,
-				State.class, "BioProc", 6
+				Triple.of ( State.class, "Gene", 0 ),
+				Triple.of ( Transition.class, "cooc_wi", 1 ),
+				Triple.of ( State.class, "Trait", 2 ),
+				Triple.of ( Transition.class, "cooc_wi", 3 ),
+				Triple.of ( State.class, "Gene", 4 ),
+				Triple.of ( Transition.class, "participates_in", 5 ),
+				Triple.of ( State.class, "BioProc", 6 )
 			)
 		);
 		
@@ -192,9 +192,9 @@ public class CypherGraphTraverserIT
 		assertTrue ( 
 			"Test path for " + probeConcept.getPID () + " not found!", 
 			checkPathEvidences ( probePaths, 
-				Transition.class, "h_s_s", 3, 
-				State.class, "Protein", 4,
-				State.class, "Publication", 6 
+				Triple.of ( Transition.class, "h_s_s", 3 ), 
+				Triple.of ( State.class, "Protein", 4 ),
+				Triple.of ( State.class, "Publication", 6 ) 
 			)
 		);		
 	}
@@ -317,40 +317,47 @@ public class CypherGraphTraverserIT
 	 *  we have a given {@link StateMachineComponent} (1st element), a concept or relation of a given type (2nd element).
 	 *  
 	 */
+	@SafeVarargs
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	private boolean checkPathEvidences ( List<EvidencePathNode> paths, Object... testedParams )
+	private boolean checkPathEvidences ( 
+		List<EvidencePathNode> paths, Triple<Class<? extends StateMachineComponent>, String, Integer>... testedParams )
 	{
 		return paths.stream ()
 		.map ( EvidencePathNode::getEvidencesInPositionOrder )
 		.anyMatch ( evidences -> 
 		{ 
-			// Little helper to check if evidence testedIdx is instance of exptEvidence and has concept/relation type named
-			// exptEvType
-			//
-			Function3<Class<? extends StateMachineComponent>, String, Integer, Boolean> evidenceChecker =
-			( exptEvidence, exptEvType, testedIdx ) -> 
-			{
-				StateMachineComponent ev = (StateMachineComponent) evidences.get ( testedIdx );
-				
-				if ( !exptEvidence.isInstance ( ev ) ) return false;
-				
-				MetaData evType = ev instanceof State 
-					? ((State) ev).getValidConceptClass ()
-					: ((Transition) ev).getValidRelationType ();
-				
-				return exptEvType.equals ( evType.getId () );
-			};
-			
 			// A path is valid if all the probed positions are as expected.
-			for ( int i = 0; i < testedParams.length; )
-				if ( !evidenceChecker.apply (
-				  (Class<Transition>) testedParams [ i++ ],
-				  (String) testedParams [ i++ ],
-				  (int) testedParams [ i++ ]				  
+			for ( int i = 0; i < testedParams.length; i++ )
+				if ( !checkPathEvidence (
+					evidences, testedParams [ i ].getRight (),
+				  (Class<Transition>) testedParams [ i ].getLeft (),
+				  (String) testedParams [ i ].getMiddle ()				  
 				)) return false;
 			
 			return true;
 		});		
+	}
+
+	/**
+	 * Little helper used by {@link #checkPathEvidences(List, Triple...)} to check if evidence 
+	 * evidences[ testedIdx ] is instance of expectedEvidence and has concept/relation type named 
+	 * expectedEvType.
+	 */
+	
+	private boolean checkPathEvidence ( 
+		List<StateMachineComponent> evidences, int testedIdx,
+		Class<? extends StateMachineComponent> expectedEvidence, String expectedEvType
+	)
+	{
+		StateMachineComponent ev = evidences.get ( testedIdx );
+		
+		if ( !expectedEvidence.isInstance ( ev ) ) return false;
+		
+		MetaData evType = ev instanceof State 
+			? ((State) ev).getValidConceptClass ()
+			: ((Transition) ev).getValidRelationType ();
+		
+		return expectedEvType.equals ( evType.getId () );		
 	}
 	
 	/**

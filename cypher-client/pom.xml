@@ -71,8 +71,8 @@
 			<artifactId>jutils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.vavr</groupId>
-			<artifactId>vavr</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
   </dependencies>
   

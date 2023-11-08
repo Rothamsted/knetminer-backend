@@ -1,9 +1,10 @@
 # Revision History
 
-*This file was last reviewed on 2023-07-31*. **Please, keep this note updated**.
+*This file was last reviewed on 2023-11-07*. **Please, keep this note updated**.
 
 ## 4.0.1-SNAPSHOT
-* Current snapshot 
+* Old/outdated vavr library removed.
+* Various dependencies upgraded. 
 
 ## 4.0
 * Migration to Spring 6, directly and from other dependencies (Ondex, jutils). **WARNING: no backward compatibility guaranteed**.

@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.BiMap;
 
-import io.vavr.Tuple;
-import io.vavr.Tuple3;
+import org.apache.commons.lang3.tuple.Triple;
 import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition;
 import net.sourceforge.ondex.algorithm.graphquery.DirectedEdgeTransition.EdgeTreatment;
 import net.sourceforge.ondex.algorithm.graphquery.State;
@@ -239,10 +238,10 @@ public class StateMachine2CyTranslator
 			
 			// We need to create different departures for different states and/or different constraint lengths
 			// So, this will contain: (destination state, d, maxRepeats) -> [transitions]
-			Map<Tuple3<State, Boolean, Integer>, List<Transition>> byLenTrns = 
+			Map<Triple<State, Boolean, Integer>, List<Transition>> byLenTrns = 
 				transitions.stream ().collect ( 
 					Collectors.groupingBy ( t ->
-						Tuple.of ( 
+						Triple.of ( 
 							this.stateMachine.getTransitionTarget ( t ),
 							isDirectedTransition ( t ),
 							getMaxRelRepeats ( t, distance ) 
@@ -250,10 +249,10 @@ public class StateMachine2CyTranslator
 				
 			
 			// See if the node has any looping edge.
-			Map<Tuple3<State, Boolean, Integer>, List<Transition>> loops = byLenTrns
+			Map<Triple<State, Boolean, Integer>, List<Transition>> loops = byLenTrns
 				.entrySet ()
 				.stream ()
-				.filter ( e -> state.equals ( e.getKey ()._1 () ) )
+				.filter ( e -> state.equals ( e.getKey ().getLeft () ) )
 				.collect ( Collectors.toMap ( Map.Entry::getKey, Map.Entry::getValue ) );
 			
 			final boolean isNextHopLoopMode;
@@ -299,16 +298,16 @@ public class StateMachine2CyTranslator
 
 			// We want them in a given order, it helps with generating multiple versions, which need to be committed
 			// into git.
-			List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
+			List<Map.Entry<Triple<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
 				sortTransitionGroups ( byLenTrns );
 			
 			sortedByLenTrns.forEach ( e -> 
 			{
-				Tuple3<State, Boolean, Integer> grp = e.getKey ();
+				Triple<State, Boolean, Integer> grp = e.getKey ();
 				List<Transition> trnsGroup = e.getValue ();
 				
-				int maxTrnsRepeats = grp._3 ();
-				State target = grp._1 ();
+				int maxTrnsRepeats = grp.getRight ();
+				State target = grp.getLeft ();
 
 				// Path constraint that cannot be fulfilled, so let's skip it
 				if ( maxTrnsRepeats <= 0 ) {
@@ -511,11 +510,11 @@ public class StateMachine2CyTranslator
 	 * some determinism in the creation of numbered query names and the paths associated to them. 
 	 * 
 	 */
-	private static List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortTransitionGroups (
-		Map<Tuple3<State, Boolean, Integer>, List<Transition>> byLenTrns
+	private static List<Map.Entry<Triple<State, Boolean, Integer>, List<Transition>>> sortTransitionGroups (
+		Map<Triple<State, Boolean, Integer>, List<Transition>> byLenTrns
 	)
 	{
-		List<Map.Entry<Tuple3<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
+		List<Map.Entry<Triple<State, Boolean, Integer>, List<Transition>>> sortedByLenTrns = 
 			new ArrayList<> ( byLenTrns.entrySet () );
 		
 		Collections.sort 
@@ -523,18 +522,18 @@ public class StateMachine2CyTranslator
 			sortedByLenTrns, 
 			(e1, e2) -> 
 			{
-				Tuple3<State, Boolean, Integer> k1 = e1.getKey (), k2 = e2.getKey ();
+				Triple<State, Boolean, Integer> k1 = e1.getKey (), k2 = e2.getKey ();
 				
 				// Compare the keys
-				String c1 = k1._1 ().getValidConceptClass ().getId ();
-				String c2 = k2._1 ().getValidConceptClass ().getId ();
+				String c1 = k1.getLeft ().getValidConceptClass ().getId ();
+				String c2 = k2.getLeft ().getValidConceptClass ().getId ();
 				int cmp = c1.compareTo ( c2 ); if ( cmp != 0 ) return cmp;
 
 				// If it's not enough, compare the transition lengths
-				if ( ( cmp = Integer.compare ( k1._3 (), k2._3 () ) ) != 0 ) return cmp;
+				if ( ( cmp = Integer.compare ( k1.getRight (), k2.getRight () ) ) != 0 ) return cmp;
 				
 				// For same key/length, distinguish between directionality
-				if ( ( cmp = Boolean.compare ( k1._2 (), k2._2 () ) ) != 0 ) return cmp; 
+				if ( ( cmp = Boolean.compare ( k1.getMiddle (), k2.getMiddle () ) ) != 0 ) return cmp; 
 
 				// Eventually, fall back to the transitions
 				//
