@@ -1,8 +1,9 @@
 # Revision History
 
-*This file was last reviewed on 2023-11-07*. **Please, keep this note updated**.
+*This file was last reviewed on 2023-11-08*. **Please, keep this note updated**.
 
 ## 4.0.2-SNAPSHOT
+* Current snapshot
 
 ## 4.0.1
 * Old/outdated vavr library removed.
