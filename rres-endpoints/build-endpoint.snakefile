@@ -11,6 +11,7 @@ all_results = [
 	f"{KNET_DATASET_TARGET}/knowledge-graph-uris.oxl",
 	f"{KNET_DATASET_TARGET}/rdf/knowledge-graph.ttl.bz2",
 	f"{KNET_DATASET_TARGET}/rdf/ontologies",
+	f"{KNET_DATASET_TARGET}/rdf/knowledge-graph-metadata.ttl",
 	f"{KNET_DATASET_TARGET}/tmp/tdb",
 	f"{KNET_DATASET_TARGET}/rdf/tdb.tar.bz2"
 ]
