@@ -3,13 +3,13 @@
 set -e
 echo -e "\n\tStopping Neo4j\n"
 
-if [[ ! -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid" ]]; then
+if [[ ! -f "$KETL_OUT/tmp/neo4j-slurm.jobid" ]]; then
   echo -e "\nNo JOB ID file\n"
   exit
 fi
 
-job=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"`
-host=`cat "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host"`
+job=`cat "$KETL_OUT/tmp/neo4j-slurm.jobid"`
+host=`cat "$KETL_OUT/tmp/neo4j-slurm.host"`
 
 # --signal doesn't work and without it, KILL seems to be sent
 # scancel --signal=TERM --full $job
@@ -23,5 +23,5 @@ while true; do
   sleep 5
 done
 
-rm -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.jobid"
-rm -f "$KNET_DATASET_TARGET/tmp/neo4j-slurm.host"
+rm -f "$KETL_OUT/tmp/neo4j-slurm.jobid"
+rm -f "$KETL_OUT/tmp/neo4j-slurm.host"

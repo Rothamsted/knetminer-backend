@@ -5,10 +5,22 @@
 # infrastructure.
 # 
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
+
+# Environments like SLURM need absolute paths. If you don't set this from the root invoker,
+# you might have problems with finding config/default-cfg.sh, invoked below
+#
+KETL_HOME=`realpath "$0"`
+KETL_HOME=`dirname "$KETL_HOME"`
+cd "$KETL_HOME"
+export KETL_HOME="`pwd`"
+
+cd "$KETL_HOME"
+
+# This defines a few defaults and then invokes other specific config files
+# 
+. config/default-cfg.sh
 
 snakemake --cores --until all \
   --snakefile build-endpoint.snakefile \
-  --config dataset_id="$KNET_DATASET_ID" dataset_version="$KNET_DATASET_VERSION"\
-  $KNET_SNAKE_OPTS
+  --config dataset_id="$KETL_DATASET_ID" dataset_version="$KETL_DATASET_VERSION"\
+  $KETL_SNAKE_OPTS

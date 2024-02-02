@@ -9,8 +9,8 @@ if [[ -z "$host" ]]; then
 fi
 
 echo -e "\nRestarting $host\n"
-# We need this convoluted thing, that SSH with a personal user, then does sudo as docker
-# 'docker' is the user controlling everything about the instance.
+# We need this convoluted thing, SSH with a personal user, then sudo as docker.
+# 'docker' is the user controlling everything about Docker.
 # 
 # If you try 'ssh docker' only, you'll get a 'password expired' message. We might have IT people 
 # fixing it, but this is quicker and less dependant on them.

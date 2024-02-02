@@ -3,11 +3,9 @@
 #
 
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
 
-rdf_target="$KNET_DATASET_TARGET/rdf"
-tdb="$KNET_DATASET_TARGET/tmp/tdb"
+rdf_target="$KETL_OUT/rdf"
+tdb="$KETL_OUT/tmp/tdb"
 tdb_zip="$rdf_target/tdb.tar.bz2"
 
 echo -e "\n\tCompressing '$tdb' to '$tdb_zip' \n"
