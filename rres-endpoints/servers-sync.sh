@@ -4,6 +4,10 @@
 # This has to be ran manually, it isn't part of build-endpoint.snakefile.
 #
 set -e
+
+echo -e "\n\n  ****** STOPPING, THIS IS TO BE REVIEWED ******"
+exit 2
+
 cd "$KNET_SCRIPTS_HOME"
 . config/init-dataset-cfg.sh
 

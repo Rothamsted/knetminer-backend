@@ -1,5 +1,5 @@
 
-######## Check mandatory parameters
+######## CLI arguments
 
 if [[ $# -le 2 ]]; then
 	echo -e "\n\n\tUsage: $0 <dataset-id> <dataset-version> [environment-id]\n\n"
@@ -10,6 +10,7 @@ fi
 export KETL_DATASET_ID="$1"
 export KETL_DATASET_VERSION="$2"
 export KETL_ENVIRONMENT="$3"
+
 
 ########## General variables
 
@@ -29,9 +30,6 @@ export KETL_SRC_OXL=''
 # Where all the output goes, including to-be-exported and temp files
 export KETL_OUT="$KETL_HOME/output"
 
-# If true, it processes the Neo4j-related steps (rdf2neo, etc)
-export KETL_HAS_NEO4J=false
-
 # Options passed to the 'snakemake' command
 export KETL_SNAKE_OPTS=''
 
@@ -46,15 +44,31 @@ export KETL_RDFEXP_HOME=''
 # The Ondex flavour of the rdf2neo converter
 export KETL_NEOEXPORT_HOME=''
 
-# The Neo4j server home. This uses their own naming convention
+# This is used to define the name of the Neo4j dump. 
+# You can possibly use it for NEO4J_HOME too
+export KETL_NEO_VERSION='5.15.0'
+
+
+### Neo4j settings
+
+# These are normally overwritten by config/datasets/xxx-vv-cfg.sh, since each dataset knows 
+# if it has a Neo DB.
+
+# If true, it processes the Neo4j-related steps (rdf2neo, etc)
+export KETL_HAS_NEO4J=false
+
+# The Neo4j server home. This uses their own naming convention.
 # export NEO4J_HOME=''
 
 # You might need special, environment-dependent scripts to start/stop Neo
-export KETL_NEO_START="$KETL_HOME/utils/neo-start.sh" 
-export KETL_NEO_STOP="$KETL_HOME/utils/neo-stop.sh" 
+export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start.sh" 
+export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop.sh"
+
+# Empty/init the dataset's DB, see the default file for details
+export KETL_NEO_INIT="$KETL_HOME/utils/neo4j/neo-init.sh" 
 
 # The credentials for the server where you want upload the OXL export.
-# Note that usually this IS NOT a production server  
+# Note that usually this IS NOT a production server.
 export KETL_NEO_USR='neo4j'
 export KETL_NEO_PWD='testTest' # Recent Neo doesn't accept 'test'
 
@@ -62,11 +76,15 @@ export KETL_NEO_PWD='testTest' # Recent Neo doesn't accept 'test'
 # Neo server 
 function ketl_get_neo_url ()
 {
-	return 'bolt://localhost:7687'
+	echo 'bolt://localhost:7687'
 }
+export -f ketl_get_neo_url
 
 
-###### Invoke specific configs. They override common defs above.
+###### Invokes specific configs. They override common defs above.
+
+# As you can see, these additional specific configs are invoked based on the parameters
+# passed at the begin of the hereby file, which usually come from some top ETL invoker.
 
 ## Optional environment
 #
@@ -74,6 +92,6 @@ if [[ ! -z "$KETL_ENVIRONMENT" ]]; then
   . "${KETL_HOME}/config/environments/${KETL_ENVIRONMENT}-env.sh"
 fi
 
-## Dataset-specific config
+## Dataset-specific config.
 #
 . "${KETL_HOME}/config/datasets/${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-cfg.sh"

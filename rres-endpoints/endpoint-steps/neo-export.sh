@@ -13,16 +13,12 @@ set -e
 tdb="$1"
 neo_dump="$2"
 
-echo -e "\nClearing Neo4j at '$NEO4J_HOME'"
-"$KETL_NEO_STOP"
-rm -Rf "$NEO4J_HOME/data/databases/"* "$NEO4J_HOME/data/transactions/"*
-"$NEO4J_HOME/bin/neo4j-admin" set-initial-password "$KNET_NEO_PWD"
-"$KETL_NEO_START"
+"$KETL_NEO_INIT"
 
 rdf_target="$KETL_OUT/rdf"
 neo_url=`ketl_get_neo_url`
 
-export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$ketl_get_neo_url'"
+export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$neo_url'"
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.user='$KETL_NEO_USR'"
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 
@@ -55,4 +51,4 @@ fi
 # of any past transactions, else, the dump is much bigger than necessary. 
 #
 echo -e "\n\tNeo4j Dump to '$neo_dump'\n"
-"$NEO4J_HOME/bin/neo4j-admin" dump --to="$neo_dump"
+"$NEO4J_HOME/bin/neo4j-admin" database dump --to-stdout neo4j >"$neo_dump"

@@ -6,7 +6,5 @@ export KETL_RDFEXP_HOME="$odx_home/rdf-export-2-cli/target/rdf-export-2-cli_7.0.
 # The Ondex flavour of the rdf2neo converter
 export KETL_NEOEXPORT_HOME="$odx_home/neo4j-export/target/neo4j-exporter"
 
-export NEO4J_HOME=/tmp/neo4j-community-5.15.0
-
 # TODO: you need to do it manually, since it relies on sourced files
 # conda activate snakemake

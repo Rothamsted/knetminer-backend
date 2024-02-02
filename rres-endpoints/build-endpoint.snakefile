@@ -3,7 +3,8 @@
 #
 KETL_SRC_OXL = os.environ [ "KETL_SRC_OXL" ]
 KETL_OUT = os.environ [ "KETL_OUT" ]
-	
+KETL_NEO_VERSION = os.environ [ "KETL_NEO_VERSION" ]
+
 dataset_id = config [ "dataset_id" ]
 dataset_version = config [ "dataset_version" ]
 
@@ -19,7 +20,7 @@ all_results = [
 # This is done only when KETL_HAS_NEO4J is set
 # TODO: possibly, we need a similar trick for ontologies, TDB, etc
 if os.environ [ "KETL_HAS_NEO4J" ] == 'true':
-	all_results.append ( f"{KETL_OUT}/neo4j.dump" )
+	all_results.append ( f"{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump" )
 
 
 # The usual umbrella, which possibly triggers everything else
@@ -75,7 +76,7 @@ rule neo_export:
 	input:
 		f"{KETL_OUT}/tmp/tdb"
 	output:
-		f"{KETL_OUT}/neo4j.dump"
+		f"{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump"
 	shell:
 		'./endpoint-steps/neo-export.sh "{input}" "{output}"'
 

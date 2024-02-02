@@ -1,3 +1,7 @@
+# ***** TO BE REVIEWED ****
+
+*TODO: we are in the process of simplifynig the RRes ETL pipeline, and this doc has yet to be aligned to recent changes.*
+
 # The Knetminer Raw Data Pipelines
 
 The script you find in the hereby folder and [/cyverse-endpoints](../cyverse-endpoints) are used to
