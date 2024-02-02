@@ -6,10 +6,16 @@
 
 set -e
 
-echo -e "\n\nRDF Generating dataset descriptor into '$outf'"
+in_oxl="$1"
+out_oxl="$2" # Annotated OXL
+out_rdf="$3" # Metadata RDF
+
+mkdir -p \
+	"`dirname "$out_oxl"`"\
+	"`dirname "$out_rdf"`"
+
+echo -e "\n\nRDF Generating dataset descriptor into:\n  '$out_oxl'\n  '$out_rdf'"
 "$KETL_RDFEXP_HOME/oxl-descriptor.sh" \
   --template "$KETL_RDFEXP_HOME/knetminer-descriptors/knetminer-metadata-template.ttl" \
   --config "$KETL_HOME/config/datasets/${KETL_DATASET_ID}-metadata-descriptor.properties" \
-  --export "$KETL_OUT/rdf/knowledge-graph-metadata.ttl" \
-  "$KETL_OUT/tmp/knowledge-graph-uris.oxl" \
-  "$KETL_OUT/knowledge-graph-uri-metadata.oxl"
+  --export "$out_rdf" "$in_oxl" "$out_oxl"

@@ -6,8 +6,10 @@
 
 set -e
 
-mkdir -p "$KETL_OUT"
-mkdir -p "$KETL_OUT/tmp"
+in_oxl="$1"
+out_oxl="$2"
 
-echo -e "\n\nAdding URIs to '$KETL_SRC_OXL' and saving to '$KETL_OUT/knowledge-graph-uris.oxl'"
-"$KETL_RDFEXP_HOME/add-uris.sh" "$KETL_SRC_OXL" "$KETL_OUT/tmp/knowledge-graph-uris.oxl"
+mkdir -p "`dirname "$out_oxl"`"
+
+echo -e "\n\nAdding URIs to '$in_oxl' and saving to '$out_oxl'"
+"$KETL_RDFEXP_HOME/add-uris.sh" "$in_oxl" "$out_oxl"

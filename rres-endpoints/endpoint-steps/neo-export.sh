@@ -10,6 +10,9 @@
 #
 set -e
 
+tdb="$1"
+neo_dump="$2"
+
 echo -e "\nClearing Neo4j at '$NEO4J_HOME'"
 "$KETL_NEO_STOP"
 rm -Rf "$NEO4J_HOME/data/databases/"* "$NEO4J_HOME/data/transactions/"*
@@ -17,8 +20,6 @@ rm -Rf "$NEO4J_HOME/data/databases/"* "$NEO4J_HOME/data/transactions/"*
 "$KETL_NEO_START"
 
 rdf_target="$KETL_OUT/rdf"
-tdb="$KETL_OUT/tmp/tdb"
-
 neo_url=`ketl_get_neo_url`
 
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$ketl_get_neo_url'"
@@ -53,5 +54,5 @@ fi
 # TODO: review the options in $NEO4J_HOME about the transaction log retentions, we need to get rid 
 # of any past transactions, else, the dump is much bigger than necessary. 
 #
-echo -e "\n\tNeo4j Dump to '$KETL_OUT/neo4j.dump'\n"
-"$NEO4J_HOME/bin/neo4j-admin" dump --to="$KETL_OUT/neo4j.dump"
+echo -e "\n\tNeo4j Dump to '$neo_dump'\n"
+"$NEO4J_HOME/bin/neo4j-admin" dump --to="$neo_dump"

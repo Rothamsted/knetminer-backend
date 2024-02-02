@@ -4,11 +4,10 @@
 
 set -e
 
-rdf_target="$KETL_OUT/rdf"
-tdb="$KETL_OUT/tmp/tdb"
-tdb_zip="$rdf_target/tdb.tar.bz2"
+tdb="$1"
+tdb_zip="$2"
 
 echo -e "\n\tCompressing '$tdb' to '$tdb_zip' \n"
 rm -f "$tdb_zip"
 cd "$tdb/.."
-tar cv --bzip2 -f "$tdb_zip" tdb
+tar cv --bzip2 -f "$tdb_zip" "$tdb"

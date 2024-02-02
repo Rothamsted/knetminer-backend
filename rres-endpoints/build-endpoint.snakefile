@@ -8,7 +8,7 @@ dataset_id = config [ "dataset_id" ]
 dataset_version = config [ "dataset_version" ]
 
 all_results = [
-	f"{KETL_OUT}/knowledge-graph-uri-metadata.oxl",
+	f"{KETL_OUT}/knowledge-graph-annotated.oxl",
 	f"{KETL_OUT}/rdf/knowledge-graph.ttl.bz2",
 	f"{KETL_OUT}/rdf/ontologies",
 	f"{KETL_OUT}/rdf/knowledge-graph-metadata.ttl",
@@ -27,7 +27,9 @@ rule all:
 	input:
 		all_results
 
-# Steps are listed in the same order they're executed
+# Steps are listed in the same order they're executed.
+# When possible, input and output params are passed as a convenient way to keep them
+# synched with the hereby file.
 #
 
 rule add_uris:
@@ -44,19 +46,19 @@ rule dataset_metadata:
 	input:
 		f"{KETL_OUT}/tmp/knowledge-graph-uris.oxl"
 	output:
-		[ f"{KETL_OUT}/knowledge-graph-uri-metadata.oxl",
-		  f"{KETL_OUT}/rdf/knowledge-graph-metadata.ttl" ]
+		f"{KETL_OUT}/knowledge-graph-annotated.oxl",
+		meta_rdf = f"{KETL_OUT}/rdf/knowledge-graph-metadata.ttl"
 	shell:
-		f"./endpoint-steps/create-dataset-metadata.sh"
+		'./endpoint-steps/create-dataset-metadata.sh "{input}" "{output[0]}" "{output.meta_rdf}"'
 
 
 rule rdf_export:
 	input:
-		f"{KETL_OUT}/knowledge-graph-uris.oxl"
+		f"{KETL_OUT}/tmp/knowledge-graph-uris.oxl"
 	output:
 		f"{KETL_OUT}/rdf/knowledge-graph.ttl.bz2"
 	shell:
-		f"./endpoint-steps/rdf-export.sh"
+		'./endpoint-steps/rdf-export.sh "{input}" "{output}"'
 
 
 rule tdb_load:
@@ -66,7 +68,7 @@ rule tdb_load:
 		directory ( f"{KETL_OUT}/rdf/ontologies" ),
 		directory ( f"{KETL_OUT}/tmp/tdb" )
 	shell:
-		f"./endpoint-steps/tdb-load.sh"	
+		'./endpoint-steps/tdb-load.sh'	
 
 
 rule neo_export:
@@ -75,7 +77,7 @@ rule neo_export:
 	output:
 		f"{KETL_OUT}/neo4j.dump"
 	shell:
-		f"./endpoint-steps/neo-export.sh"
+		'./endpoint-steps/neo-export.sh "{input}" "{output}"'
 
 
 # We deliver a zipped TDB, ready for download. This is done after we are sure it was good for Neo4j.
@@ -87,7 +89,7 @@ rule tdb_zip:
 	output:
 		f"{KETL_OUT}/rdf/tdb.tar.bz2"
 	shell:
-		f"./endpoint-steps/tdb-zip.sh"
+		'./endpoint-steps/tdb-zip.sh "{input}" "{output}"'
 
 # You might need to run servers-sync.sh manually after this
 #	
