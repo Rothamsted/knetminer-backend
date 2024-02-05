@@ -1,0 +1,16 @@
+prefName
+altName
+# The PID, TODO: we need more complex queries, to consider 1-n accessions 
+identifier
+AUTHORS
+AbstractHeader
+Abstract
+MeSH
+description
+Description
+Phenotype
+Pheno
+study
+growth_conditions
+Chemical
+Authors

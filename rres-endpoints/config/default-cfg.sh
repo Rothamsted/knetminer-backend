@@ -48,6 +48,15 @@ export KETL_NEOEXPORT_HOME=''
 # You can possibly use it for NEO4J_HOME too
 export KETL_NEO_VERSION='5.15.0'
 
+# The KnetMiner codebase
+export KNET_HOME=''
+# Eg, export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
+export KNET_INITIALIZER_HOME='' 
+# Used by $KNET_HOME/docker/dataset-init.sh, it's one of the dirs in 
+# $KNET_HOME/datasets. It might be different from the default, since multiple
+# datasets might have the same config
+export KNET_DATASET_ID="$KETL_DATASET_ID"
+
 
 ### Neo4j settings
 

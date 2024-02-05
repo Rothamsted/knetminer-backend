@@ -11,7 +11,7 @@
 set -e
 
 tdb="$1"
-neo_dump="$2"
+out_flag="$2" # Creates this file to signal that the step was successfully completed
 
 "$KETL_NEO_INIT"
 
@@ -26,29 +26,4 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 echo -e "\n\tStarting neo4j-export\n"
 "$KETL_NEOEXPORT_HOME/ondex2neo.sh" --tdb "$tdb"
 
-echo -e "\nDone. Waiting before stopping Neo4j\n"
-sleep 60
-"$KETL_NEO_STOP"
-
-echo -e "Another pause, just in case.\n"
-sleep 20
-
-# TODO: remove, seemed to be needed in the past, now it should be fixed.
-# WARNING: it is broken anyway, we don't use is_slurm_neo anymore, move it
-# to neo-stop-slurm.sh
-# 
-if false && `$is_slurm_neo`; then
-  echo -e "\nOne more restart, needed under SLURM"
-  
-  sleep 60
-  "$KETL_NEO_START"
-
-  sleep 60
-  "$KETL_NEO_STOP"
-fi
-
-# TODO: review the options in $NEO4J_HOME about the transaction log retentions, we need to get rid 
-# of any past transactions, else, the dump is much bigger than necessary. 
-#
-echo -e "\n\tNeo4j Dump to '$neo_dump'\n"
-"$NEO4J_HOME/bin/neo4j-admin" database dump --to-stdout neo4j >"$neo_dump"
+echo `date` >"$out_flag"

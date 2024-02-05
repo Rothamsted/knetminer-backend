@@ -76,9 +76,18 @@ rule neo_export:
 	input:
 		f"{KETL_OUT}/tmp/tdb"
 	output:
-		f"{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump"
+		f"{KETL_OUT}/tmp/neo-export.flag"
 	shell:
 		'./endpoint-steps/neo-export.sh "{input}" "{output}"'
+
+
+rule neo_index:
+	input:
+		f"{KETL_OUT}/tmp/neo-export.flag"
+	output:
+		f"{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump"
+	shell:
+		'./endpoint-steps/neo-index.sh "{output}"'
 
 
 # We deliver a zipped TDB, ready for download. This is done after we are sure it was good for Neo4j.
