@@ -1,4 +1,4 @@
-export RRES_HOME=data_home=/home/data/knetminer
+export RRES_HOME=/home/data/knetminer
 export RRES_SOFTWARE_HOME="$RRES_HOME/software"
 
 # The Ondex RDF exporter
@@ -28,7 +28,19 @@ function ketl_get_neo_url ()
 export KETL_NEO_START="$KETL_HOME/utils/neo-start-slurm.sh" 
 export KETL_NEO_STOP="$KETL_HOME/utils/neo-stop-slurm.sh" 
 
-# TODO: remove it from both here and my home
+# This script contains the stupid initialisation that 'conda init' puts in .bashrc
+# You need to SOURCE it manually, from your own shell
+# We rely on the Conda/Mamba/Snakemake installation at:
+# /home/data/knetminer/software/conda/mamba
+# TODO: make this script available to everyone
+
+# . /home/usern/brandizim/.local/bin/conda-init.sh
+
+# And then you need this too
+# . conda activate snakemake
+
+
+
 #conda activate "$KNET_DATA_HOME/software/conda/mamba/envs/snakemake"
 
 module load snakemake/6.1.0-foss-2020b
