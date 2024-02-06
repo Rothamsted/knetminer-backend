@@ -5,7 +5,7 @@ oxl_home="$RRES_HOME/etl-test/poaceae/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network-free.oxl"
 
-export ETL_OUT="$RRES_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
+export KETL_OUT="$RRES_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 
 # Neo 
 export KETL_HAS_NEO4J=true
