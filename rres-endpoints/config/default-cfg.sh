@@ -28,7 +28,7 @@ fi
 export KETL_SRC_OXL=''
 
 # Where all the output goes, including to-be-exported and temp files
-export KETL_OUT="$KETL_HOME/output"
+export KETL_OUT="$KETL_HOME/output/${KETL_DATASET_ID}/${KETL_DATASET_VERSION}"
 
 # Options passed to the 'snakemake' command
 export KETL_SNAKE_OPTS=''

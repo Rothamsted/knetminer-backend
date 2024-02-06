@@ -10,5 +10,7 @@ export KETL_NEOEXPORT_HOME="$odx_home/neo4j-export/target/neo4j-exporter"
 export KNET_HOME="$code_home/knetminer/knetminer"
 export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 
+# export KETL_SNAKE_OPTS='--dry-run'
+
 # TODO: you need to do it manually, since it relies on sourced files
 # conda activate snakemake

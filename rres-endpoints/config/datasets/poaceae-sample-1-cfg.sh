@@ -1,10 +1,6 @@
 # The aratiny dataset from the Knetminer test data, used for testing the ETL
 # scripts. 
 
-# This is the same as dataset-cfg.sh, but we need it earlier than that
-# TODO: review
-export KETL_OUT="${KETL_OUT}/${KETL_DATASET_ID}/${KETL_DATASET_VERSION}"
-
 # This is a dummy test OXL
 export KETL_SRC_OXL="${KETL_OUT}/tmp/${KETL_DATASET_ID}.oxl"
 
