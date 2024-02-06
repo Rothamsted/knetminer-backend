@@ -13,7 +13,7 @@ export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetmi
 export JAVA_TOOL_OPTIONS="-Xmx64G"
 
 export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
-# export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
+export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
 
 
 # TODO: you need to do it manually, since it relies on sourced files

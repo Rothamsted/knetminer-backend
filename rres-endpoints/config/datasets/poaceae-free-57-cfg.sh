@@ -1,6 +1,7 @@
 # /home/data/knetminer/etl-test/poaceae/57/generic/knowledge-network-free.oxl
 
-oxl_home="$RRES_HOME/etl-test/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
+# Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
+oxl_home="$RRES_HOME/etl-test/poaceae/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network-free.oxl"
 
