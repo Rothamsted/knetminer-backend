@@ -83,11 +83,12 @@ rule neo_export:
 
 rule neo_index:
 	input:
-		f"{KETL_OUT}/tmp/neo-export.flag"
+		f"{KETL_OUT}/tmp/neo-export.flag",
+		oxl = f"{KETL_OUT}/knowledge-graph-annotated.oxl"
 	output:
 		f"{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump"
 	shell:
-		'./endpoint-steps/neo-index.sh "{output}"'
+		'./endpoint-steps/neo-index.sh "{input.oxl}" "{output}"'
 
 
 # We deliver a zipped TDB, ready for download. 

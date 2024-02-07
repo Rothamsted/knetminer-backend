@@ -2,7 +2,7 @@
 # new KnetMiner API
 set -e
 
-oxl_src="$1"
+oxl_src="$1" # the OXL with URIs (mandatory) and metadata annotations (optional)
 neo_dump="$2" # The output of this step is the Neo dump, ready for deployment
 
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$neo_url'"
