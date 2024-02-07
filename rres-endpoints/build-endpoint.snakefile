@@ -90,8 +90,13 @@ rule neo_index:
 		'./endpoint-steps/neo-index.sh "{output}"'
 
 
-# We deliver a zipped TDB, ready for download. This is done after we are sure it was good for Neo4j.
+# We deliver a zipped TDB, ready for download. 
 # The TDB is re-used by AgriSchemas, to build the Knetminer mapping.
+#
+# WARNING: for sake of performance, this is done in parallel with rdf2neo and 
+# its downstream steps. This implies that if something about Neo export fails
+# due to TDB or RDF being wrong, you MUST delete the corresponding intermediate
+# files manually. 
 #
 rule tdb_zip:
 	input:
