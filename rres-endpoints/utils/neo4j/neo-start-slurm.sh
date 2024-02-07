@@ -15,7 +15,7 @@ fi
 
 echo -e "\n\tStarting Neo4j on SLURM\n"
 out="$KETL_OUT/tmp/neo4j-slurm.out"
-job=`sbatch --parsable -o "$out" -e "$out" "$KETL_HOME/utils/neo4/neo-start.sbatch"`
+job=`sbatch --parsable -o "$out" -e "$out" "$KETL_HOME/utils/neo4j/neo-start.sbatch"`
 
 # Wait until submitted, so that we can get the host
 while true; do

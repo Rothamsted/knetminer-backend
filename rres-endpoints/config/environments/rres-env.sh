@@ -17,7 +17,7 @@ export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetmi
 export JAVA_TOOL_OPTIONS="-Xmx64G"
 
 export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
-export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
+#export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
 
 
 # TODO: you need to do it manually, since it relies on sourced files
@@ -29,8 +29,8 @@ function ketl_get_neo_url ()
   echo "bolt://$neo_host:7687"
 }
 
-export KETL_NEO_START="$KETL_HOME/utils/neo-start-slurm.sh" 
-export KETL_NEO_STOP="$KETL_HOME/utils/neo-stop-slurm.sh" 
+export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start-slurm.sh" 
+export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop-slurm.sh" 
 
 # This script contains the stupid initialisation that 'conda init' puts in .bashrc
 # You need to SOURCE it manually, from your own shell
@@ -43,6 +43,6 @@ export KETL_NEO_STOP="$KETL_HOME/utils/neo-stop-slurm.sh"
 # And then you need this too
 # . conda activate snakemake
 
-module load snakemake/6.1.0-foss-2020b
+#module load snakemake/6.1.0-foss-2020b
 
 

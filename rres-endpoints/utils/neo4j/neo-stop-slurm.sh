@@ -11,17 +11,19 @@ fi
 job=`cat "$KETL_OUT/tmp/neo4j-slurm.jobid"`
 host=`cat "$KETL_OUT/tmp/neo4j-slurm.host"`
 
-# --signal doesn't work and without it, KILL seems to be sent
-# scancel --signal=TERM --full $job
+# In the past, --signal doesn't work and without it, KILL seems to be sent
+# Now it seems to be working
+scancel --signal=TERM --full $job
 
-srun -w "$host" pkill -u $USER -f 'org.neo4j.server.CommunityEntryPoint' || true
+# TODO: remove? It's the alt way to shutdown
+# srun -w "$host" pkill -u $USER -f 'org.neo4j.server.CommunityEntryPoint' || true
 
-# Wait until done
-while true; do
-  status=`squeue -j $job --noheader` || err=$?
-  [[ $err != 0 ||-z "$status" ]] && break
-  sleep 5
-done
+## Wait until done
+#while true; do
+#  status=`squeue -j $job --noheader` || err=$?
+#  [[ $err != 0 ||-z "$status" ]] && break
+#  sleep 5
+#done
 
 rm -f "$KETL_OUT/tmp/neo4j-slurm.jobid"
 rm -f "$KETL_OUT/tmp/neo4j-slurm.host"
