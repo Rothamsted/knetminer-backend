@@ -9,7 +9,7 @@
 # For the tests, we have to use this OXL, which overrides the defaults loaded above
 #
 dataDir: "${KETL_OUT}/tmp/knet-init/data"
-oxl: "${KETL_SRC_OXL}"
+oxl: "" # overridden by commands
 
 customOptions @merge:
   cypherConceptIndexProps: "${mydir}/neo4j/concept-index-properties.txt"

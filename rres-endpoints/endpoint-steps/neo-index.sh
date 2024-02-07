@@ -5,6 +5,8 @@ set -e
 oxl_src="$1" # the OXL with URIs (mandatory) and metadata annotations (optional)
 neo_dump="$2" # The output of this step is the Neo dump, ready for deployment
 
+neo_url=`ketl_get_neo_url`
+
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$neo_url'"
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.user='$KETL_NEO_USR'"
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
