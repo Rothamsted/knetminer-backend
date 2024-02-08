@@ -14,7 +14,8 @@ export KETL_NEOEXPORT_HOME="$RRES_SOFTWARE_HOME/ondex-mini/tools/neo4j-exporter"
 export KNET_HOME="$RRES_SOFTWARE_HOME/knetminer"
 export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 
-export JAVA_TOOL_OPTIONS="-Xmx64G"
+# WARNING: this must be compatible with SLURM limits set in config/snakemake/slurm
+export JAVA_TOOL_OPTIONS="-Xmx56G"
 
 export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
 #export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"

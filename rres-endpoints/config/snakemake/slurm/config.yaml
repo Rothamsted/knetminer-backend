@@ -1,2 +1,2 @@
 jobs: 16
-cluster: "sbatch --chdir=/home/data/knetminer/software/knetminer-backend/rres-endpoints --mem=65g --cpus-per-task=16 --qos=long --time=1-0:0:0  -o .snakemake/log/slurm-{rule}.out -e .snakemake/log/slurm-{rule}.out"
+cluster: "sbatch --chdir=/home/data/knetminer/software/knetminer-backend/rres-endpoints --mem=64g --cpus-per-task=16 --qos=long --time=1-0:0:0  -o .snakemake/log/slurm-{rule}.out -e .snakemake/log/slurm-{rule}.out"
