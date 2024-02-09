@@ -24,9 +24,9 @@ if [[ "$KETL_ENVIRONMENT" == "rres" ]]; then
   So, now we will wait $sleep_time before stopping Neo again.
   
   If you see problems with the dump command, restart Neo manually,
-  check "$NEO4J_HOME/log/debug.log" to ensure the server actually
-  restarted, then run the ETL workflow again, to have this hereby
-  script re-running. 
+  check "$NEO4J_HOME/logs/debug.log" 
+  to ensure the server actually restarted, then run the ETL workflow 
+  again, to have this hereby script re-running. 
 
 EOT
   
