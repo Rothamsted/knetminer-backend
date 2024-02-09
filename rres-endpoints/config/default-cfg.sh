@@ -49,11 +49,11 @@ export KETL_NEOEXPORT_HOME=''
 export KETL_NEO_VERSION='5.15.0'
 
 # The KnetMiner codebase
-export KNET_HOME=''
-# Eg, export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
+export KNET_WEBAPP=''
+# Eg, export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 export KNET_INITIALIZER_HOME='' 
-# Used by $KNET_HOME/docker/dataset-init.sh, it's one of the dirs in 
-# $KNET_HOME/datasets. It might be different from the default, since multiple
+# Used by $KNET_WEBAPP/docker/dataset-init.sh, it's one of the dirs in 
+# $KNET_WEBAPP/datasets. It might be different from the default, since multiple
 # datasets might have the same config
 export KNET_DATASET_ID="$KETL_DATASET_ID"
 
@@ -88,6 +88,25 @@ function ketl_get_neo_url ()
 	echo 'bolt://localhost:7687'
 }
 export -f ketl_get_neo_url
+
+
+
+###### rsync options, used for cross-server copies
+
+# Default rsync options. --inplace or --append are dangerous when rsync is interruped
+export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse"
+
+# Backup options, the only things not preserved are devices and owner. This is
+# because we have a regular user doing this, not necessarily the root.
+#
+export RSYNC_BKP_OPTS="--recursive --links --times --specials --perms"
+
+# Mirror options, as usually, the destination is synched with the source, but not vice-versa
+# (you need to run a dest->source synch too in this case)
+#
+export RSYNC_MIRROR_OPTS="$RSYNC_BKP_OPTS --delete --delete-during"
+
+
 
 
 ###### Invokes specific configs. They override common defs above.

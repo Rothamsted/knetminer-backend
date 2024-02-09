@@ -7,8 +7,8 @@ export KETL_RDFEXP_HOME="$odx_home/rdf-export-2-cli/target/rdf-export-2-cli_7.0.
 # The Ondex flavour of the rdf2neo converter
 export KETL_NEOEXPORT_HOME="$odx_home/neo4j-export/target/neo4j-exporter"
 
-export KNET_HOME="$code_home/knetminer/knetminer"
-export KNET_INITIALIZER_HOME="$KNET_HOME/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
+export KNET_WEBAPP="$code_home/knetminer/knetminer"
+export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 
 # export KETL_SNAKE_OPTS='--dry-run'
 

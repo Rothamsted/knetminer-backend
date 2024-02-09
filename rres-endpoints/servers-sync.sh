@@ -5,21 +5,22 @@
 #
 set -e
 
-echo -e "\n\n  ****** STOPPING, THIS IS TO BE REVIEWED ******"
-exit 2
+# As in build-endpoint.sh, this defines a few defaults and then invokes other
+# specific config files.
+#
+. config/default-cfg.sh
 
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
+cd "$KETL_HOME"
 
 echo -e "\n\n\tSynchronising file dumps with their web publishing location\n"
 echo -e "Please, beware, logs from this command report hashed dirs\n"
 
-web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR"
+web_target="$KNET_WEB_SSH:$KNET_WEB_DUMPS"
 
 # If the dataset isn't public, it is published on the same target, but under an obfuscated
 # directory, which is based on this hash code.
 #
-secret_path="$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"
+secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KNET_DATASET_VERSION.key"
 if [[ -e "$secret_path" ]]; then
 	secret=`cat "$secret_path"`
 	web_target="$web_target/reserved/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
@@ -29,8 +30,12 @@ else
 fi
 
 
-chmod -R ugo+rX "$KNET_DATASET_TARGET"
-rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DATASET_TARGET/" "$web_target"
+chmod -R ugo+rX "$KETL_OUT"
+rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KETL_OUT/" "$web_target"
+
+
+echo -e "\n\n  ****** STOPPING HERE, THE REST OF THIS SCRIPT IS TO BE REVIEWED ******"
+exit 2
 
 
 # The Neo4j stuff.

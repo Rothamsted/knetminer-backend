@@ -1,5 +1,5 @@
 # This file and everything in its directory are copied to $KETL_OUT/tmp/knet-init/config 
-# by neo-indexing.sh, and merged there with files coming from KNET_HOME/datasets
+# by neo-indexing.sh, and merged there with files coming from KNET_WEBAPP/datasets
 #
 # The relative paths used here work from that resulting dir.
 

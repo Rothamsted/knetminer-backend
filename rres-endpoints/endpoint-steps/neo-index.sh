@@ -15,7 +15,7 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 printf "\n\n  Creating KnetMiner initialisation files\n\n"
 knet_cfg="$KETL_OUT/tmp/knet-init"
 mkdir -p "$knet_cfg"
-"$KNET_HOME/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_DATASET_ID"
+"$KNET_WEBAPP/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_DATASET_ID"
 cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
 
 printf "\n\n  Creating Neo full-text index for concpept searching\n\n"
