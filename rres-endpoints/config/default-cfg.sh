@@ -94,7 +94,7 @@ export -f ketl_get_neo_url
 ###### rsync options, used for cross-server copies
 
 # Default rsync options. --inplace or --append are dangerous when rsync is interruped
-export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse"
+export RSYNC_DFLT_OPTS="--progress --human-readable --stats --rsh=ssh --partial --sparse --dry-run"
 
 # Backup options, the only things not preserved are devices and owner. This is
 # because we have a regular user doing this, not necessarily the root.
