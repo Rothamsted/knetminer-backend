@@ -31,7 +31,9 @@ fi
 
 
 chmod -R ugo+rX "$KETL_OUT"
+set +x
 rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KETL_OUT/" "$web_target"
+set -x
 
 
 echo -e "\n\n  ****** STOPPING HERE, THE REST OF THIS SCRIPT IS TO BE REVIEWED ******"
