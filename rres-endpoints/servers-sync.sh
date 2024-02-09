@@ -35,7 +35,7 @@ rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KETL_OU
 set +x
 
 
-echo -e "\n\n  ****** STOPPING HERE, THE REST OF THIS SCRIPT IS TO BE REVIEWED ******"
+echo -e "\n\n  ****** STOPPING HERE, THE REST OF THIS SCRIPT IS TO BE REVIEWED ******\n"
 exit 2
 
 
