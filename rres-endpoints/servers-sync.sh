@@ -20,13 +20,13 @@ web_target="$KNET_WEB_SSH:$KNET_WEB_DUMPS"
 # If the dataset isn't public, it is published on the same target, but under an obfuscated
 # directory, which is based on this hash code.
 #
-secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KNET_DATASET_VERSION.key"
+secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KETL_DATASET_VERSION.key"
 if [[ -e "$secret_path" ]]; then
 	secret=`cat "$secret_path"`
-	web_target="$web_target/reserved/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
+	web_target="$web_target/reserved/$KETL_DATASET_ID/$KETL_DATASET_VERSION/$secret"
 	web_target="$web_target/$secret"
 else
-	web_target="$web_target/$KNET_DATASET_ID/$KNET_DATASET_VERSION"
+	web_target="$web_target/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 fi
 
 
