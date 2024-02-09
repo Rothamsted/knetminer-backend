@@ -24,7 +24,6 @@ secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KETL_DATASET_VERSION.key"
 if [[ -e "$secret_path" ]]; then
 	secret=`cat "$secret_path"`
 	web_target="$web_target/reserved/$KETL_DATASET_ID/$KETL_DATASET_VERSION/$secret"
-	web_target="$web_target/$secret"
 else
 	web_target="$web_target/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 fi
