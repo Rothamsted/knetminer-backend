@@ -9,7 +9,7 @@ echo -e "\n\n  Waiting before stopping Neo4j\n"
 sleep 30
 "$KETL_NEO_STOP"
 
-if [[ "$KETL_ENVIRONMENT" == "rres" ]] then
+if [[ "$KETL_ENVIRONMENT" == "rres" ]]; then
 
 	sleep_time=10m
 
