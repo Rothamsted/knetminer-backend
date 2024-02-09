@@ -4,7 +4,6 @@ set -e
 
 neo_dump="$1" # The output of this step is the Neo dump, ready for deployment
 
-neo_url=`ketl_get_neo_url`
 
 echo -e "\n\n  Waiting before stopping Neo4j\n"
 sleep 30
