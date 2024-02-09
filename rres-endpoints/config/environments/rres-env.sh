@@ -51,7 +51,7 @@ export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop-slurm.sh"
 
 # The SSH coordinates fo the knetminer.com web server, where file dumps are copied
 # for download
-export KNET_WEB_SSH=brandizim@babvs59
+export KNET_WEB_SSH='brandizim@babvs59.rothamsted.ac.uk'
 
 # The root of the download directory, corresponding to
 # something like knetminer.com/downloads
