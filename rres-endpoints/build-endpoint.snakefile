@@ -71,6 +71,12 @@ rule tdb_load:
 	shell:
 		'./endpoint-steps/tdb-load.sh'	
 
+# ==> NOTE: review the options in $NEO4J_HOME about the transaction log retentions, 
+# to get rid of past transactions retention, else, the dump can be much bigger than 
+# necessary. 
+#
+# See: https://neo4j.com/docs/operations-manual/current/database-internals/transaction-logs/
+#
 
 rule neo_export:
 	input:
