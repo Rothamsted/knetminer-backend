@@ -46,7 +46,11 @@ export KETL_NEOEXPORT_HOME=''
 
 # This is used to define the name of the Neo4j dump. 
 # You can possibly use it for NEO4J_HOME too
-export KETL_NEO_VERSION='5.15.0'
+#
+# ===> Override this in config/datasets/name-ver.sh, so that we can keep track
+# of the version that was used for a given dataset
+#
+export KETL_NEO_VERSION='5.16.0'
 
 # The KnetMiner codebase
 export KNET_WEBAPP=''
