@@ -37,6 +37,8 @@ EOT
 fi
 
 echo -e "\n  Neo4j Dump to '$neo_dump'\n"
-"$NEO4J_HOME/bin/neo4j-admin" database dump --to-stdout neo4j --verbose >"$neo_dump"
+# WARNING!!! DO NOT USE --verbose!!! It sends diagnostic messages to the
+# standard output!!! See: https://github.com/neo4j/neo4j/issues/13397
+"$NEO4J_HOME/bin/neo4j-admin" database dump --to-stdout neo4j >"$neo_dump"
 
 echo -e "\n  Neo4j Dump done\n"
