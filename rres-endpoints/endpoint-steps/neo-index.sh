@@ -15,8 +15,11 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 printf "\n\n  Creating KnetMiner initialisation files\n\n"
 
 knet_cfg="$KETL_OUT/tmp/knet-init"
+# Re-creating it all is the safest option, comment this at your own risk, and 
+# DO NOT push the commented version back to github (or leave it in the RRes file
+# system).
 rm -Rf "$knet_cfg"
-mkdir "$knet_cfg"
+mkdir -p "$knet_cfg"
 
 "$KNET_WEBAPP/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_DATASET_ID"
 cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
