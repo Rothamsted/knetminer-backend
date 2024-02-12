@@ -64,12 +64,13 @@ rule rdf_export:
 
 rule tdb_load:
 	input:
-		f"{KETL_OUT}/rdf/knowledge-graph.ttl.bz2"
+		f"{KETL_OUT}/rdf/knowledge-graph.ttl.bz2",
+		meta_rdf = f"{KETL_OUT}/rdf/knowledge-graph-metadata.ttl"
 	output:
-		directory ( f"{KETL_OUT}/rdf/ontologies" ),
-		directory ( f"{KETL_OUT}/tmp/tdb" )
+		directory ( f"{KETL_OUT}/tmp/tdb" ),
+		ontologies = directory ( f"{KETL_OUT}/rdf/ontologies" )
 	shell:
-		'./endpoint-steps/tdb-load.sh'	
+		'./endpoint-steps/tdb-load.sh "{input[0]}" "{input.meta_rdf}" "{output[0]}" "{output.ontologies}"'	
 
 # ==> NOTE: review the options in $NEO4J_HOME about the transaction log retentions, 
 # to get rid of past transactions retention, else, the dump can be much bigger than 
