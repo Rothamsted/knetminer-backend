@@ -13,19 +13,21 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 
 
 printf "\n\n  Creating KnetMiner initialisation files\n\n"
+
 knet_cfg="$KETL_OUT/tmp/knet-init"
-mkdir -p "$knet_cfg"
+rm -Rf "$knet_cfg"
+mkdir "$knet_cfg"
+
 "$KNET_WEBAPP/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_DATASET_ID"
 cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
 
-printf "\n\n  Creating Neo full-text index for concpept searching\n\n"
+# This does all of base indexing, --neo-index and --neo-motifs in one go (in this order).
+# --neo-motifs is provisional, we need it until we can replace it with the new traverser.
+#
+printf "\n\n  Creating Neo indexing (full-text and semantic motifs)\n\n"
 "$KNET_INITIALIZER_HOME/knet-init.sh" \
--c "$knet_cfg/config/config-etl.yml" --neo-index=config:// --in "$oxl_src"
+-c "$knet_cfg/config/config-etl.yml" --neo-index=config:// --neo-motifs --in "$oxl_src"
 
-# This is provisional, we need it until we can replace it with the new traverser
-printf "\n\n  Creating Semantic Motif Links\n\n"
-"$KNET_INITIALIZER_HOME/knet-init.sh" \
-  -c "$knet_cfg/config/config-etl.yml" --neo-motifs --neo-url=config:// --in "$oxl_src"
 
 echo -e "\nAll Neo4j indexing done\n"
 echo `date` >"$out_flag"
