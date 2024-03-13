@@ -16,7 +16,7 @@ echo -e "\nRestarting $host\n"
 # fixing it, but this is quicker and less dependant on them.
 #
 sudo_cmd="sudo -u docker --set-home --login --non-interactive"
-ssh "$KNET_SSH_USER@$host" 'bash -il' << EOT
+ssh "$host" 'bash -il' << EOT
 
 set -e
 $sudo_cmd /opt/software/knetminer-ci/docker/dataset-cleanup.sh  '$KNET_TEST_DATASET_DIR'
