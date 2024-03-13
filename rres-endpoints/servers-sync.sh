@@ -35,10 +35,6 @@ rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KETL_OU
 set +x
 
 
-echo -e "\n\n  ****** STOPPING HERE, THE REST OF THIS SCRIPT IS TO BE REVIEWED ******\n"
-exit 2
-
-
 # The Neo4j stuff.
 #
 # This transfers the dump and restart the Neo4j server, on configured machines. As you can see, you can disable this
