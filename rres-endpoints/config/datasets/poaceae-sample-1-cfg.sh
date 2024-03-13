@@ -10,7 +10,7 @@ export KETL_NEO_VERSION='5.16.0'
 export NEO4J_HOME="/tmp/neo4j-community-$KETL_NEO_VERSION"
 
 # Knet Initialiser
-export KNET_DATASET_ID="poaceae-test"
+export KNET_INIT_DATASET_ID="poaceae-test"
 
 if [[ ! -e "${KETL_SRC_OXL}" ]]; then
 

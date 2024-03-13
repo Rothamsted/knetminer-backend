@@ -59,7 +59,7 @@ export KNET_INITIALIZER_HOME=''
 # Used by $KNET_WEBAPP/docker/dataset-init.sh, it's one of the dirs in 
 # $KNET_WEBAPP/datasets. It might be different from the default, since multiple
 # datasets might have the same config
-export KNET_DATASET_ID="$KETL_DATASET_ID"
+export KNET_INIT_DATASET_ID="$KETL_DATASET_ID"
 
 
 ### Neo4j settings

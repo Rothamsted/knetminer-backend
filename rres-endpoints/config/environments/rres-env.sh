@@ -62,6 +62,9 @@ export KNET_WEB_DUMPS=/var/www/html/knetminer/downloads
 export KNET_SECRETS="$KNET_SOFTWARE/secrets"
 export KNET_WEB_SECRETS="$KNET_SECRETS/web-data"
 
+## The neo4j server
+export KNET_NEO_SSH=neo4j@babvs65.rothamsted.ac.uk
+export KNET_NEO_DATA=/opt/data
 
 
 # This script contains the stupid initialisation that 'conda init' puts in .bashrc

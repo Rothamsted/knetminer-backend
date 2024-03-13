@@ -13,4 +13,6 @@ export KETL_NEO_VERSION='5.16.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 
 # Knet Initialiser
-export KNET_DATASET_ID="poaceae-test"
+# The name within the code base, which identifies the config dir to be
+# used for the KnetMiner initialiser
+export KNET_INIT_DATASET_ID="poaceae-test"

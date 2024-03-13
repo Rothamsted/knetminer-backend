@@ -21,7 +21,7 @@ knet_cfg="$KETL_OUT/tmp/knet-init"
 rm -Rf "$knet_cfg"
 mkdir -p "$knet_cfg"
 
-"$KNET_WEBAPP/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_DATASET_ID"
+"$KNET_WEBAPP/docker/dataset-init.sh" --force "$knet_cfg" "$KNET_INIT_DATASET_ID"
 cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
 
 # This does all of base indexing, --neo-index and --neo-motifs in one go (in this order).

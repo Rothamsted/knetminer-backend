@@ -45,11 +45,11 @@ exit 2
 # step completely with a flag, which is to be set upon dataset configuration.
 #
 
-if [[ "$KNET_DATASET_HAS_NEO4J" != 'false' ]]; then
+if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 
 	echo -e "\n\n\tSynchronising file dump with Neo4j server\n"
-	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/neo4j.dump" \
-	             "$KNET_NEO_SERVER_SSH:$KNET_NEO_SERVER_DATA_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
+	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump" \
+	             "$KNET_NEO_SSH:$KNET_NEO_DATA/$KETL_DATASET_ID-$KETL_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
 	    
 	# Synch Neo4j only if the dump was actually updated         
 	if [[ ! "$rsout" =~ 'Number of regular files transferred: 0' ]]; then 
@@ -59,7 +59,7 @@ if [[ "$KNET_DATASET_HAS_NEO4J" != 'false' ]]; then
 	  # This issues commands to stop, re-load from the dump, restart.
 	  # eg, see neo-server-update-poaceae.sh
 	  #
-	  ./config/neo4j/neo-server-update-$KNET_DATASET_ID.sh
+	  ./config/neo4j/neo-server-update-$KETL_DATASET_ID.sh
 	
 	fi
 fi
