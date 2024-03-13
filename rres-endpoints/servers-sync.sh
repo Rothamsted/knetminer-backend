@@ -55,10 +55,14 @@ if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 	  # This issues commands to stop, re-load from the dump, restart.
 	  # eg, see neo-server-update-poaceae.sh
 	  #
-	  ./config/neo4j/neo-server-update-$KETL_DATASET_ID.sh
+	  ./utils/neo4j/neo-server-update-$KETL_DATASET_ID.sh
 	
 	fi
 fi
+
+exit -e "\n\n  **** ENDING HERE ***\n"
+exit 2
+
 
 # The KnetMiner instances (eg, babvs72/73).
 # 
