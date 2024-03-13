@@ -60,23 +60,19 @@ if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 	fi
 fi
 
-echo -e "\n\n  **** ENDING HERE ***\n"
-exit 2
-
-
 # The KnetMiner instances (eg, babvs72/73).
 # 
 # These require that the new OXL is put in place and the Knetminer's Docker container(s) is (are) restarted, so that
 # they can reload the new data.
 #
-if [[ ! -z "$KNET_TEST_SERVERS" ]]; then
+if [[ ! -z "$KNET_TESTINST_SSH" ]]; then
 	echo -e "\n\n\tSynchronising OXL data on KnetMiner app servers (requires manual reload)\n"
-	for host in $KNET_TEST_SERVERS
+	for host in $KNET_TESTINST_SSH
 	do
 	  echo -e "\nSynchronising OXL dump with '$host' Knetminer server\n"
 	  rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS \
-	        "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl" \
-	        "$KNET_SSH_USER@$host:$KNET_TEST_DATA_DIR/knowledge-network.oxl" | tee /dev/tty`
+	        "${KETL_OUT}/knowledge-graph-annotated.oxl" \
+	        "$host:$KNET_TESTINST_DATA_PATH/knowledge-network.oxl" | tee /dev/tty`
 	
 	  [[ "$rsout" =~ 'Number of regular files transferred: 0' ]] && continue
 	  [[ "$rsout" =~ 'rsync error:' ]] && exit 1
