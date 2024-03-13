@@ -44,7 +44,7 @@ set +x
 if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 
 	echo -e "\n\n\tSynchronising file dump with Neo4j server\n"
-	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "{KETL_OUT}/neo4j-{KETL_NEO_VERSION}.dump" \
+	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KETL_OUT/neo4j-${KETL_NEO_VERSION}.dump" \
 	             "$KNET_NEO_SSH:$KNET_NEO_DATA/$KETL_DATASET_ID-$KETL_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
 	    
 	# Synch Neo4j only if the dump was actually updated         
