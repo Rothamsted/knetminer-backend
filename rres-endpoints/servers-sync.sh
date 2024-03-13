@@ -72,7 +72,7 @@ if [[ ! -z "$KNET_TESTINST_SSH" ]]; then
 	  echo -e "\nSynchronising OXL dump with '$host' Knetminer server\n"
 	  rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS \
 	        "${KETL_OUT}/knowledge-graph-annotated.oxl" \
-	        "$host:$KNET_TESTINST_DATA_PATH/knowledge-network.oxl" | tee /dev/tty`
+	        "$host:$KNET_TESTINST_DATA_PATH/data/knowledge-network.oxl" | tee /dev/tty`
 	
 	  [[ "$rsout" =~ 'Number of regular files transferred: 0' ]] && continue
 	  [[ "$rsout" =~ 'rsync error:' ]] && exit 1

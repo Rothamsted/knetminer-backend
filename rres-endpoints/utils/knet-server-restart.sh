@@ -19,6 +19,6 @@ sudo_cmd="sudo -u docker --set-home --login --non-interactive"
 ssh "$host" 'bash -il' << EOT
 
 set -e
-$sudo_cmd /opt/software/knetminer-ci/docker/dataset-cleanup.sh  '$KNET_TEST_DATASET_DIR'
+$sudo_cmd /opt/software/knetminer-ci/docker/dataset-cleanup.sh  '$KNET_TESTINST_DATA_PATH'
 $sudo_cmd /opt/software/knetminer-ci/rres/dockerhub-deploy.sh
 EOT

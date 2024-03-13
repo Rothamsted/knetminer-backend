@@ -30,7 +30,7 @@ export KNET_NEO_DATA=/opt/data
 
 ## RRes Test instances for Knetminer
 # Test servers like babvs73
-export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/poaceae-ci/data
+export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/poaceae-ci
 # babvs73: based on old Traverser, available at knetminer.com/ci-test
 # babvs72: based on Neo4j+OXL Traverser, available at knetminer.com/ci-test-cypher
 export KNET_TESTINST_SSH="brandizim@babvs73.rothamsted.ac.uk brandizim@babvs72.rothamsted.ac.uk"
