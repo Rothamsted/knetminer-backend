@@ -60,7 +60,7 @@ if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 	fi
 fi
 
-exit -e "\n\n  **** ENDING HERE ***\n"
+echo -e "\n\n  **** ENDING HERE ***\n"
 exit 2
 
 
