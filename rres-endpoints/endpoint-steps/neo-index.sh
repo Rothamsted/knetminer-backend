@@ -13,6 +13,7 @@ export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.password='$KETL_NEO_PWD'"
 
 
 printf "\n\n  Creating KnetMiner initialisation files\n\n"
+printf "\n  ====> MAKE SURE $KNET_INITIALIZER_HOME IS UPDATED!!!\n\n"
 
 knet_cfg="$KETL_OUT/tmp/knet-init"
 # Re-creating it all is the safest option, comment this at your own risk, and 
