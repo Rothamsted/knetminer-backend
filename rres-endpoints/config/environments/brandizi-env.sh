@@ -1,22 +1,16 @@
-export KNET_SCRIPTS_HOME=`realpath "${BASH_SOURCE[0]}"`
-export KNET_SCRIPTS_HOME=`dirname "$KNET_SCRIPTS_HOME"`
-cd "$KNET_SCRIPTS_HOME/../.."
-export KNET_SCRIPTS_HOME="`pwd`"
+code_home=/Users/brandizi/Documents/Work/RRes/code
+odx_home="$code_home/ondex/ondex-knet-builder/ondex-knet-builder/modules"
 
-export KNET_ENV_POSTFIX="-brandizi"
+# The Ondex RDF exporter
+export KETL_RDFEXP_HOME="$odx_home/rdf-export-2-cli/target/rdf-export-2-cli_7.0.1-SNAPSHOT"
 
-export KNET_DATA_HOME=/tmp/knetminer-data-test
+# The Ondex flavour of the rdf2neo converter
+export KETL_NEOEXPORT_HOME="$odx_home/neo4j-export/target/neo4j-exporter"
 
-ondex_mods="/Users/brandizi/Documents/Work/RRes/ondex_git/ondex-knet-builder/ondex-knet-builder/modules"
-export KNET_RDFEXP_HOME="$ondex_mods/rdf-export-2-cli/target/rdf-export-2-cli_4.0-SNAPSHOT"
+export KNET_WEBAPP="$code_home/knetminer/knetminer"
+export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 
-export KNET_NEOEXPORT_HOME="$ondex_mods/neo4j-export/target/neo4j-exporter"
-export NEO4J_HOME="$ondex_mods/neo4j-export/target/neo4j.server/neo4j-community-4.3.2"
+# export KETL_SNAKE_OPTS='--dry-run'
 
-export KNET_NEO_URL="bolt://localhost:17690"
-export KNET_NEO_USR="neo4j"
-export KNET_NEO_PWD="test"
-
-. config/common-cfg.sh
-
-conda activate snakemake
+# TODO: you need to do it manually, since it relies on sourced files
+# conda activate snakemake

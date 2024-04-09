@@ -7,16 +7,20 @@
 #
 
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
 
-rdf_target="$KNET_DATASET_TARGET/rdf"
-mkdir -p "$rdf_target"
-outf="$rdf_target/knowledge-graph.ttl"
+in_oxl="$1"
+out_rdf="$2"
 
-echo -e "\n\nRDF Exporting '$KNET_DATASET_TARGET/knowledge-graph-uris.oxl' to '${outf}.bz2'"
-rm -f "${outf}.fifo"
-mkfifo "${outf}.fifo" # no stdout available here, hence we need the Unix FIFO to pipe things lazily. 
-"$KNET_RDFEXP_HOME/odx2rdf.sh" "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl" "${outf}.fifo" &
-bzip2 -c <"${outf}.fifo" >"${outf}.bz2"
-rm -f "${outf}.fifo"
+out_dir="`dirname "$out_rdf"`"
+mkdir -p "$out_dir"
+
+tmp_dir="$ETL_OUT/tmp"
+mkdir -p "$tmp_dir"
+fifo="$tmp_dir/rdf-export.fifo"
+
+echo -e "\n\nRDF Exporting '$in_oxl' to '$out_rdf'"
+rm -f "$fifo"
+mkfifo "$fifo" # no stdout available here, hence we need the Unix FIFO to pipe things lazily. 
+"$KETL_RDFEXP_HOME/odx2rdf.sh" "$in_oxl" "$fifo" &
+bzip2 -c <"$fifo" >"$out_rdf"
+rm -f "$fifo"

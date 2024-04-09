@@ -4,29 +4,35 @@
 # This has to be ran manually, it isn't part of build-endpoint.snakefile.
 #
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
+
+# As in build-endpoint.sh, this defines a few defaults and then invokes other
+# specific config files.
+#
+. config/default-cfg.sh
+
+cd "$KETL_HOME"
 
 echo -e "\n\n\tSynchronising file dumps with their web publishing location\n"
 echo -e "Please, beware, logs from this command report hashed dirs\n"
 
-web_target="$KNET_DOWNLOAD_SSH:$KNET_DOWNLOAD_DIR"
+web_target="$KNET_WEB_SSH:$KNET_WEB_DUMPS"
 
 # If the dataset isn't public, it is published on the same target, but under an obfuscated
 # directory, which is based on this hash code.
 #
-secret_path="$KNET_WEB_SECRETS_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION.key"
+secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KETL_DATASET_VERSION.key"
 if [[ -e "$secret_path" ]]; then
 	secret=`cat "$secret_path"`
-	web_target="$web_target/reserved/$KNET_DATASET_ID/$KNET_DATASET_VERSION/$secret"
-	web_target="$web_target/$secret"
+	web_target="$web_target/reserved/$KETL_DATASET_ID/$KETL_DATASET_VERSION/$secret"
 else
-	web_target="$web_target/$KNET_DATASET_ID/$KNET_DATASET_VERSION"
+	web_target="$web_target/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 fi
 
 
-chmod -R ugo+rX "$KNET_DATASET_TARGET"
-rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DATASET_TARGET/" "$web_target"
+chmod -R ugo+rX "$KETL_OUT"
+set -x
+rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KETL_OUT/" "$web_target"
+set +x
 
 
 # The Neo4j stuff.
@@ -35,11 +41,11 @@ rsync --exclude=tmp --exclude='.*' $RSYNC_DFLT_OPTS $RSYNC_MIRROR_OPTS "$KNET_DA
 # step completely with a flag, which is to be set upon dataset configuration.
 #
 
-if [[ "$KNET_DATASET_HAS_NEO4J" != 'false' ]]; then
+if [[ "$KETL_HAS_NEO4J" != 'false' ]]; then
 
 	echo -e "\n\n\tSynchronising file dump with Neo4j server\n"
-	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KNET_DATASET_TARGET/neo4j.dump" \
-	             "$KNET_NEO_SERVER_SSH:$KNET_NEO_SERVER_DATA_DIR/$KNET_DATASET_ID-$KNET_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
+	rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS "$KETL_OUT/neo4j-${KETL_NEO_VERSION}.dump" \
+	             "$KNET_NEO_SSH:$KNET_NEO_DATA/$KETL_DATASET_ID-$KETL_DATASET_VERSION-neo4j.dump" | tee /dev/tty`
 	    
 	# Synch Neo4j only if the dump was actually updated         
 	if [[ ! "$rsout" =~ 'Number of regular files transferred: 0' ]]; then 
@@ -49,7 +55,7 @@ if [[ "$KNET_DATASET_HAS_NEO4J" != 'false' ]]; then
 	  # This issues commands to stop, re-load from the dump, restart.
 	  # eg, see neo-server-update-poaceae.sh
 	  #
-	  ./config/neo4j/neo-server-update-$KNET_DATASET_ID.sh
+	  ./utils/neo4j/neo-server-update-$KETL_DATASET_ID.sh
 	
 	fi
 fi
@@ -59,14 +65,14 @@ fi
 # These require that the new OXL is put in place and the Knetminer's Docker container(s) is (are) restarted, so that
 # they can reload the new data.
 #
-if [[ ! -z "$KNET_TEST_SERVERS" ]]; then
+if [[ ! -z "$KNET_TESTINST_SSH" ]]; then
 	echo -e "\n\n\tSynchronising OXL data on KnetMiner app servers (requires manual reload)\n"
-	for host in $KNET_TEST_SERVERS
+	for host in $KNET_TESTINST_SSH
 	do
 	  echo -e "\nSynchronising OXL dump with '$host' Knetminer server\n"
 	  rsout=`rsync $RSYNC_DFLT_OPTS $RSYNC_BKP_OPTS \
-	        "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl" \
-	        "$KNET_SSH_USER@$host:$KNET_TEST_DATA_DIR/knowledge-network.oxl" | tee /dev/tty`
+	        "${KETL_OUT}/knowledge-graph-annotated.oxl" \
+	        "$host:$KNET_TESTINST_DATA_PATH/data/knowledge-network.oxl" | tee /dev/tty`
 	
 	  [[ "$rsout" =~ 'Number of regular files transferred: 0' ]] && continue
 	  [[ "$rsout" =~ 'rsync error:' ]] && exit 1

@@ -6,30 +6,38 @@
 # the pipeline more incremental.
 # 
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
 
-rdf_target="$KNET_DATASET_TARGET/rdf"
-tdb="$KNET_DATASET_TARGET/tmp/tdb"
+# Inputs
+kg_rdf="$1"
+meta_rdf="$2"
+
+# Outputs
+tdb="$3"
+ontos="$4"
+
+
+rdf_files="$meta_rdf"
+
 if [[ ! -d "$tdb" ]]; then
   # If it exists, we assume it's already populated and the command below takes the TDB as-is when no RDF is 
   # given.
   
-  rdf_files=""$rdf_target/knowledge-graph.ttl.bz2""
+  rdf_files="$kg_rdf"
 fi
 
 # Same for this
-if [[ ! -d "$rdf_target/ontologies" ]]; then
+if [[ ! -d "$ontos" ]]; then
 
   echo -e "\n\tDownloading Ontologies\n"
   
-  mkdir -p "$rdf_target/ontologies"
-  "$KNET_NEOEXPORT_HOME/get_ontologies.sh" "$rdf_target/ontologies"
+  mkdir -p "$ontos"
+  "$KETL_NEOEXPORT_HOME/get_ontologies.sh" "$ontos"
 
   # smaller ones first, don't postpone stupid errors with these
-  rdf_files=""$rdf_target/ontologies/"*.* $rdf_files"
+  rdf_files=""$ontos/"*.* $rdf_files"
 fi
 
 echo -e "\n\tLoading RDF into '$tdb' \n"
-# -l option does the trick
-"$KNET_NEOEXPORT_HOME/ondex2neo.sh" -l --tdb "$tdb" $rdf_files
+
+# -l option does the trick of just loading the TDB and not running the whole thing
+"$KETL_NEOEXPORT_HOME/ondex2neo.sh" -l --tdb "$tdb" $rdf_files

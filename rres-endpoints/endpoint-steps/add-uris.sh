@@ -5,11 +5,11 @@
 #   
 
 set -e
-cd "$KNET_SCRIPTS_HOME"
-. config/init-dataset-cfg.sh
 
-mkdir -p "$KNET_DATASET_TARGET"
-mkdir -p "$KNET_DATASET_TARGET/tmp"
+in_oxl="$1"
+out_oxl="$2"
 
-echo -e "\n\nAdding URIs to '$KNET_SRC_OXL' and saving to '$KNET_DATASET_TARGET/knowledge-graph-uris.oxl'"
-"$KNET_RDFEXP_HOME/add-uris.sh" "$KNET_SRC_OXL" "$KNET_DATASET_TARGET/knowledge-graph-uris.oxl"
+mkdir -p "`dirname "$out_oxl"`"
+
+echo -e "\n\nAdding URIs to '$in_oxl' and saving to '$out_oxl'"
+"$KETL_RDFEXP_HOME/add-uris.sh" "$in_oxl" "$out_oxl"
