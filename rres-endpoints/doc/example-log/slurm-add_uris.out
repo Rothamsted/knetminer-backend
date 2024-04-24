@@ -1,0 +1,56 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 17:27:49 2024]
+rule add_uris:
+    input: /home/data/knetminer/etl-test/cereals-dummy/cereals-dummy-1.oxl
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knowledge-graph-uris.oxl
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+
+Adding URIs to '/home/data/knetminer/etl-test/cereals-dummy/cereals-dummy-1.oxl' and saving to '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knowledge-graph-uris.oxl'
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G
+
+17:27:59.794 [INFO ]: Loading '/home/data/knetminer/etl-test/cereals-dummy/cereals-dummy-1.oxl'
+17:28:00.147 [INFO ]: Starting OXL parsing... [OXL Parser]
+17:28:03.956 [INFO ]: OXL parsing finished. [OXL Parser]
+17:28:03.957 [INFO ]: Graph Loaded, now processing it
+17:28:03.957 [INFO ]: Adding URIs to 16256 concept(s) and 16508 relation(s)
+17:28:03.957 [INFO ]: Start processing concepts
+17:28:04.246 [INFO ]: 10% of concepts done
+17:28:04.257 [INFO ]: 20% of concepts done
+17:28:04.268 [INFO ]: 30% of concepts done
+17:28:04.279 [INFO ]: 40% of concepts done
+17:28:04.287 [INFO ]: 50% of concepts done
+17:28:04.295 [INFO ]: 60% of concepts done
+17:28:04.304 [INFO ]: 70% of concepts done
+17:28:04.312 [INFO ]: 80% of concepts done
+17:28:04.320 [INFO ]: 90% of concepts done
+17:28:04.328 [INFO ]: 100% of concepts done
+17:28:04.329 [INFO ]: Start processing relations
+17:28:04.667 [INFO ]: 10% of relations done
+17:28:04.719 [INFO ]: 20% of relations done
+17:28:04.774 [INFO ]: 30% of relations done
+17:28:04.803 [INFO ]: 40% of relations done
+17:28:04.830 [INFO ]: 50% of relations done
+17:28:04.855 [INFO ]: 60% of relations done
+17:28:04.880 [INFO ]: 70% of relations done
+17:28:04.905 [INFO ]: 80% of relations done
+17:28:04.929 [INFO ]: 90% of relations done
+17:28:04.954 [INFO ]: 100% of relations done
+Total concepts to export: 16,256
+
+Total relations to export: 16,508
+
+17:28:06.776 [INFO ]: URI addition finished.
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+[Wed Apr 24 17:28:06 2024]
+Finished job 0.
+1 of 1 steps (100%) done

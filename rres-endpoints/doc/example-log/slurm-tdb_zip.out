@@ -1,0 +1,66 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 18:38:46 2024]
+rule tdb_zip:
+    input: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/tdb.tar.bz2
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+	Compressing '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb' to '/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/tdb.tar.bz2' 
+
+tar: Removing leading `/' from member names
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/tdb.lock
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/.snakemake_timestamp
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/nodes.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPOS.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSP.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/journal.jrnl
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POS.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPOG.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GOSP.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POS.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/nodes-data.bdf
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/prefixes-data.obj
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPO.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPO.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSPG.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPOS.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPU.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POS.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/nodes.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPU.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GOSP.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POSG.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/tdb.lock
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSPG.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/prefixes.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPOG.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSPG.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPOG.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSP.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GOSP.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/nodes-data.obj
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GSPO.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/prefixes-data.bdf
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPU.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/nodes.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/SPO.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/prefixes.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GPOS.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GSPO.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POSG.bpt
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/OSP.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/prefixes.dat
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/GSPO.idn
+/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb/Data-0001/POSG.idn
+[Wed Apr 24 18:38:58 2024]
+Finished job 0.
+1 of 1 steps (100%) done

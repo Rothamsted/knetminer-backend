@@ -1,0 +1,132 @@
+nohup: ignoring input
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 16
+Job stats:
+job                 count    min threads    max threads
+----------------  -------  -------------  -------------
+add_uris                1              1              1
+all                     1              1              1
+dataset_metadata        1              1              1
+neo_dump                1              1              1
+neo_export              1              1              1
+neo_index               1              1              1
+rdf_export              1              1              1
+tdb_load                1              1              1
+tdb_zip                 1              1              1
+total                   9              1              1
+
+Select jobs to execute...
+
+[Tue Mar 12 09:50:03 2024]
+rule add_uris:
+    input: /home/data/knetminer/etl-test/poaceae/57/generic/knowledge-network-free.oxl
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/knowledge-graph-uris.oxl
+    jobid: 2
+    resources: tmpdir=/tmp
+
+Submitted job 2 with external jobid 'Submitted batch job 324984'.
+[Tue Mar 12 10:03:43 2024]
+Finished job 2.
+1 of 9 steps (11%) done
+Select jobs to execute...
+
+[Tue Mar 12 10:03:43 2024]
+rule dataset_metadata:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/knowledge-graph-uris.oxl
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/knowledge-graph-annotated.oxl, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph-metadata.ttl
+    jobid: 1
+    resources: tmpdir=/tmp
+
+Submitted job 1 with external jobid 'Submitted batch job 324987'.
+
+[Tue Mar 12 10:03:43 2024]
+rule rdf_export:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/knowledge-graph-uris.oxl
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph.ttl.bz2
+    jobid: 3
+    resources: tmpdir=/tmp
+
+Submitted job 3 with external jobid 'Submitted batch job 324988'.
+[Tue Mar 12 10:17:34 2024]
+Finished job 1.
+2 of 9 steps (22%) done
+[Tue Mar 12 10:26:25 2024]
+Finished job 3.
+3 of 9 steps (33%) done
+Select jobs to execute...
+
+[Tue Mar 12 10:26:26 2024]
+rule tdb_load:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph.ttl.bz2, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph-metadata.ttl
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/tdb, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/ontologies
+    jobid: 4
+    resources: tmpdir=/tmp
+
+Submitted job 4 with external jobid 'Submitted batch job 324990'.
+[Tue Mar 12 10:56:18 2024]
+Finished job 4.
+4 of 9 steps (44%) done
+Select jobs to execute...
+
+[Tue Mar 12 10:56:19 2024]
+rule neo_export:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/tdb
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/neo-export.flag
+    jobid: 8
+    resources: tmpdir=/tmp
+
+Submitted job 8 with external jobid 'Submitted batch job 324993'.
+
+[Tue Mar 12 10:56:19 2024]
+rule tdb_zip:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/tdb
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/tdb.tar.bz2
+    jobid: 5
+    resources: tmpdir=/tmp
+
+Submitted job 5 with external jobid 'Submitted batch job 324994'.
+[Tue Mar 12 11:14:11 2024]
+Finished job 5.
+5 of 9 steps (56%) done
+[Tue Mar 12 11:19:11 2024]
+Finished job 8.
+6 of 9 steps (67%) done
+Select jobs to execute...
+
+[Tue Mar 12 11:19:12 2024]
+rule neo_index:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/neo-export.flag, /home/data/knetminer/pub/endpoints/poaceae-free/57/knowledge-graph-annotated.oxl
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/neo-index.flag
+    jobid: 7
+    resources: tmpdir=/tmp
+
+Submitted job 7 with external jobid 'Submitted batch job 324997'.
+[Tue Mar 12 11:40:24 2024]
+Finished job 7.
+7 of 9 steps (78%) done
+Select jobs to execute...
+
+[Tue Mar 12 11:40:24 2024]
+rule neo_dump:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/neo-index.flag
+    output: /home/data/knetminer/pub/endpoints/poaceae-free/57/neo4j-5.16.0.dump
+    jobid: 6
+    resources: tmpdir=/tmp
+
+Submitted job 6 with external jobid 'Submitted batch job 324999'.
+[Tue Mar 12 11:52:35 2024]
+Finished job 6.
+8 of 9 steps (89%) done
+Select jobs to execute...
+
+[Tue Mar 12 11:52:35 2024]
+localrule all:
+    input: /home/data/knetminer/pub/endpoints/poaceae-free/57/knowledge-graph-annotated.oxl, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph.ttl.bz2, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/ontologies, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/knowledge-graph-metadata.ttl, /home/data/knetminer/pub/endpoints/poaceae-free/57/tmp/tdb, /home/data/knetminer/pub/endpoints/poaceae-free/57/rdf/tdb.tar.bz2, /home/data/knetminer/pub/endpoints/poaceae-free/57/neo4j-5.16.0.dump
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue Mar 12 11:52:35 2024]
+Finished job 0.
+9 of 9 steps (100%) done
+Complete log: /home/data/knetminer/software/knetminer-backend/rres-endpoints/.snakemake/log/2024-03-12T094938.570417.snakemake.log

@@ -1,0 +1,378 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 18:38:46 2024]
+rule neo_export:
+    input: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/neo-export.flag
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+Clearing Neo4j at '/home/data/knetminer/software/neo4j-community-5.16.0-etl'
+
+	Stopping Neo4j
+
+
+No JOB ID file
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G
+Changed password for user 'neo4j'. IMPORTANT: this change will only take effect if performed before the database is started for the first time.
+
+	Starting Neo4j on SLURM
+
+
+Job submitted to host rothhpc418, ID:328750
+
+
+	Starting neo4j-export
+
+
+
+  rdf2neo.sh
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G -Dneo4j.boltUrl='bolt://rothhpc418:7687' -Dneo4j.user='neo4j' -Dneo4j.password='testTest' -Dfile.encoding=UTF-8
+18:39:10.433 [INFO ]: Getting maker configuration from Spring XML file 'file:///home/data/knetminer/software/ondex-mini/tools/neo4j-exporter/ondex_config/config.xml'
+18:39:11.944 [INFO ]: Getting maker configuration from Spring Context
+18:39:11.947 [INFO ]: Using MultiConfigNeo4jLoader PG maker
+18:39:15.568 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+18:39:15.573 [INFO ]: Starting PG nodes making
+18:39:17.256 [INFO ]: Waiting for the batch processor to finish
+18:39:29.746 [INFO ]: 7/7 batch jobs completed
+18:39:29.746 [INFO ]: Waiting for the batch processor to finish
+18:39:29.747 [INFO ]: Batch processor finished
+18:39:29.747 [INFO ]: PG nodes making ended
+18:39:29.747 [INFO ]: [Concepts] RDF-PG conversion finished
+18:39:29.779 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+18:39:29.779 [INFO ]: Starting PG nodes making
+18:39:30.394 [INFO ]: Waiting for the batch processor to finish
+18:39:31.685 [INFO ]: 10/10 batch jobs completed
+18:39:31.685 [INFO ]: Waiting for the batch processor to finish
+18:39:31.685 [INFO ]: Batch processor finished
+18:39:31.685 [INFO ]: PG nodes making ended
+18:39:31.685 [INFO ]: [Accessions] RDF-PG conversion finished
+18:39:31.700 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+18:39:31.700 [INFO ]: Starting PG nodes making
+18:39:31.711 [INFO ]: Waiting for the batch processor to finish
+18:39:32.050 [INFO ]: 1/1 batch jobs completed
+18:39:32.051 [INFO ]: Waiting for the batch processor to finish
+18:39:32.051 [INFO ]: Batch processor finished
+18:39:32.051 [INFO ]: PG nodes making ended
+18:39:32.051 [INFO ]: [Metadata] RDF-PG conversion finished
+18:39:32.065 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+18:39:32.066 [INFO ]: Starting PG nodes making
+18:39:32.066 [INFO ]: Waiting for the batch processor to finish
+18:39:32.066 [INFO ]: 1/1 batch jobs completed
+18:39:32.067 [INFO ]: Waiting for the batch processor to finish
+18:39:32.067 [INFO ]: Batch processor finished
+18:39:32.067 [INFO ]: PG nodes making ended
+18:39:32.067 [INFO ]: [Reified Relations] RDF-PG conversion finished
+18:39:32.080 [INFO ]: [Indices] RDF source has about 0 triple(s)
+18:39:32.080 [INFO ]: Starting PG nodes making
+18:39:32.080 [INFO ]: Waiting for the batch processor to finish
+18:39:32.081 [INFO ]: 1/1 batch jobs completed
+18:39:32.081 [INFO ]: Waiting for the batch processor to finish
+18:39:32.081 [INFO ]: Batch processor finished
+18:39:32.081 [INFO ]: PG nodes making ended
+18:39:32.081 [INFO ]: [Indices] RDF-PG conversion finished
+18:39:32.106 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+18:39:32.107 [INFO ]: Starting PG relations making
+18:39:33.361 [INFO ]: Waiting for the batch processor to finish
+18:39:35.891 [INFO ]: 23/23 batch jobs completed
+18:39:35.891 [INFO ]: Waiting for the batch processor to finish
+18:39:35.892 [INFO ]: Batch processor finished
+18:39:35.892 [INFO ]: PG relations making ended
+18:39:35.892 [INFO ]: [Concepts] RDF-PG conversion finished
+18:39:35.906 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+18:39:35.906 [INFO ]: Starting PG relations making
+18:39:36.277 [INFO ]: Waiting for the batch processor to finish
+18:39:36.872 [INFO ]: 10/10 batch jobs completed
+18:39:36.872 [INFO ]: Waiting for the batch processor to finish
+18:39:36.872 [INFO ]: Batch processor finished
+18:39:36.873 [INFO ]: PG relations making ended
+18:39:36.873 [INFO ]: [Accessions] RDF-PG conversion finished
+18:39:36.887 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+18:39:36.887 [INFO ]: Starting PG relations making
+18:39:36.887 [INFO ]: Waiting for the batch processor to finish
+18:39:36.887 [INFO ]: 1/1 batch jobs completed
+18:39:36.888 [INFO ]: Waiting for the batch processor to finish
+18:39:36.888 [INFO ]: Batch processor finished
+18:39:36.888 [INFO ]: PG relations making ended
+18:39:36.888 [INFO ]: [Metadata] RDF-PG conversion finished
+18:39:36.900 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+18:39:36.900 [INFO ]: Starting PG relations making
+18:39:37.957 [INFO ]: Waiting for the batch processor to finish
+18:39:41.526 [INFO ]: 7/7 batch jobs completed
+18:39:41.526 [INFO ]: Waiting for the batch processor to finish
+18:39:41.527 [INFO ]: Batch processor finished
+18:39:41.527 [INFO ]: PG relations making ended
+18:39:41.527 [INFO ]: [Reified Relations] RDF-PG conversion finished
+18:39:41.540 [INFO ]: [Indices] RDF source has about 0 triple(s)
+18:39:41.540 [INFO ]: Starting PG relations making
+18:39:41.541 [INFO ]: Waiting for the batch processor to finish
+18:39:41.541 [INFO ]: 1/1 batch jobs completed
+18:39:41.541 [INFO ]: Waiting for the batch processor to finish
+18:39:41.542 [INFO ]: Batch processor finished
+18:39:41.542 [INFO ]: PG relations making ended
+18:39:41.542 [INFO ]: [Indices] RDF-PG conversion finished
+18:39:41.554 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+18:39:41.555 [WARN ]: [Concepts] No Cypher index definitions found, no Cypher index will be created
+18:39:41.555 [INFO ]: [Concepts] RDF-PG conversion finished
+18:39:41.567 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+18:39:41.567 [WARN ]: [Accessions] No Cypher index definitions found, no Cypher index will be created
+18:39:41.567 [INFO ]: [Accessions] RDF-PG conversion finished
+18:39:41.578 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+18:39:41.579 [WARN ]: [Metadata] No Cypher index definitions found, no Cypher index will be created
+18:39:41.579 [INFO ]: [Metadata] RDF-PG conversion finished
+18:39:41.589 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+18:39:41.589 [WARN ]: [Reified Relations] No Cypher index definitions found, no Cypher index will be created
+18:39:41.589 [INFO ]: [Reified Relations] RDF-PG conversion finished
+18:39:41.601 [INFO ]: [Indices] RDF source has about 0 triple(s)
+18:39:41.601 [INFO ]: [Indices] Loading Index definitions
+18:39:42.339 [INFO ]: [Indices] Index definitions loaded, returning 22 row(s)
+18:39:42.340 [INFO ]: [Indices] Starting Cypher Indexing
+18:39:42.467 [INFO ]: Indexing on node 'Concept'.'identifier'
+18:39:42.477 [INFO ]: Indexing on node 'Publication'.'identifier'
+18:39:42.485 [INFO ]: Indexing on node 'Resource'.'identifier'
+18:39:42.492 [INFO ]: Indexing on node 'Gene'.'identifier'
+18:39:42.499 [INFO ]: Indexing on node 'Protein'.'identifier'
+18:39:42.507 [INFO ]: Indexing on node 'PlantOntologyTerm'.'identifier'
+18:39:42.524 [INFO ]: Indexing on node 'CelComp'.'identifier'
+18:39:42.551 [INFO ]: Indexing on node 'CoExpCluster'.'identifier'
+18:39:42.566 [INFO ]: Indexing on node 'ProtDomain'.'identifier'
+18:39:42.574 [INFO ]: Indexing on node 'SNPEffect'.'identifier'
+18:39:42.582 [INFO ]: Indexing on node 'SNP'.'identifier'
+18:39:42.590 [INFO ]: Indexing on node 'EC'.'identifier'
+18:39:42.597 [INFO ]: Indexing on node 'Enzyme'.'identifier'
+18:39:42.606 [INFO ]: Indexing on node 'Phenotype'.'identifier'
+18:39:42.613 [INFO ]: Indexing on node 'BioProc'.'identifier'
+18:39:42.645 [INFO ]: Indexing on node 'Trait'.'identifier'
+18:39:42.653 [INFO ]: Indexing on node 'MolFunc'.'identifier'
+18:39:42.661 [INFO ]: Indexing on node 'Path'.'identifier'
+18:39:42.669 [INFO ]: Indexing on node 'Reaction'.'identifier'
+18:39:42.676 [INFO ]: Indexing on node 'Accession'.'identifier'
+18:39:42.685 [INFO ]: Indexing on node 'DataSource'.'identifier'
+18:39:42.692 [INFO ]: Indexing on node 'EvidenceType'.'identifier'
+18:39:42.699 [INFO ]: Indexing on node 'Concept'.'prefName'
+18:39:42.706 [INFO ]: Indexing on node 'Publication'.'prefName'
+18:39:42.714 [INFO ]: Indexing on node 'Resource'.'prefName'
+18:39:42.721 [INFO ]: Indexing on node 'Gene'.'prefName'
+18:39:42.734 [INFO ]: Indexing on node 'Protein'.'prefName'
+18:39:42.742 [INFO ]: Indexing on node 'PlantOntologyTerm'.'prefName'
+18:39:42.772 [INFO ]: Indexing on node 'CelComp'.'prefName'
+18:39:42.780 [INFO ]: Indexing on node 'CoExpCluster'.'prefName'
+18:39:42.788 [INFO ]: Indexing on node 'ProtDomain'.'prefName'
+18:39:42.795 [INFO ]: Indexing on node 'SNPEffect'.'prefName'
+18:39:42.803 [INFO ]: Indexing on node 'SNP'.'prefName'
+18:39:42.810 [INFO ]: Indexing on node 'EC'.'prefName'
+18:39:42.817 [INFO ]: Indexing on node 'Enzyme'.'prefName'
+18:39:42.824 [INFO ]: Indexing on node 'Phenotype'.'prefName'
+18:39:42.830 [INFO ]: Indexing on node 'BioProc'.'prefName'
+18:39:42.858 [INFO ]: Indexing on node 'Trait'.'prefName'
+18:39:42.866 [INFO ]: Indexing on node 'MolFunc'.'prefName'
+18:39:42.874 [INFO ]: Indexing on node 'Path'.'prefName'
+18:39:42.925 [INFO ]: Indexing on node 'Reaction'.'prefName'
+18:39:42.933 [INFO ]: Indexing on node 'Accession'.'prefName'
+18:39:42.939 [INFO ]: Indexing on node 'DataSource'.'prefName'
+18:39:42.959 [INFO ]: Indexing on node 'EvidenceType'.'prefName'
+18:39:42.971 [INFO ]: Indexing on node 'Concept'.'altName'
+18:39:42.978 [INFO ]: Indexing on node 'Publication'.'altName'
+18:39:43.008 [INFO ]: Indexing on node 'Resource'.'altName'
+18:39:43.015 [INFO ]: Indexing on node 'Gene'.'altName'
+18:39:43.032 [INFO ]: Indexing on node 'Protein'.'altName'
+18:39:43.040 [INFO ]: Indexing on node 'PlantOntologyTerm'.'altName'
+18:39:43.046 [INFO ]: Indexing on node 'CelComp'.'altName'
+18:39:43.108 [INFO ]: Indexing on node 'CoExpCluster'.'altName'
+18:39:43.115 [INFO ]: Indexing on node 'ProtDomain'.'altName'
+18:39:43.122 [INFO ]: Indexing on node 'SNPEffect'.'altName'
+18:39:43.130 [INFO ]: Indexing on node 'SNP'.'altName'
+18:39:43.136 [INFO ]: Indexing on node 'EC'.'altName'
+18:39:43.172 [INFO ]: Indexing on node 'Enzyme'.'altName'
+18:39:43.179 [INFO ]: Indexing on node 'Phenotype'.'altName'
+18:39:43.187 [INFO ]: Indexing on node 'BioProc'.'altName'
+18:39:43.194 [INFO ]: Indexing on node 'Trait'.'altName'
+18:39:43.201 [INFO ]: Indexing on node 'MolFunc'.'altName'
+18:39:43.237 [INFO ]: Indexing on node 'Path'.'altName'
+18:39:43.244 [INFO ]: Indexing on node 'Reaction'.'altName'
+18:39:43.252 [INFO ]: Indexing on node 'Accession'.'altName'
+18:39:43.259 [INFO ]: Indexing on node 'DataSource'.'altName'
+18:39:43.265 [INFO ]: Indexing on node 'EvidenceType'.'altName'
+18:39:43.292 [INFO ]: Indexing on node 'Concept'.'label'
+18:39:43.300 [INFO ]: Indexing on node 'Publication'.'label'
+18:39:43.307 [INFO ]: Indexing on node 'Resource'.'label'
+18:39:43.314 [INFO ]: Indexing on node 'Gene'.'label'
+18:39:43.321 [INFO ]: Indexing on node 'Protein'.'label'
+18:39:43.328 [INFO ]: Indexing on node 'PlantOntologyTerm'.'label'
+18:39:43.360 [INFO ]: Indexing on node 'CelComp'.'label'
+18:39:43.387 [INFO ]: Indexing on node 'CoExpCluster'.'label'
+18:39:43.394 [INFO ]: Indexing on node 'ProtDomain'.'label'
+18:39:43.426 [INFO ]: Indexing on node 'SNPEffect'.'label'
+18:39:43.434 [INFO ]: Indexing on node 'SNP'.'label'
+18:39:43.441 [INFO ]: Indexing on node 'EC'.'label'
+18:39:43.448 [INFO ]: Indexing on node 'Enzyme'.'label'
+18:39:43.455 [INFO ]: Indexing on node 'Phenotype'.'label'
+18:39:43.462 [INFO ]: Indexing on node 'BioProc'.'label'
+18:39:43.468 [INFO ]: Indexing on node 'Trait'.'label'
+18:39:43.495 [INFO ]: Indexing on node 'MolFunc'.'label'
+18:39:43.505 [INFO ]: Indexing on node 'Path'.'label'
+18:39:43.511 [INFO ]: Indexing on node 'Reaction'.'label'
+18:39:43.518 [INFO ]: Indexing on node 'Accession'.'label'
+18:39:43.524 [INFO ]: Indexing on node 'DataSource'.'label'
+18:39:43.530 [INFO ]: Indexing on node 'EvidenceType'.'label'
+18:39:43.560 [INFO ]: Indexing on relation 'identifier'.'label'
+18:39:43.568 [INFO ]: Indexing on relation 'dataSource'.'label'
+18:39:43.596 [INFO ]: Indexing on relation 'evidence'.'label'
+18:39:43.623 [INFO ]: Indexing on relation 'relatedConcept'.'label'
+18:39:43.630 [INFO ]: Indexing on relation 'associated_with'.'label'
+18:39:43.637 [INFO ]: Indexing on relation 'has_domain'.'label'
+18:39:43.644 [INFO ]: Indexing on relation 'has_mutant'.'label'
+18:39:43.650 [INFO ]: Indexing on relation 'has_variation'.'label'
+18:39:43.688 [INFO ]: Indexing on relation 'xref'.'label'
+18:39:43.695 [INFO ]: Indexing on relation 'has_phenotype'.'label'
+18:39:43.702 [INFO ]: Indexing on relation 'cooc_wi'.'label'
+18:39:43.708 [INFO ]: Indexing on relation 'pos_reg'.'label'
+18:39:43.715 [INFO ]: Indexing on relation 'ortho'.'label'
+18:39:43.752 [INFO ]: Indexing on relation 'participates_in'.'label'
+18:39:43.759 [INFO ]: Indexing on relation 'equ'.'label'
+18:39:43.765 [INFO ]: Indexing on relation 'enriched_for'.'label'
+18:39:43.785 [INFO ]: Indexing on relation 'has_function'.'label'
+18:39:43.810 [INFO ]: Indexing on relation 'para'.'label'
+18:39:43.816 [INFO ]: Indexing on relation 'cat_c'.'label'
+18:39:43.822 [INFO ]: Indexing on relation 'located_in'.'label'
+18:39:43.875 [INFO ]: Indexing on relation 'leads_to'.'label'
+18:39:43.881 [INFO ]: Indexing on relation 'pub_in'.'label'
+18:39:43.887 [INFO ]: Indexing on relation 'enc'.'label'
+18:39:43.941 [INFO ]: Indexing on relation 'regulates'.'label'
+18:39:43.948 [INFO ]: Indexing on relation 'physical'.'label'
+18:39:43.954 [INFO ]: Indexing on relation 'homoeolog'.'label'
+18:39:44.007 [INFO ]: Indexing on relation 'occ_in'.'label'
+18:39:44.014 [INFO ]: Indexing on relation 'part_of'.'label'
+18:39:44.021 [INFO ]: Indexing on relation 'h_s_s'.'label'
+18:39:44.048 [INFO ]: Indexing on relation 'genetic'.'label'
+18:39:44.073 [INFO ]: Indexing on relation 'ca_by'.'label'
+18:39:44.080 [INFO ]: Indexing on relation 'testProp'.'label'
+18:39:44.086 [INFO ]: Indexing on relation 'not_located_in'.'label'
+18:39:44.123 [INFO ]: Indexing on relation 'is_a'.'label'
+18:39:44.129 [INFO ]: Indexing on relation 'not_function'.'label'
+18:39:44.136 [INFO ]: Indexing on relation 'identifier'.'evidence'
+18:39:44.157 [INFO ]: Indexing on relation 'dataSource'.'evidence'
+18:39:44.162 [INFO ]: Indexing on relation 'evidence'.'evidence'
+18:39:44.168 [INFO ]: Indexing on relation 'relatedConcept'.'evidence'
+18:39:44.174 [INFO ]: Indexing on relation 'associated_with'.'evidence'
+18:39:44.180 [INFO ]: Indexing on relation 'has_domain'.'evidence'
+18:39:44.201 [INFO ]: Indexing on relation 'has_mutant'.'evidence'
+18:39:44.208 [INFO ]: Indexing on relation 'has_variation'.'evidence'
+18:39:44.214 [INFO ]: Indexing on relation 'xref'.'evidence'
+18:39:44.221 [INFO ]: Indexing on relation 'has_phenotype'.'evidence'
+18:39:44.227 [INFO ]: Indexing on relation 'cooc_wi'.'evidence'
+18:39:44.233 [INFO ]: Indexing on relation 'pos_reg'.'evidence'
+18:39:44.239 [INFO ]: Indexing on relation 'ortho'.'evidence'
+18:39:44.244 [INFO ]: Indexing on relation 'participates_in'.'evidence'
+18:39:44.274 [INFO ]: Indexing on relation 'equ'.'evidence'
+18:39:44.281 [INFO ]: Indexing on relation 'enriched_for'.'evidence'
+18:39:44.287 [INFO ]: Indexing on relation 'has_function'.'evidence'
+18:39:44.293 [INFO ]: Indexing on relation 'para'.'evidence'
+18:39:44.321 [INFO ]: Indexing on relation 'cat_c'.'evidence'
+18:39:44.328 [INFO ]: Indexing on relation 'located_in'.'evidence'
+18:39:44.334 [INFO ]: Indexing on relation 'leads_to'.'evidence'
+18:39:44.340 [INFO ]: Indexing on relation 'pub_in'.'evidence'
+18:39:44.346 [INFO ]: Indexing on relation 'enc'.'evidence'
+18:39:44.352 [INFO ]: Indexing on relation 'regulates'.'evidence'
+18:39:44.393 [INFO ]: Indexing on relation 'physical'.'evidence'
+18:39:44.399 [INFO ]: Indexing on relation 'homoeolog'.'evidence'
+18:39:44.405 [INFO ]: Indexing on relation 'occ_in'.'evidence'
+18:39:44.411 [INFO ]: Indexing on relation 'part_of'.'evidence'
+18:39:44.417 [INFO ]: Indexing on relation 'h_s_s'.'evidence'
+18:39:44.422 [INFO ]: Indexing on relation 'genetic'.'evidence'
+18:39:44.428 [INFO ]: Indexing on relation 'ca_by'.'evidence'
+18:39:44.433 [INFO ]: Indexing on relation 'testProp'.'evidence'
+18:39:44.463 [INFO ]: Indexing on relation 'not_located_in'.'evidence'
+18:39:44.468 [INFO ]: Indexing on relation 'is_a'.'evidence'
+18:39:44.473 [INFO ]: Indexing on relation 'not_function'.'evidence'
+18:39:44.497 [INFO ]: Indexing on node 'Concept'.'ondexId'
+18:39:44.502 [INFO ]: Indexing on node 'Publication'.'ondexId'
+18:39:44.508 [INFO ]: Indexing on node 'Resource'.'ondexId'
+18:39:44.532 [INFO ]: Indexing on node 'Gene'.'ondexId'
+18:39:44.538 [INFO ]: Indexing on node 'Protein'.'ondexId'
+18:39:44.543 [INFO ]: Indexing on node 'PlantOntologyTerm'.'ondexId'
+18:39:44.566 [INFO ]: Indexing on node 'CelComp'.'ondexId'
+18:39:44.572 [INFO ]: Indexing on node 'CoExpCluster'.'ondexId'
+18:39:44.577 [INFO ]: Indexing on node 'ProtDomain'.'ondexId'
+18:39:44.582 [INFO ]: Indexing on node 'SNPEffect'.'ondexId'
+18:39:44.588 [INFO ]: Indexing on node 'SNP'.'ondexId'
+18:39:44.593 [INFO ]: Indexing on node 'EC'.'ondexId'
+18:39:44.598 [INFO ]: Indexing on node 'Enzyme'.'ondexId'
+18:39:44.632 [INFO ]: Indexing on node 'Phenotype'.'ondexId'
+18:39:44.638 [INFO ]: Indexing on node 'BioProc'.'ondexId'
+18:39:44.644 [INFO ]: Indexing on node 'Trait'.'ondexId'
+18:39:44.650 [INFO ]: Indexing on node 'MolFunc'.'ondexId'
+18:39:44.656 [INFO ]: Indexing on node 'Path'.'ondexId'
+18:39:44.661 [INFO ]: Indexing on node 'Reaction'.'ondexId'
+18:39:44.666 [INFO ]: Indexing on node 'Accession'.'ondexId'
+18:39:44.698 [INFO ]: Indexing on node 'DataSource'.'ondexId'
+18:39:44.703 [INFO ]: Indexing on node 'EvidenceType'.'ondexId'
+18:39:44.709 [INFO ]: Indexing on relation 'identifier'.'ondexId'
+18:39:44.714 [INFO ]: Indexing on relation 'dataSource'.'ondexId'
+18:39:44.720 [INFO ]: Indexing on relation 'evidence'.'ondexId'
+18:39:44.726 [INFO ]: Indexing on relation 'relatedConcept'.'ondexId'
+18:39:44.731 [INFO ]: Indexing on relation 'associated_with'.'ondexId'
+18:39:44.769 [INFO ]: Indexing on relation 'has_domain'.'ondexId'
+18:39:44.775 [INFO ]: Indexing on relation 'has_mutant'.'ondexId'
+18:39:44.781 [INFO ]: Indexing on relation 'has_variation'.'ondexId'
+18:39:44.786 [INFO ]: Indexing on relation 'xref'.'ondexId'
+18:39:44.805 [INFO ]: Indexing on relation 'has_phenotype'.'ondexId'
+18:39:44.811 [INFO ]: Indexing on relation 'cooc_wi'.'ondexId'
+18:39:44.817 [INFO ]: Indexing on relation 'pos_reg'.'ondexId'
+18:39:44.836 [INFO ]: Indexing on relation 'ortho'.'ondexId'
+18:39:44.851 [INFO ]: Indexing on relation 'participates_in'.'ondexId'
+18:39:44.868 [INFO ]: Indexing on relation 'equ'.'ondexId'
+18:39:44.875 [INFO ]: Indexing on relation 'enriched_for'.'ondexId'
+18:39:44.882 [INFO ]: Indexing on relation 'has_function'.'ondexId'
+18:39:44.888 [INFO ]: Indexing on relation 'para'.'ondexId'
+18:39:44.894 [INFO ]: Indexing on relation 'cat_c'.'ondexId'
+18:39:44.911 [INFO ]: Indexing on relation 'located_in'.'ondexId'
+18:39:44.917 [INFO ]: Indexing on relation 'leads_to'.'ondexId'
+18:39:44.947 [INFO ]: Indexing on relation 'pub_in'.'ondexId'
+18:39:44.953 [INFO ]: Indexing on relation 'enc'.'ondexId'
+18:39:44.959 [INFO ]: Indexing on relation 'regulates'.'ondexId'
+18:39:44.980 [INFO ]: Indexing on relation 'physical'.'ondexId'
+18:39:44.986 [INFO ]: Indexing on relation 'homoeolog'.'ondexId'
+18:39:44.991 [INFO ]: Indexing on relation 'occ_in'.'ondexId'
+18:39:45.014 [INFO ]: Indexing on relation 'part_of'.'ondexId'
+18:39:45.020 [INFO ]: Indexing on relation 'h_s_s'.'ondexId'
+18:39:45.025 [INFO ]: Indexing on relation 'genetic'.'ondexId'
+18:39:45.047 [INFO ]: Indexing on relation 'ca_by'.'ondexId'
+18:39:45.052 [INFO ]: Indexing on relation 'testProp'.'ondexId'
+18:39:45.057 [INFO ]: Indexing on relation 'not_located_in'.'ondexId'
+18:39:45.080 [INFO ]: Indexing on relation 'is_a'.'ondexId'
+18:39:45.086 [INFO ]: Indexing on relation 'not_function'.'ondexId'
+18:39:45.091 [INFO ]: Indexing on node labels
+18:39:45.150 [INFO ]: Indexing on relation types
+18:39:45.154 [INFO ]: Indexing on node 'Publication'.'Abstract'
+18:39:45.179 [INFO ]: Indexing on node 'Publication'.'AbstractHeader'
+18:39:45.185 [INFO ]: Indexing on node 'Phenotype'.'Phenotype'
+18:39:45.191 [INFO ]: Indexing on node 'Publication'.'Chemical'
+18:39:45.196 [INFO ]: Indexing on node 'Publication'.'MeSH'
+18:39:45.202 [INFO ]: Indexing on node 'Publication'.'Abstract_1'
+18:39:45.220 [INFO ]: Indexing on node 'Protein'.'Pheno'
+18:39:45.246 [INFO ]: Indexing on node 'Publication'.'AbstractHeader_1'
+18:39:45.252 [INFO ]: Indexing on node 'Phenotype'.'scoring'
+18:39:45.258 [INFO ]: Indexing on node 'Phenotype'.'Phenotype_1'
+18:39:45.290 [INFO ]: Indexing on node 'Phenotype'.'study'
+18:39:45.297 [INFO ]: Indexing on node 'Phenotype'.'growth_conditions'
+18:39:45.303 [INFO ]: [Indices] Cypher Indexing Ended
+18:39:45.303 [INFO ]: [Indices] RDF-PG conversion finished
+18:39:45.304 [INFO ]: The end
+
+Java Finished, quitting the shell too.
+
+
+
+  ondex2neo.sh finished
+[Wed Apr 24 18:39:45 2024]
+Finished job 0.
+1 of 1 steps (100%) done

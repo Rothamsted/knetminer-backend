@@ -1,5 +1,17 @@
 ###### General
 
+if ! which snakemake >/dev/null; then
+  cat <<EOT
+
+  WARNING: snakemake not found in PATH. If you're missing conda initialisation, run this:
+  
+  BEFORE running Snakemake-based scripts, else they will FAIL
+
+EOT
+
+fi 
+
+
 # The KnetMiner team has all of its stuff here
 export KNET_HOME=/home/data/knetminer
 # Where we keep software executables

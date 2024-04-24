@@ -1,0 +1,211 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 18:37:48 2024]
+rule tdb_load:
+    input: /home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/knowledge-graph.ttl.bz2, /home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/knowledge-graph-metadata.ttl
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb, /home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+	Downloading Ontologies
+
+	BioKNO main file
+--2024-04-24 18:37:48--  https://raw.githubusercontent.com/Rothamsted/bioknet-onto/master/bioknet.owl
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.110.133, 185.199.109.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 32549 (32K) [text/plain]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bioknet.owl’
+
+     0K .......... .......... .......... .                    100%  776K=0.04s
+
+2024-04-24 18:37:49 (776 KB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bioknet.owl’ saved [32549/32549]
+
+	BioKNO Ondex mappings
+--2024-04-24 18:37:49--  https://raw.githubusercontent.com/Rothamsted/bioknet-onto/master/bk_ondex.owl
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.109.133, 185.199.111.133, 185.199.108.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 409992 (400K) [text/plain]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bk_ondex.owl’
+
+     0K .......... .......... .......... .......... .......... 12% 2.80M 0s
+    50K .......... .......... .......... .......... .......... 24% 5.53M 0s
+   100K .......... .......... .......... .......... .......... 37% 7.97M 0s
+   150K .......... .......... .......... .......... .......... 49% 7.39M 0s
+   200K .......... .......... .......... .......... .......... 62% 7.90M 0s
+   250K .......... .......... .......... .......... .......... 74% 8.21M 0s
+   300K .......... .......... .......... .......... .......... 87% 8.02M 0s
+   350K .......... .......... .......... .......... .......... 99% 10.1M 0s
+   400K                                                       100% 3.74M=0.06s
+
+2024-04-24 18:37:49 (6.29 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bk_ondex.owl’ saved [409992/409992]
+
+	Mappings to external ontologies
+--2024-04-24 18:37:49--  https://raw.githubusercontent.com/Rothamsted/bioknet-onto/master/bk_mappings.ttl
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.111.133, 185.199.110.133, 185.199.109.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.111.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 14000 (14K) [text/plain]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bk_mappings.ttl’
+
+     0K .......... ...                                        100% 5.69M=0.002s
+
+2024-04-24 18:37:50 (5.69 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/bk_mappings.ttl’ saved [14000/14000]
+
+
+---- Additional ontologies, to be used for the triple store
+	schema.org
+--2024-04-24 18:37:50--  https://schema.org/version/latest/schemaorg-current-https.ttl
+Resolving schema.org (schema.org)... 142.250.200.46, 2a00:1450:4009:823::200e
+Connecting to schema.org (schema.org)|142.250.200.46|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 239274 (234K) [text/turtle]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/schema.ttl’
+
+     0K .......... .......... .......... .......... .......... 21% 3.80M 0s
+    50K .......... .......... .......... .......... .......... 42% 5.90M 0s
+   100K .......... .......... .......... .......... .......... 64% 8.66M 0s
+   150K .......... .......... .......... .......... .......... 85% 13.6M 0s
+   200K .......... .......... .......... ...                  100% 18.7M=0.03s
+
+2024-04-24 18:37:51 (7.10 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/schema.ttl’ saved [239274/239274]
+
+	BioPAX
+--2024-04-24 18:37:51--  http://www.biopax.org/release/biopax-level3.owl
+Resolving www.biopax.org (www.biopax.org)... 142.150.84.100
+Connecting to www.biopax.org (www.biopax.org)|142.150.84.100|:80... connected.
+HTTP request sent, awaiting response... 200 No headers, assuming HTTP/0.9
+Length: unspecified
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/biopax-level3.owl’
+
+     0K                                                        3.65M=0s
+
+2024-04-24 18:37:52 (3.65 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/biopax-level3.owl’ saved [57]
+
+	SIO
+URL transformed to HTTPS due to an HSTS policy
+--2024-04-24 18:37:52--  https://semanticscience.org/ontology/sio.owl
+Resolving semanticscience.org (semanticscience.org)... 137.120.31.101
+Connecting to semanticscience.org (semanticscience.org)|137.120.31.101|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://raw.githubusercontent.com/micheldumontier/semanticscience/master/ontology/sio/release/sio-release.owl [following]
+--2024-04-24 18:37:52--  https://raw.githubusercontent.com/micheldumontier/semanticscience/master/ontology/sio/release/sio-release.owl
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.110.133, 185.199.109.133, 185.199.111.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.110.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1470936 (1.4M) [text/plain]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/sio.owl’
+
+     0K .......... .......... .......... .......... ..........  3% 1.03M 1s
+    50K .......... .......... .......... .......... ..........  6% 5.56M 1s
+   100K .......... .......... .......... .......... .......... 10% 11.1M 1s
+   150K .......... .......... .......... .......... .......... 13% 14.4M 0s
+   200K .......... .......... .......... .......... .......... 17% 20.1M 0s
+   250K .......... .......... .......... .......... .......... 20% 17.2M 0s
+   300K .......... .......... .......... .......... .......... 24% 17.1M 0s
+   350K .......... .......... .......... .......... .......... 27% 12.8M 0s
+   400K .......... .......... .......... .......... .......... 31% 28.5M 0s
+   450K .......... .......... .......... .......... .......... 34% 20.5M 0s
+   500K .......... .......... .......... .......... .......... 38% 13.4M 0s
+   550K .......... .......... .......... .......... .......... 41% 26.0M 0s
+   600K .......... .......... .......... .......... .......... 45% 15.4M 0s
+   650K .......... .......... .......... .......... .......... 48% 16.2M 0s
+   700K .......... .......... .......... .......... .......... 52% 29.1M 0s
+   750K .......... .......... .......... .......... .......... 55% 21.5M 0s
+   800K .......... .......... .......... .......... .......... 59% 12.9M 0s
+   850K .......... .......... .......... .......... .......... 62% 42.4M 0s
+   900K .......... .......... .......... .......... .......... 66% 17.7M 0s
+   950K .......... .......... .......... .......... .......... 69% 16.0M 0s
+  1000K .......... .......... .......... .......... .......... 73% 25.0M 0s
+  1050K .......... .......... .......... .......... .......... 76% 20.0M 0s
+  1100K .......... .......... .......... .......... .......... 80% 14.5M 0s
+  1150K .......... .......... .......... .......... .......... 83% 30.8M 0s
+  1200K .......... .......... .......... .......... .......... 87% 25.8M 0s
+  1250K .......... .......... .......... .......... .......... 90% 27.3M 0s
+  1300K .......... .......... .......... .......... .......... 93% 17.5M 0s
+  1350K .......... .......... .......... .......... .......... 97% 31.2M 0s
+  1400K .......... .......... .......... ......               100% 35.0M=0.1s
+
+2024-04-24 18:37:53 (11.2 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/sio.owl’ saved [1470936/1470936]
+
+	dcterms:
+URL transformed to HTTPS due to an HSTS policy
+--2024-04-24 18:37:53--  https://www.dublincore.org/specifications/dublin-core/dcmi-terms/dublin_core_terms.ttl
+Resolving www.dublincore.org (www.dublincore.org)... 104.22.53.69, 104.22.52.69, 172.67.23.21, ...
+Connecting to www.dublincore.org (www.dublincore.org)|104.22.53.69|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 47834 (47K) [text/turtle]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/dcterms.ttl’
+
+     0K .......... .......... .......... .......... ......    100% 6.87M=0.007s
+
+2024-04-24 18:37:53 (6.87 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/dcterms.ttl’ saved [47834/47834]
+
+	dc:
+URL transformed to HTTPS due to an HSTS policy
+--2024-04-24 18:37:53--  https://www.dublincore.org/specifications/dublin-core/dcmi-terms/dublin_core_elements.ttl
+Resolving www.dublincore.org (www.dublincore.org)... 104.22.53.69, 104.22.52.69, 172.67.23.21, ...
+Connecting to www.dublincore.org (www.dublincore.org)|104.22.53.69|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 14329 (14K) [text/turtle]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/dcelements.ttl’
+
+     0K .......... ...                                        100% 62.2M=0s
+
+2024-04-24 18:37:54 (62.2 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/dcelements.ttl’ saved [14329/14329]
+
+	SKOS
+URL transformed to HTTPS due to an HSTS policy
+--2024-04-24 18:37:54--  https://www.w3.org/TR/skos-reference/skos.rdf
+Resolving www.w3.org (www.w3.org)... 104.18.22.19, 104.18.23.19, 2606:4700::6812:1713, ...
+Connecting to www.w3.org (www.w3.org)|104.18.22.19|:443... connected.
+HTTP request sent, awaiting response... 301 Moved Permanently
+Location: https://www.w3.org/2009/08/skos-reference/skos.rdf [following]
+--2024-04-24 18:37:55--  https://www.w3.org/2009/08/skos-reference/skos.rdf
+Reusing existing connection to www.w3.org:443.
+HTTP request sent, awaiting response... 200 OK
+Length: 28966 (28K) [application/rdf+xml]
+Saving to: ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/skos.rdf’
+
+     0K .......... .......... ........                        100% 64.7M=0s
+
+2024-04-24 18:37:55 (64.7 MB/s) - ‘/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/ontologies/ext/skos.rdf’ saved [28966/28966]
+
+
+	Loading RDF into '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/tdb' 
+
+
+
+  rdf2neo.sh
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G -Dfile.encoding=UTF-8
+18:38:03.154 [INFO ]: Starting TDB Loading
+18:38:06.662 [INFO ]: Start: 4 files
+18:38:07.411 [INFO ]:   End file: bioknet.owl (triples/quads = 192)
+18:38:07.503 [INFO ]:   End file: bk_mappings.ttl (triples/quads = 163)
+18:38:07.638 [INFO ]:   End file: bk_ondex.owl (triples/quads = 4,416)
+18:38:11.653 [INFO ]:   End file: knowledge-graph.ttl.bz2 (triples/quads = 449,022)
+18:38:11.655 [INFO ]: Finished: 4 files: 453,793 tuples in 4.99s (Avg: 90,922)
+18:38:12.199 [INFO ]: Finish - index SPO
+18:38:12.206 [INFO ]: Start replay index SPO
+18:38:12.208 [INFO ]: Index set:  SPO => SPO->POS, SPO->OSP
+18:38:12.307 [INFO ]: Index set:  SPO => SPO->POS, SPO->OSP [450,073 items, 0.1 seconds]
+18:38:13.293 [INFO ]: Finish - index OSP
+18:38:13.397 [INFO ]: Finish - index POS
+18:38:13.399 [INFO ]: Time = 6.765 seconds : Triples = 453,793 : Rate = 67,080 /s
+18:38:13.399 [INFO ]: TDB Loading ended
+
+Java Finished, quitting the shell too.
+
+
+
+  ondex2neo.sh finished
+[Wed Apr 24 18:38:13 2024]
+Finished job 0.
+1 of 1 steps (100%) done

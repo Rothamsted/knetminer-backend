@@ -71,6 +71,13 @@ export KNET_INIT_DATASET_ID="$KETL_DATASET_ID"
 export KETL_HAS_NEO4J=false
 
 # The Neo4j server home. This uses their own naming convention.
+# This is the server that is used to populate an empty DB with the current dataset and then
+# to produce the Neo4j dump about the dataset.
+#
+# This IS NOT any production or test database (not until we change these scripts).
+# If you're using SLURM, the start/stopping scripts will use this either, to launch
+# the server on a SLURM node.
+#
 # export NEO4J_HOME=''
 
 # You might need special, environment-dependent scripts to start/stop Neo

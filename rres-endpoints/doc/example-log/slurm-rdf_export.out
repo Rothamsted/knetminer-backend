@@ -1,0 +1,63 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 17:28:46 2024]
+rule rdf_export:
+    input: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knowledge-graph-uris.oxl
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/knowledge-graph.ttl.bz2
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+
+RDF Exporting '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knowledge-graph-uris.oxl' to '/home/data/knetminer/pub/endpoints/cereals-dummy/1/rdf/knowledge-graph.ttl.bz2'
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G
+
+17:28:48.032 [INFO ]: Loading '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knowledge-graph-uris.oxl'
+17:28:48.146 [INFO ]: Starting OXL parsing... [OXL Parser]
+17:28:51.437 [INFO ]: OXL parsing finished. [OXL Parser]
+17:28:51.438 [INFO ]: Graph Loaded, now exporting to RDF
+17:28:51.440 [INFO ]: Exporting to '/tmp/rdf-export.fifo'
+17:28:51.552 [INFO ]: Exporting graph meta-entities
+17:28:52.906 [INFO ]: Exporting 16256 concept(s)
+17:28:53.477 [INFO ]: 10% of concepts exported
+17:28:53.647 [INFO ]: 20% of concepts exported
+17:28:53.835 [INFO ]: 30% of concepts exported
+17:28:54.055 [INFO ]: 40% of concepts exported
+17:28:54.249 [INFO ]: 50% of concepts exported
+17:28:54.424 [INFO ]: 60% of concepts exported
+17:28:54.614 [INFO ]: 70% of concepts exported
+17:28:55.096 [INFO ]: 80% of concepts exported
+17:28:55.285 [INFO ]: 90% of concepts exported
+17:28:55.797 [INFO ]: 100% of concepts exported
+17:28:56.274 [INFO ]: Waiting for the batch processor to finish
+17:28:57.286 [INFO ]: 7/7 batch jobs completed
+17:28:57.287 [INFO ]: Waiting for the batch processor to finish
+17:28:57.287 [INFO ]: Batch processor finished
+17:28:57.288 [INFO ]: Exporting 16508 relation(s)
+17:28:57.447 [INFO ]: 10% of relations exported
+17:28:57.577 [INFO ]: 20% of relations exported
+17:28:57.702 [INFO ]: 30% of relations exported
+17:28:57.828 [INFO ]: 40% of relations exported
+17:28:57.967 [INFO ]: 50% of relations exported
+17:28:58.102 [INFO ]: 60% of relations exported
+17:28:58.224 [INFO ]: 70% of relations exported
+17:28:58.368 [INFO ]: 80% of relations exported
+17:28:58.506 [INFO ]: 90% of relations exported
+17:28:58.624 [INFO ]: 100% of relations exported
+17:28:59.259 [INFO ]: Waiting for the batch processor to finish
+17:29:00.250 [INFO ]: 11/11 batch jobs completed
+17:29:00.250 [INFO ]: Waiting for the batch processor to finish
+17:29:00.251 [INFO ]: Batch processor finished
+17:29:00.251 [INFO ]: RDF export finished, a total of 32764 concepts+relations exported, 449022 triples created
+
+17:29:00.252 [INFO ]: Conversion finished.
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+[Wed Apr 24 17:29:00 2024]
+Finished job 0.
+1 of 1 steps (100%) done

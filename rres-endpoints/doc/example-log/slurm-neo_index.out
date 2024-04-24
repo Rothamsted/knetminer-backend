@@ -1,0 +1,323 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 16
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Wed Apr 24 18:40:11 2024]
+rule neo_index:
+    input: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/neo-export.flag, /home/data/knetminer/pub/endpoints/cereals-dummy/1/knowledge-graph-annotated.oxl
+    output: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/neo-index.flag
+    jobid: 0
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+
+
+  Creating KnetMiner initialisation files
+
+
+  ====> MAKE SURE /home/data/knetminer/software/knetminer/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT IS UPDATED!!!
+
+
+
+	Dataset initialiser, working on "/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init", with dataset ID:'poaceae-test'
+
+
+  Updating existing target dir
+
+
+  Copying config defaults
+
+
+  Adding specific config files from poaceae-test
+
+
+  Creating default directories (if not already there)
+
+
+  Remember you need the data file "/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/data/knowledge-network.oxl"
+
+
+  All done!
+
+'/home/data/knetminer/software/knetminer-backend/rres-endpoints/config/knet-init/config-etl.yml' -> '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/config-etl.yml'
+'/home/data/knetminer/software/knetminer-backend/rres-endpoints/config/knet-init/neo4j/concept-index-properties.txt' -> '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/concept-index-properties.txt'
+'/home/data/knetminer/software/knetminer-backend/rres-endpoints/config/knet-init/neo4j/config.xml' -> '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/config.xml'
+
+
+  Creating Neo indexing (full-text and semantic motifs)
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx56G -Dneo4j.boltUrl='bolt://rothhpc418:7687' -Dneo4j.user='neo4j' -Dneo4j.password='testTest'
+20240424-18:40:20.370 [main] INFO  KnetMinerInitializerCLI - Loading Knetminer configuration from: "/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/config-etl.yml"
+20240424-18:40:20.382 [main] INFO  KnetminerConfiguration - Loading Ondex/Knetminer configuration from '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/config-etl.yml'
+20240424-18:40:22.142 [main] INFO  KnetMinerInitializerCLI - Loading the OXL from: "/home/data/knetminer/pub/endpoints/cereals-dummy/1/knowledge-graph-annotated.oxl"
+20240424-18:40:22.435 [main] INFO  Parser - Starting OXL parsing... [OXL Parser]
+20240424-18:40:26.427 [main] INFO  Parser - OXL parsing finished. [OXL Parser]
+20240424-18:40:26.429 [main] INFO  KnetMinerInitializerCLI - Doing the data initialisation
+20240424-18:40:26.456 [main] INFO  KnetMinerInitializer - Getting/building Lucene Index from: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/data/index
+20240424-18:40:26.707 [main] INFO  LuceneEnv - Using Lucene with index dir: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/data/index [LuceneEnv - setONDEXGraph]
+20240424-18:40:27.231 [main] INFO  LuceneEnv - Index opened, old metadata deletions: 
+20240424-18:40:27.232 [main] INFO  LuceneEnv - Start indexing the Ondex Graph, 16257 concept(s) sent to index
+20240424-18:40:28.157 [pool-2-thread-1] INFO  PercentProgressLogger - 10% of concepts submitted to index
+20240424-18:40:28.777 [pool-2-thread-1] INFO  PercentProgressLogger - 20% of concepts submitted to index
+20240424-18:40:29.216 [pool-2-thread-1] INFO  PercentProgressLogger - 30% of concepts submitted to index
+20240424-18:40:29.703 [pool-2-thread-1] INFO  PercentProgressLogger - 40% of concepts submitted to index
+20240424-18:40:30.155 [pool-2-thread-1] INFO  PercentProgressLogger - 50% of concepts submitted to index
+20240424-18:40:30.561 [pool-2-thread-1] INFO  PercentProgressLogger - 60% of concepts submitted to index
+20240424-18:40:31.000 [pool-2-thread-1] INFO  PercentProgressLogger - 70% of concepts submitted to index
+20240424-18:40:31.467 [pool-2-thread-1] INFO  PercentProgressLogger - 80% of concepts submitted to index
+20240424-18:40:31.951 [pool-2-thread-1] INFO  PercentProgressLogger - 90% of concepts submitted to index
+20240424-18:40:32.399 [pool-2-thread-1] INFO  PercentProgressLogger - 100% of concepts submitted to index
+20240424-18:40:32.964 [main] INFO  LuceneEnv - Start indexing the Ondex Graph, 16508 relation(s) sent to index
+20240424-18:40:33.005 [pool-2-thread-1] INFO  PercentProgressLogger - 10% of relations submitted to index
+20240424-18:40:33.258 [pool-2-thread-1] INFO  PercentProgressLogger - 20% of relations submitted to index
+20240424-18:40:33.499 [pool-2-thread-1] INFO  PercentProgressLogger - 30% of relations submitted to index
+20240424-18:40:33.736 [pool-2-thread-1] INFO  PercentProgressLogger - 40% of relations submitted to index
+20240424-18:40:33.989 [pool-2-thread-1] INFO  PercentProgressLogger - 50% of relations submitted to index
+20240424-18:40:34.245 [pool-2-thread-1] INFO  PercentProgressLogger - 60% of relations submitted to index
+20240424-18:40:34.502 [pool-2-thread-1] INFO  PercentProgressLogger - 70% of relations submitted to index
+20240424-18:40:34.787 [pool-2-thread-1] INFO  PercentProgressLogger - 80% of relations submitted to index
+20240424-18:40:35.040 [pool-2-thread-1] INFO  PercentProgressLogger - 90% of relations submitted to index
+20240424-18:40:35.332 [pool-2-thread-1] INFO  PercentProgressLogger - 100% of relations submitted to index
+20240424-18:40:36.740 [main] INFO  KnetMinerInitializer - Ondex graph index initialisation finished
+20240424-18:40:36.740 [main] INFO  KnetMinerInitializer - Initializing semantic motif data
+20240424-18:40:36.744 [main] INFO  KnetMinerInitializer - Creating semantic motif data
+20240424-18:40:36.744 [main] INFO  KnetMinerInitializer - Initialising seed genes from TAXID list: [3702, 4565, 39947]
+20240424-18:40:36.796 [main] INFO  AbstractGraphTraverser - Initialising Graph Traverser 'uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser'
+20240424-18:40:36.895 [main] INFO  CypherGraphTraverser - Configuring uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser from <file:////home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/config.xml>
+20240424-18:40:39.055 [main] INFO  CyQueriesReader - Loading queries from '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/semantic-motif-queries.txt'
+20240424-18:40:39.289 [main] WARN  IOUtils - readFiles(), ignoring missing directory '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/semantic-motif-queries'
+20240424-18:40:39.593 [main] INFO  CypherGraphTraverser - uk.ac.rothamsted.knetminer.backend.cypher.genesearch.CypherGraphTraverser configured
+20240424-18:40:39.596 [main] WARN  CypherGraphTraverser - Removing duplicated traverser query: MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_8_d:enc] - (gene_8:Gene) WHERE gene_1.iri IN $startGeneIris RETURN path
+20240424-18:40:39.596 [main] WARN  CypherGraphTraverser - Some duplicated traverser queries were removed, see log messages above
+20240424-18:40:39.597 [main] INFO  CypherGraphTraverser - Graph Traverser, beginning parallel traversing of 5235 concept(s)
+20240424-18:40:39.665 [main] INFO  PathQueryProcessor - ---- Cypher Graph Traverser, Config -----
+20240424-18:40:39.665 [main] INFO  PathQueryProcessor - queryBatchSize = 500
+20240424-18:40:39.665 [main] INFO  PathQueryProcessor - queryTimeoutMs = <default>
+20240424-18:40:39.666 [main] INFO  PathQueryProcessor - performanceReportFrequency = <default>
+20240424-18:40:39.666 [main] INFO  PathQueryProcessor - queryPageSize = <default>
+20240424-18:40:39.666 [main] INFO  PathQueryProcessor - queryThreadPoolSize = <default>
+20240424-18:40:39.666 [main] INFO  PathQueryProcessor - queryThreadQueueSize = <default>
+20240424-18:40:39.666 [main] INFO  PathQueryProcessor - ---- /CypherQueryTraverser, Config -----
+20240424-18:40:40.964 [SinglePathQueryProcessor_2] INFO  GraphMemIndex - Ondex Memory Index, starting indexing operations
+20240424-18:40:40.964 [SinglePathQueryProcessor_2] INFO  GraphMemIndex - indexing 16257 concept(s) against the field/attribute: "iri"/"iri"
+20240424-18:40:40.991 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 10% of concepts indexed
+20240424-18:40:40.994 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 20% of concepts indexed
+20240424-18:40:41.000 [SinglePathQueryProcessor_2] WARN  GraphMemIndex - === NO VALUE FOR THE ONDEX MEMORY INDEX, field: "iri", entity: datasetMetadata
+20240424-18:40:41.002 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 30% of concepts indexed
+20240424-18:40:41.005 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 40% of concepts indexed
+20240424-18:40:41.008 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 50% of concepts indexed
+20240424-18:40:41.011 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 60% of concepts indexed
+20240424-18:40:41.014 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 70% of concepts indexed
+20240424-18:40:41.017 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 80% of concepts indexed
+20240424-18:40:41.020 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 90% of concepts indexed
+20240424-18:40:41.023 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 100% of concepts indexed
+20240424-18:40:41.024 [SinglePathQueryProcessor_2] INFO  GraphMemIndex - indexing 16508 relation(s) against the field/attribute: "iri"/"iri"
+20240424-18:40:41.035 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 10% of relations indexed
+20240424-18:40:41.047 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 20% of relations indexed
+20240424-18:40:41.057 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 30% of relations indexed
+20240424-18:40:41.068 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 40% of relations indexed
+20240424-18:40:41.077 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 50% of relations indexed
+20240424-18:40:41.088 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 60% of relations indexed
+20240424-18:40:41.098 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 70% of relations indexed
+20240424-18:40:41.108 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 80% of relations indexed
+20240424-18:40:41.117 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 90% of relations indexed
+20240424-18:40:41.127 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 100% of relations indexed
+20240424-18:40:42.289 [SinglePathQueryProcessor_11] INFO  PercentProgressLogger - 10% of graph traversing queries processed
+20240424-18:40:43.213 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 20% of graph traversing queries processed
+20240424-18:40:44.198 [SinglePathQueryProcessor_14] INFO  PercentProgressLogger - 30% of graph traversing queries processed
+20240424-18:40:45.101 [SinglePathQueryProcessor_2] INFO  PercentProgressLogger - 40% of graph traversing queries processed
+20240424-18:40:46.151 [SinglePathQueryProcessor_15] INFO  PercentProgressLogger - 50% of graph traversing queries processed
+20240424-18:40:47.269 [SinglePathQueryProcessor_4] INFO  PercentProgressLogger - 60% of graph traversing queries processed
+20240424-18:40:48.260 [SinglePathQueryProcessor_11] INFO  PercentProgressLogger - 70% of graph traversing queries processed
+20240424-18:40:49.294 [SinglePathQueryProcessor_1] INFO  PercentProgressLogger - 80% of graph traversing queries processed
+20240424-18:40:50.755 [SinglePathQueryProcessor_6] INFO  PercentProgressLogger - 90% of graph traversing queries processed
+20240424-18:40:51.867 [SinglePathQueryProcessor_13] INFO  PercentProgressLogger - 100% of graph traversing queries processed
+20240424-18:40:51.894 [main] INFO  PathQueryProcessor - Cypher traverser finished
+20240424-18:40:51.954 [main] INFO  CyTraverserPerformanceTracker - 
+
+  -------------- Cypher Graph Traverser, Query Stats --------------
+Total queries issued: 814
+Query	Tot Invocations	% Timeouts	Tot Returned Paths	Avg Ret Paths x Gene	Avg Time(ms)	Avg Path Len	Tot Time(min)
+"MATCH path = (gene_1:Gene) - [cooc_wi_9_21:cooc_wi] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	35	  0.01	144.18	  3.00	  0.03
+"MATCH path = (gene_1:Gene) - [de_9_22_d:differentially_expressed] -> (dGES_22:DGES) - [enriched_for_23_4_d:enriched_for] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	100.45	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [de_9_22_d:differentially_expressed] -> (dGES_22:DGES) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 58.91	  0.00	  0.01
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [cat_c_10_12_d:cat_c] -> (eC_12:EC) - [equ_12_3:equ] - (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	100.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [cat_c_10_15_d:cat_c] -> (eC_15:EC) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	1	  0.00	 71.18	  5.00	  0.01
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [cooc_wi_10_21:cooc_wi] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	130.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [has_domain_10_11_d:has_domain] -> (protDomain_11:ProtDomain) - [has_function_11_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 96.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [has_domain_10_11_d:has_domain] -> (protDomain_11:ProtDomain) - [located_in_11_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 79.91	  0.00	  0.01
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [has_domain_10_11_d:has_domain] -> (protDomain_11:ProtDomain) - [participates_in_11_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	112.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [has_domain_10_14_d:has_domain] -> (protDomain_14:ProtDomain) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	245	  0.04	115.64	  5.10	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [has_function_10_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	4	  0.00	134.36	  7.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [is_a_10_177_d:is_a] -> (enzyme_177:Enzyme) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 83.91	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [is_a_10_17_d:is_a] -> (enzyme_17:Enzyme) - [ca_by_17_188_d:ca_by] -> (reaction_188:Reaction) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 97.00	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [is_a_10_17_d:is_a] -> (enzyme_17:Enzyme) - [ca_by_17_18_d:ca_by] -> (reaction_18:Reaction) - [part_of_18_19_d:part_of] -> (path_19:Path) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	232.55	  0.00	  0.04
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [located_in_10_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	3	  0.00	 83.55	  7.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [participates_in_10_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	2	  0.00	101.18	  7.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [pub_in_10_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	19	  0.00	106.00	  6.58	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_10b:Protein) - [rel_xref:xref] - (protein_11:Protein) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	251	  0.05	131.91	  5.25	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:h_s_s|ortho|xref*0..1] - (protein_7:Protein) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	1255	  0.23	200.00	  3.74	  0.04
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_8_d:enc] - (gene_8:Gene) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	19	  0.00	117.73	  7.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [cooc_wi_9_21:cooc_wi] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	100.00	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_function_9_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	1	  0.00	 83.27	  9.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_observ_pheno_9_13_d:has_observ_pheno] -> (phenotype_13:Phenotype) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	102.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [is_part_of_211_21:is_part_of] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	164.55	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [pub_in_211_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	166.45	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_21_d:associated_with] -> (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	119.00	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [leads_to_20_26_d:leads_to] -> (sNPEffect_26:SNPEffect) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	107.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [located_in_9_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	3	  0.00	 96.91	  9.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [participates_in_9_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 87.09	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	4	  0.00	115.00	  9.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic] -> (gene_9b:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 98.09	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [cooc_wi_9_21:cooc_wi] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 97.09	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_function_9_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 97.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_observ_pheno_9_13_d:has_observ_pheno] -> (phenotype_13:Phenotype) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	118.73	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [is_part_of_211_21:is_part_of] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	167.18	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [pub_in_211_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	246.82	  0.00	  0.05
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [associated_with_20_21_d:associated_with] -> (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	175.73	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [has_variation_9_20_d:has_variation] -> (sNP_20:SNP) - [leads_to_20_26_d:leads_to] -> (sNPEffect_26:SNPEffect) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	139.82	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [located_in_9_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	191.27	  0.00	  0.04
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) - [participates_in_9_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	131.45	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:genetic|physical] - (gene_9b:Gene) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	120.27	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) - [rel_9_9_2:physical] -> (gene_9b:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	128.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) <- [rel_9_9_2:genetic] - (gene_9b:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 98.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_10_d:enc] -> (protein_10:Protein) - [rel_10_10:ortho] - (protein_10b:Protein) <- [enc_10_9_d:enc] - (gene_9:Gene) <- [rel_9_9_2:physical] - (gene_9b:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	112.91	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [enc_1_7_d:enc] -> (protein_7:Protein) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	788	  0.14	1208.55	  3.00	  0.22
+"MATCH path = (gene_1:Gene) - [has_function_9_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	177	  0.03	 87.18	  3.00	  0.02
+"MATCH path = (gene_1:Gene) - [has_observ_pheno_9_13_d:has_observ_pheno] -> (phenotype_13:Phenotype) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 92.00	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [inv_in_1_188_d:inv_in] -> (reaction_188:Reaction) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 52.09	  0.00	  0.01
+"MATCH path = (gene_1:Gene) - [located_in_9_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	233	  0.04	 71.00	  3.00	  0.01
+"MATCH path = (gene_1:Gene) - [occ_in_1_2_d:occ_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 76.73	  0.00	  0.01
+"MATCH path = (gene_1:Gene) - [part_of_1_19_d:part_of] -> (path_19:Path) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	60	  0.01	 93.55	  3.00	  0.02
+"MATCH path = (gene_1:Gene) - [part_of_1_23_d:part_of] -> (coExpCluster_23:CoExpCluster) - [part_of_23_25_d:part_of] -> (coExpStudy_25:CoExpStudy) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	118.73	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [part_of_1_23_d:part_of] -> (coExpCluster_23:CoExpCluster) - [rel:enriched_for] -> (bioProc_4:BioProc) WHERE toFloat(rel.p_adjust)<1E-10 AND gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	10	  0.00	156.27	  5.00	  0.03
+"MATCH path = (gene_1:Gene) - [part_of_1_23_d:part_of] -> (coExpCluster_23:CoExpCluster) - [rel:enriched_for] -> (plantOntologyTerm_24:PlantOntologyTerm) WHERE toFloat(rel.over_represented_padj)<1E-3 AND gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	167	  0.03	123.00	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [participates_in_9_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	178	  0.03	 98.00	  3.00	  0.02
+"MATCH path = (gene_1:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	690	  0.13	115.64	  3.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [is_part_of_211_21:is_part_of] -> (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	164.82	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [pub_in_211_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	141.27	  0.00	  0.03
+"MATCH path = (gene_1:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	130.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [leads_to_20_26_d:leads_to] -> (sNPEffect_26:SNPEffect) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	244	  0.04	 92.64	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_8:homoeolog|regulates|genetic|physical] - (gene_8:Gene) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	8724	  1.59	425.27	  3.00	  0.08
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [cooc_wi_9_21:cooc_wi] - (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 82.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [has_function_9_3_d:has_function] -> (molFunc_3:MolFunc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	5	  0.00	 85.64	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [has_observ_pheno_9_13_d:has_observ_pheno] -> (phenotype_13:Phenotype) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 70.36	  0.00	  0.01
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [inv_in_1_188_d:inv_in] -> (reaction_188:Reaction) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	 89.36	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [located_in_9_5_d:located_in] -> (celComp_5:CelComp) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	11	  0.00	 96.00	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [occ_in_1_2_d:occ_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	100.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [part_of_1_19_d:part_of] -> (path_19:Path) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	71	  0.01	116.73	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [participates_in_9_4_d:participates_in] -> (bioProc_4:BioProc) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	9	  0.00	 82.18	  5.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [pub_in_9_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	62	  0.01	159.45	  5.00	  0.03
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [is_part_of_211_21:is_part_of] -> (trait_21:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	112.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) - [pub_in_211_2_d:pub_in] -> (publication_2:Publication) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	104.18	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [associated_with_20_211_d:associated_with] -> (trait_211:Trait) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	0	  0.00	102.55	  0.00	  0.02
+"MATCH path = (gene_1:Gene) - [rel_1_9:homoeolog|regulates|genetic|physical] - (gene_9:Gene) - [rel_1_20_d:has_mutant|has_variation] -> (sNP_20:SNP) - [leads_to_20_26_d:leads_to] -> (sNPEffect_26:SNPEffect) WHERE gene_1.iri IN $startGeneIris RETURN path"	11	  0.00	340	  0.06	107.45	  7.00	  0.02
+
+
+20240424-18:40:51.954 [main] INFO  KnetMinerInitializer - Generating semantic motif summary tables
+20240424-18:40:51.972 [main] INFO  PercentProgressLogger - 10% of paths stored
+20240424-18:40:51.982 [main] INFO  PercentProgressLogger - 20% of paths stored
+20240424-18:40:51.994 [main] INFO  PercentProgressLogger - 30% of paths stored
+20240424-18:40:52.005 [main] INFO  PercentProgressLogger - 40% of paths stored
+20240424-18:40:52.021 [main] INFO  PercentProgressLogger - 50% of paths stored
+20240424-18:40:52.038 [main] INFO  PercentProgressLogger - 60% of paths stored
+20240424-18:40:52.057 [main] INFO  PercentProgressLogger - 70% of paths stored
+20240424-18:40:52.079 [main] INFO  PercentProgressLogger - 80% of paths stored
+20240424-18:40:52.105 [main] INFO  PercentProgressLogger - 90% of paths stored
+20240424-18:40:52.133 [main] INFO  PercentProgressLogger - 100% of paths stored
+20240424-18:40:52.136 [main] INFO  KnetMinerInitializer - Creating genes2QTLs map
+20240424-18:40:52.140 [main] INFO  PercentProgressLogger - 10% of genes processed
+20240424-18:40:52.141 [main] INFO  PercentProgressLogger - 20% of genes processed
+20240424-18:40:52.142 [main] INFO  PercentProgressLogger - 30% of genes processed
+20240424-18:40:52.143 [main] INFO  PercentProgressLogger - 40% of genes processed
+20240424-18:40:52.144 [main] INFO  PercentProgressLogger - 50% of genes processed
+20240424-18:40:52.145 [main] INFO  PercentProgressLogger - 60% of genes processed
+20240424-18:40:52.146 [main] INFO  PercentProgressLogger - 70% of genes processed
+20240424-18:40:52.147 [main] INFO  PercentProgressLogger - 80% of genes processed
+20240424-18:40:52.148 [main] INFO  PercentProgressLogger - 90% of genes processed
+20240424-18:40:52.149 [main] INFO  PercentProgressLogger - 100% of genes processed
+20240424-18:40:52.149 [main] INFO  KnetMinerInitializer - Populated gene2QTL with 0 mapping(s)
+20240424-18:40:52.149 [main] INFO  KnetMinerInitializer - Dumping semantic motif summary tables on files, at "/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/data"
+20240424-18:40:52.341 [main] INFO  KnetMinerInitializer - Saving graph stats to '/home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/data/knowledge-network-stats.json'
+20240424-18:40:52.367 [main] INFO  KnetMinerInitializer - End of graph stats export
+20240424-18:40:52.368 [main] INFO  KnetMinerInitializer - genes2Concepts populated with 5095 elements
+20240424-18:40:52.368 [main] INFO  KnetMinerInitializer - concepts2Genes populated with 6145 elements
+20240424-18:40:52.368 [main] INFO  KnetMinerInitializer - genes2PathLengths populated with 12493 elements
+20240424-18:40:52.368 [main] WARN  KnetMinerInitializer - genes2QTLs is null/empty
+20240424-18:40:52.368 [main] INFO  KnetMinerInitializer - Semantic motif data initialization ended.
+20240424-18:40:52.369 [main] INFO  KnetMinerInitializerCLI - Creating Neo4j indexes and optimisations
+20240424-18:40:52.372 [main] INFO  NeoInitComponent - NeoConceptIndexer setting Neo4j connection from config params
+20240424-18:40:52.373 [main] INFO  NeoInitComponent - Setting Neo4j connection from driver parameter
+20240424-18:40:52.373 [main] INFO  NeoConceptIndexer - Retrieving concept index properties from: /home/data/knetminer/pub/endpoints/cereals-dummy/1/tmp/knet-init/config/neo4j/concept-index-properties.txt
+20240424-18:40:52.378 [main] INFO  NeoConceptIndexer - Creating Neo4j full text index for concept searching
+20240424-18:40:52.378 [main] INFO  NeoConceptIndexer - Fetching all DB concept properties
+20240424-18:40:52.568 [main] INFO  NeoConceptIndexer - Found 34 concept properties in the DB
+20240424-18:40:52.568 [main] INFO  NeoConceptIndexer - Expanding to 34 DB properties from 15 base names
+20240424-18:40:52.570 [main] INFO  NeoConceptIndexer - Returning 17 DB properties after base property filtering
+20240424-18:40:52.571 [main] INFO  NeoConceptIndexer - Deleting old concept full text index
+20240424-18:40:52.579 [main] INFO  NeoConceptIndexer - Creating full text index for concepts
+20240424-18:40:52.789 [main] INFO  NeoConceptIndexer - Full text index for concepts created
+20240424-18:40:52.790 [main] INFO  NeoConceptIndexer - Concept full text indexing, all done
+20240424-18:40:52.791 [main] INFO  NeoInitComponent - NeoGenePubIdIndexer setting Neo4j connection from config params
+20240424-18:40:52.791 [main] INFO  NeoInitComponent - Setting Neo4j connection from driver parameter
+20240424-18:40:52.792 [main] INFO  NeoGenePubIdIndexer - Creating Neo4j full text index for gene labels
+20240424-18:40:52.821 [main] INFO  NeoGenePubIdIndexer - Gene name/accession indexing, all done
+20240424-18:40:52.823 [main] INFO  NeoInitComponent - NeoChromosomeFix setting Neo4j connection from config params
+20240424-18:40:52.823 [main] INFO  NeoInitComponent - Setting Neo4j connection from driver parameter
+20240424-18:40:52.823 [main] INFO  NeoChromosomeFix - Fixing gene chromosome properties
+20240424-18:40:53.600 [main] INFO  NeoChromosomeFix - Chromosome properties processed
+20240424-18:40:53.602 [main] INFO  NeoInitComponent - NeoPrefNamesFix setting Neo4j connection from config params
+20240424-18:40:53.602 [main] INFO  NeoInitComponent - Setting Neo4j connection from driver parameter
+20240424-18:40:53.603 [main] INFO  NeoPrefNamesFix - Fixing concept prefName property
+20240424-18:40:53.803 [main] INFO  NeoPrefNamesFix - Names processed
+20240424-18:40:53.804 [main] INFO  KnetMinerInitializerCLI - Populating Neo4j with semantic motif summaries
+20240424-18:40:54.148 [main] INFO  NeoInitComponent - NeoMotifImporter setting Neo4j connection from config params
+20240424-18:40:54.149 [main] INFO  NeoInitComponent - Setting Neo4j connection from driver parameter
+20240424-18:40:54.149 [main] INFO  NeoMotifImporter - Deleting old semantic motif endpoints
+20240424-18:40:55.711 [main] INFO  NeoMotifImporter - Creating Neo4j Concept ID indexes
+20240424-18:40:55.722 [main] INFO  NeoMotifImporter - ID indexes created
+20240424-18:40:55.722 [main] INFO  NeoMotifImporter - Saving 12493 semantic motif endpoints to Neo4j
+20240424-18:40:56.149 [main] INFO  PercentProgressLogger - 10% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.152 [main] INFO  PercentProgressLogger - 20% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.154 [main] INFO  PercentProgressLogger - 30% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.157 [main] INFO  PercentProgressLogger - 40% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.160 [main] INFO  PercentProgressLogger - 50% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.162 [main] INFO  PercentProgressLogger - 60% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.165 [main] INFO  PercentProgressLogger - 70% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.168 [main] INFO  PercentProgressLogger - 80% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.171 [main] INFO  PercentProgressLogger - 90% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.174 [main] INFO  PercentProgressLogger - 100% semantic motif endpoints sent to Neo4j
+20240424-18:40:56.174 [main] INFO  NeoMotifImporter - Waiting for Neo4j updates to complete
+20240424-18:40:56.551 [neoMotifImporter.scheduler-3] INFO  PercentProgressLogger - 20% semantic motif endpoints stored
+20240424-18:40:56.612 [neoMotifImporter.scheduler-1] INFO  PercentProgressLogger - 40% semantic motif endpoints stored
+20240424-18:40:56.654 [neoMotifImporter.scheduler-5] INFO  PercentProgressLogger - 60% semantic motif endpoints stored
+20240424-18:40:56.699 [neoMotifImporter.scheduler-4] INFO  PercentProgressLogger - 80% semantic motif endpoints stored
+20240424-18:40:56.757 [neoMotifImporter.scheduler-2] INFO  PercentProgressLogger - 100% semantic motif endpoints stored
+20240424-18:40:56.758 [main] INFO  NeoMotifImporter - saveMotifLinks(), done
+20240424-18:40:56.758 [main] INFO  NeoMotifImporter - Deleting old per-concept gene counts
+20240424-18:40:56.803 [main] INFO  NeoMotifImporter - Saving 6145 per-concept gene counts to Neo4j
+20240424-18:40:56.805 [main] INFO  PercentProgressLogger - 10% counts sent to Neo4j
+20240424-18:40:56.806 [main] INFO  PercentProgressLogger - 20% counts sent to Neo4j
+20240424-18:40:56.807 [main] INFO  PercentProgressLogger - 30% counts sent to Neo4j
+20240424-18:40:56.807 [main] INFO  PercentProgressLogger - 40% counts sent to Neo4j
+20240424-18:40:56.808 [main] INFO  PercentProgressLogger - 50% counts sent to Neo4j
+20240424-18:40:56.809 [main] INFO  PercentProgressLogger - 60% counts sent to Neo4j
+20240424-18:40:56.809 [main] INFO  PercentProgressLogger - 70% counts sent to Neo4j
+20240424-18:40:56.810 [main] INFO  PercentProgressLogger - 80% counts sent to Neo4j
+20240424-18:40:56.810 [main] INFO  PercentProgressLogger - 90% counts sent to Neo4j
+20240424-18:40:56.811 [main] INFO  PercentProgressLogger - 100% counts sent to Neo4j
+20240424-18:40:56.811 [main] INFO  NeoMotifImporter - Waiting for Neo4j updates to complete
+20240424-18:40:56.954 [neoMotifImporter.scheduler-5] INFO  PercentProgressLogger - 19% counts stored
+20240424-18:40:57.027 [neoMotifImporter.scheduler-4] INFO  PercentProgressLogger - 59% counts stored
+20240424-18:40:57.087 [neoMotifImporter.scheduler-2] INFO  PercentProgressLogger - 100% counts stored
+20240424-18:40:57.088 [main] INFO  NeoMotifImporter - saveConceptGeneCounts(), done
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+
+All Neo4j indexing done
+
+[Wed Apr 24 18:40:57 2024]
+Finished job 0.
+1 of 1 steps (100%) done

@@ -1,6 +1,9 @@
 # Creates dataset metadata
 #
-# This is a wrapper of the corresponding tool in the Ondex RDF exporter (TODO: link).
+# This is a wrapper of the corresponding tool in the Ondex RDF exporter:
+# https://github.com/Rothamsted/knetbuilder/tree/master/ondex-knet-builder/modules/rdf-export-2
+# (TODO: better documentation).
+#
 # It assumes the input for the tool is the URI-equipped OXL.
 #
 
