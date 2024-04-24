@@ -97,7 +97,7 @@ export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
 Which is picked by `build-endpoint.sh` and passed to SnakeMake, this tells SnakeMake to use SLURM to run workflows, and with the SLURM config options specified in the `--profile` directory (in a format prescribed by Snakemake). In other words, with this options, SnakeMake runs workflow steps automatically on SLURM, including submitting parallel jobs when the workflow allows for it.
 
 
-## Running the data building workflow
+## Running the data building workflow
 
 After having defined all the config you need as explained above, you can run the first stage of the endpoint building, the one that prepares data dumps from the OXL. As explained in the main README, RDF and Neo4j dumps are the main output files produced by this stage.
 
