@@ -75,6 +75,10 @@ secret_path="$KNET_WEB_SECRETS/$KETL_DATASET_ID-$KETL_DATASET_VERSION.key"
 For instance, the `secret_path` at the end is an hash random code, which is appended to our web download directory, to make reserved datasets downloadable only to those who know the hash code. These dataset-download directories have to be created manually on the
 destination web server for knetminer.com and of course, prior to launching the synchronisation script.
 
+## Walk-through
+
+For RRes-endpoint this [walk-thorugh doc](doc/pipeline-walkthrough.md), which uses a dummy dataset on our RRes hosts is available.
+
 
 # CyVerse Endpoints
 

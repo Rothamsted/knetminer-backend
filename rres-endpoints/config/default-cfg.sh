@@ -92,7 +92,7 @@ export KETL_NEO_INIT="$KETL_HOME/utils/neo4j/neo-init.sh"
 export KETL_NEO_USR='neo4j'
 export KETL_NEO_PWD='testTest' # Recent Neo doesn't accept 'test'
 
-# You might have special ways, dynamic ways to establish the BOLT URL of your 
+# You might have special/dynamic ways to establish the BOLT URL of your 
 # Neo server 
 function ketl_get_neo_url ()
 {

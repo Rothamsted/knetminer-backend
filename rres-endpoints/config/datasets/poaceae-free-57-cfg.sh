@@ -29,6 +29,8 @@ export KNET_NEO_DATA=/opt/data
 
 
 ## RRes Test instances for Knetminer
+#
+
 # Test servers like babvs73
 export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/poaceae-ci
 # babvs73: based on old Traverser, available at knetminer.com/ci-test

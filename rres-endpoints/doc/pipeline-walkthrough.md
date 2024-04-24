@@ -1,3 +1,25 @@
+# Walk-through of the RRes endpoint pipeline
+
+TODO: intro
+
+## Summary
+
+- [Updating installed scripts and tools](#updating-installed-scripts-and-tools)
+- [Configuration](#configuration)
+  * [Dataset config](#dataset-config)
+- [Metadata descriptor](#metadata-descriptor)
+  * [Environment configuration](#environment-configuration)
+- [Running the data building workflow](#running-the-data-building-workflow)
+- [Utility scripts](#utility-scripts)
+- [Updating target servers](#updating-target-servers)
+  * [Checking/preparing the server synch config](#checking-preparing-the-server-synch-config)
+  * [Updating the web download location](#updating-the-web-download-location)
+  * [Running the sync](#running-the-sync)
+  * [Updating the Neo4j server](#updating-the-neo4j-server)
+  * [Updating the CI test instances](#updating-the-ci-test-instances)
+
+<small><i>Table of contents generated with <a href='http://ecotrust-canada.github.io/markdown-toc/'>markdown-toc</a></i></small>
+
 ## Updating installed scripts and tools
 
 Before running the endpoints scripts, we typically need to update the software that it uses:
@@ -165,28 +187,97 @@ drwxrws--- 3 brandizim knetminer users  151 Apr 24 18:38 ontologies/
 **Other relevant output** is in `rres-endpoints/.snakemake/log/`. In particular, here you find files named `slurm-*.out`, each corresponding to a pipeline step and each reporting their standard output + error. See a [sample output here](example-log).
 
 
+## Utility scripts
+
+In the [utils](../utils) directory, you'll find various scripts that the pipeline above invokes. A brief summary:
+
+* [neo-init-slurm.sh](../utils/neo4j/neo-init-slurm.sh) is used to delete the local Neo4j database that is populated to obtain DB dumps
+
+* [neo-start-slurm.sh](../utils/neo4j/neo-start-slurm.sh) [neo-stop-slurm.sh](../utils/neo4j/neo-stop-slurm.sh) to start/stop the same DB. 
+
+There are different flavours of these Neo-related DBs (the defaults and the `*-slurm.sh`), since, in principle, the way you manage the Neo4j server to do the above operations depends on the environment where you are. So Which of these scripts need to be called by the pipeline is defined in `config/environments/*-env.sh`: 
+
+```bash
+export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start-slurm.sh" 
+export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop-slurm.sh" 
+```
+
+The env files also have this function:
+
+```bash
+function ketl_get_neo_url ()
+{
+  neo_host=`cat "$KETL_OUT/tmp/neo4j-slurm.host"`
+  echo "bolt://$neo_host:7687"
+}
+```
+
+That's used to know how to connect to the working Neo4j server. It needs to be a function in the case of the RRes/SLURM environment, since the server is run on an arbitrary SLURM node host (chosen by the SLURM scheduler). This is saved in `$neo_host` file by the starting script above.
+
 
 ## Updating target servers
-Once the Snakemake pipeline has generwted [servers-sync.sh](../servers-sync.sh). This has a couple of tasks:
+
+Once the Snakemake pipeline has generated [servers-sync.sh](../servers-sync.sh). This has a couple of tasks:
+
 * It copies dump files onto the location accessible from `https://knetminer.com/downloads`, to make them available to the public (usually upon request, see below), as well as to ourselves (eg, to update RRes-external servers).
+
 * It updates an internal Neo4j server with the latest generated dump.
+
 * For the `poaceae-free` dataset, it updates the servers running our (old KnetMiner) test instances, [Ondex-based version](https://knetminer.com/ci-test/client/) and [Cypher-based version](https://knetminer.com/ci-test-cypher/client/).
 
 All of the steps are enabled/disabled via config variables, see below.
 
+**WARNING**: In practice, for this script to be useful, you need to have proper
+admin-like access to the servers it targets.
+
 ### Checking/preparing the server synch config
 
-TODO
+The `server-sync.sh` script depends on a couple of config variables, most of them are in [rres-env.sh](../config/environments/rres-env.sh) and shouldn't need changes. 
 
+* `KNET_WEB_SSH='brandizim@babvs59.rothamsted.ac.uk`: this is used to copy dump files to the download location, ie, it's the host of knetminer.com. This is used with rsync over SSH.
+  * TODO: maybe redefining this as `$USER@babvs59.rothamsted.ac.uk` could be useful.
+  * **Please note**: if you want to run this script unmanned, you'll need to setup SSH so that it doesn't stop asking you for your password. This is done by [authorising a key](https://phoenixnap.com/kb/setup-passwordless-ssh) of yours on the server side.
+ 
+* `KNET_WEB_DUMPS=/var/www/html/knetminer/downloads`: This is the root where to copy download files, corresponding to `https://knetminer.com/downloads`. This is used with the dataset ID and version, plus hashes (see below).
+
+* Secrets directory (to keep hashes that are used for hashed URLs, see below):
+
+	```bash
+	export KNET_SECRETS="$KNET_SOFTWARE/secrets"
+	export KNET_WEB_SECRETS="$KNET_SECRETS/web-data"
+	```
+  
+* For the poaceae-free dataset (so, not cereals-dummy used in this walk-through), we have this (usually in `config/dataset/poaceae-free-$ver-cfg.sh`):
+
+	```bash
+	# Tells the sycn script it has to update the RRes Neo4j server with the DB dump
+	export KETL_HAS_NEO4J=true
+	# Where the server is and how to connect to it via SSH
+	# ===> As above, you need access to this and you might want your key in authorized_keys
+	export KNET_NEO_SSH=neo4j@babvs65.rothamsted.ac.uk
+	# Where data dumps are copied on the Neo server
+	export KNET_NEO_DATA=/opt/data
+	```
+  These variables are then use for the Internal Neo4j server update (see below)
+  
+* For the poaceae-free dataset, we also use it to update our two test servers for KnetMiner (see below). This depends on:
+
+	```bash
+	# List of test servers and their SSH coordinates
+	# babvs73: based on old Traverser, available at knetminer.com/ci-test
+	# babvs72: based on Neo4j+OXL Traverser, available at knetminer.com/ci-test-cypher
+	export KNET_TESTINST_SSH="brandizim@babvs73.rothamsted.ac.uk brandizim@babvs72.rothamsted.ac.uk"	
+	# Where the data (OXL) are saved on each of them
+	export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/poaceae-ci
+	```
 
 ### Updating the web download location
 
 This requires you pre-define a couple of things:
 
-* Create a new secret for the dataset+version: 
+* Create a new secret for the dataset+version:
+
 ```bash
-# KNET_WEB_SECRETS is set to /home/data/knetminer/software/secrets/web-data
-# 
 cat /dev/urandom \
   | head -n 10000 \
   | shasum -a 1 \
@@ -244,9 +335,28 @@ $ ./servers-sync.sh 'cereals-dummy' 1 rres
 
 If you didn't see errors, you should now see the dump files at https://knetminer.com/downloads/reserved/cereals-dummy/1/3aeb45
 
+If you haven't configured the other stages that this script runs (described in the follow), it will fail to continue, that's normal.
+
 ### Updating the Neo4j server
-TODO
+The next step that the server sync script runs consists of updating our internal instance of the Neo4j server. This contains the poaceae-free dataset only and is used with the KnetMiner test instance at https://knetminer.com/ci-test-cypher/client/.
+
+TODO: at the moment we don't have similar automation for the AWS test server and knetminer-nova. To be made writing separated scripts.
+
+This is run if the config vars listed above are set, the operation consists of 
+
+* copying the Neo4j dump on the target Neo4j host, using rsync over SSH. This is done by commands in `server-sync.sh`.
+
+* using Neo4j commands to populate the database server with the new dump and restart the server. For doing this, `server-sync.sh` invokes [this script](../utils/neo4j/neo-server-update-poaceae-free.sh), which is dataset and Neo server-specific. As you can see, the latter sends commands to the Neo4j host via SSH.
+
 
 ### Updating the CI test instances
-TODO
+
+If proper variables are set (by the poaceae-free config), the `server-sync.sh` script updates the KnetMiner test instances. This consists of:
+
+* Copying the new OXL that the Snakemake pipeline generated (which is enriched with URIs and metadata) to the respective hosts
+* Cleaning caches, indexes, and alike
+* Restarting the KnetMiner Docker containers that run the application
+
+The last two steps are run by sending SSH commands to the target hosts, which is done by [knet-server-restart.sh](../utils/knet-server-restart.sh).
+
 
