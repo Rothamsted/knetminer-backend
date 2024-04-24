@@ -1,4 +1,4 @@
-# Walk-through of the RRes endpoint pipeline
+# Walk-through of the RRes endpoint pipeline
 
 TODO: intro
 
