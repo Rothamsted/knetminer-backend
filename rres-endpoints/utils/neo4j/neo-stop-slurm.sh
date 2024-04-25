@@ -4,7 +4,7 @@ set -e
 echo -e "\n\tStopping Neo4j\n"
 
 if [[ ! -f "$KETL_OUT/tmp/neo4j-slurm.jobid" ]]; then
-  echo -e "\nNo JOB ID file\n"
+  echo -e "\nNo JOB ID file, possibly clean stuff like "$KETL_OUT/tmp/neo4j-slurm.\*"\n"
   exit
 fi
 

@@ -9,7 +9,7 @@ set -e
 if [[ -e "$KETL_OUT/tmp/neo4j-slurm.jobid" ]]; then
   job=`cat "$KETL_OUT/tmp/neo4j-slurm.jobid"`
   echo -e "\n\n\tNeo4j appears to be running with JOB #$job"
-  echo -e "\tDelete '$KETL_OUT/tmp/neo4j-slurm.*' if that's not the case\n\n"
+  echo -e "\tDelete '$KETL_OUT/tmp/neo4j-slurm.\*' if that's not the case\n\n"
   exit 1
 fi   
 
@@ -24,6 +24,6 @@ while true; do
   sleep 5
 done
 
-echo -e "\nJob submitted to host $host, ID:$job\n"
+echo -e "\nNeo4j server job submitted to host $host, ID:$job\n"
 echo $job >"$KETL_OUT/tmp/neo4j-slurm.jobid"
 echo $host >"$KETL_OUT/tmp/neo4j-slurm.host"
