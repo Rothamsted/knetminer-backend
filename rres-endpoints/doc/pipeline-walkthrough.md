@@ -191,7 +191,7 @@ drwxrws--- 3 brandizim knetminer users  151 Apr 24 18:38 ontologies/
 
 In the [utils](../utils) directory, you'll find various scripts that the pipeline above invokes. A brief summary:
 
-* [neo-init-slurm.sh](../utils/neo4j/neo-init-slurm.sh) is used to delete the local Neo4j database that is populated to obtain DB dumps
+* [neo-init-slurm.sh](../utils/neo4j/neo-start-slurm.sh) is used to delete the local Neo4j database that is populated to obtain DB dumps
 
 * [neo-start-slurm.sh](../utils/neo4j/neo-start-slurm.sh) [neo-stop-slurm.sh](../utils/neo4j/neo-stop-slurm.sh) to start/stop the same DB. 
 
