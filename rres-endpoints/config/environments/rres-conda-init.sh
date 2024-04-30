@@ -3,8 +3,6 @@
 # ===> This NEEDS TO BE RUN MANUALLY BEFORE scripts that use Snakemake
 #
 
-set -e
-
 # This is what conda installation puts in .profile
 __conda_setup="$('/home/data/knetminer/software/conda/mamba/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
