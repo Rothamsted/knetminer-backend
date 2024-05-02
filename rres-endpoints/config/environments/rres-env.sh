@@ -35,6 +35,13 @@ export KETL_NEOEXPORT_HOME="$KNET_SOFTWARE/ondex-mini/tools/neo4j-exporter"
 export KNET_WEBAPP="$KNET_SOFTWARE/knetminer"
 export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
 
+if [[ -z "$JAVA_HOME" ]]; then
+  # This is usually a symbolic link, pointing at the last/current version
+  export JAVA_HOME="$KNET_SOFTWARE/jdk"
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
+
 # WARNING: this must be compatible with SLURM limits set in config/snakemake/slurm
 export JAVA_TOOL_OPTIONS="-Xmx56G"
 
