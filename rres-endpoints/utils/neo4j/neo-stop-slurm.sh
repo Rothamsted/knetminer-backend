@@ -11,7 +11,7 @@ fi
 job=`cat "$KETL_OUT/tmp/neo4j-slurm.jobid"`
 host=`cat "$KETL_OUT/tmp/neo4j-slurm.host"`
 
-# In the past, --signal doesn't work and without it, KILL seems to be sent
+# In the past, --signal didn't work and without it, KILL seemed to be sent
 # Now it seems to be working
 scancel --signal=TERM --full $job
 
