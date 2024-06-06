@@ -11,7 +11,7 @@ sleep 30
 
 if [[ "$KETL_ENVIRONMENT" == "rres" ]]; then
 
-	sleep_time=10m
+	sleep_time=20m  #Needs to be at least 17min for cereals-premium
 
 	cat <<EOT
 

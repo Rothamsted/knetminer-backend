@@ -43,7 +43,7 @@ fi
 
 
 # WARNING: this must be compatible with SLURM limits set in config/snakemake/slurm
-export JAVA_TOOL_OPTIONS="-Xmx56G"
+export JAVA_TOOL_OPTIONS="-Xmx310G"
 
 export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
 #export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
