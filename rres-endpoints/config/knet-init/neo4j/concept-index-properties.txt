@@ -2,6 +2,8 @@ prefName
 altName
 # The PID, TODO: we need more complex queries, to consider 1-n accessions 
 identifier
+# To support the concept selector
+ondexId
 AUTHORS
 AbstractHeader
 Abstract
