@@ -3,9 +3,9 @@
 if ! which snakemake >/dev/null; then
   cat <<EOT
 
-  WARNING: snakemake not found in PATH. If you're missing conda initialisation, run this:
-  
-  BEFORE running Snakemake-based scripts, else they will FAIL
+  WARNING: snakemake not found in PATH. If you're missing conda initialisation, run something like
+  SLURM initialisation or config/environments/rres-conda-init.sh BEFORE running Snakemake-based scripts, 
+  else they will FAIL
 
 EOT
 
@@ -46,7 +46,7 @@ fi
 export JAVA_TOOL_OPTIONS="-Xmx310G"
 
 export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
-#export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
+# export KETL_SNAKE_OPTS="$KETL_SNAKE_OPTS --dry-run"
 
 
 
