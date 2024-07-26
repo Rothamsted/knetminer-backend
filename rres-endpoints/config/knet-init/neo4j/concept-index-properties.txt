@@ -1,18 +1,18 @@
 prefName
 altName
+description
+Description
+AbstractHeader
+AUTHORS
+Authors
+Abstract
+MeSH
+Phenotype
+Pheno
+growth_conditions
+study
+Chemical
 # The PID, TODO: we need more complex queries, to consider 1-n accessions 
 identifier
 # To support the concept selector
 ondexId
-AUTHORS
-AbstractHeader
-Abstract
-MeSH
-description
-Description
-Phenotype
-Pheno
-study
-growth_conditions
-Chemical
-Authors
