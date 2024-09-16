@@ -32,6 +32,16 @@ printf "\n\n  Creating Neo indexing (full-text and semantic motifs)\n\n"
 "$KNET_INITIALIZER_HOME/knet-init.sh" \
 -c "$knet_cfg/config/config-etl.yml" --neo-index=config:// --neo-motifs --in "$oxl_src"
 
+# Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
+printf "\nRunning Cypher query to generate stats node in Neo4j\n"
 
-echo -e "\nAll Neo4j indexing done\n"
+export PATH=$PATH:$KNET_SOFTWARE/neo4j-community-5.20.0-etl/bin
+
+query="MATCH (g:Gene)
+WITH count(g) AS geneCount
+CREATE (s:Stats { Stats: '{\"geneCount\": ' + geneCount + '}' })"
+
+cypher-shell -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
+
+echo -e "\nAll Neo4j indexing and stats generation done\n"
 echo `date` >"$out_flag"

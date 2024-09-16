@@ -5,7 +5,9 @@ oxl_home="$KNET_HOME/etl-test/plants-lite/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
-export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
+# Sam 20240909 - New versioning convention
+export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC1"
+
 
 ## Neo 
 #
