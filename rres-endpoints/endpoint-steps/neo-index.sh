@@ -36,12 +36,21 @@ printf "\n\n  Creating Neo indexing (full-text and semantic motifs)\n\n"
 printf "\nRunning Cypher query to generate stats node in Neo4j\n"
 
 export PATH=$PATH:$KNET_SOFTWARE/neo4j-community-5.20.0-etl/bin
+running_host=bolt://`cat "$KETL_OUT/tmp/neo4j-slurm.host"`:7687
 
-query="MATCH (g:Gene)
-WITH count(g) AS geneCount
-CREATE (s:Stats { Stats: '{\"geneCount\": ' + geneCount + '}' })"
+current_date=$(date +%Y-%m-%d)
 
-cypher-shell -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
+query="MATCH (n)-[r]-()
+WITH count(distinct n) AS nodeCount, count(distinct r) AS edgeCount
+CREATE (s:Metadata { 
+    nodeCount: toString(nodeCount),
+    edgeCount: toString(edgeCount),
+    version: \"${KETL_DATASET_VERSION}\",
+    fileLocation: \"s3://knet-data-store/${KETL_DATASET_ID}/v${KETL_DATASET_VERSION}-RC1/neo4j-5.20.0.dump\",
+    date: \"${current_date}\"
+})"
+
+cypher-shell -a "$running_host" -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"
 echo `date` >"$out_flag"
