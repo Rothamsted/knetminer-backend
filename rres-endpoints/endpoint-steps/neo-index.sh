@@ -39,7 +39,7 @@ neo_motifs_flag='--neo-motifs'
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
 printf "\nRunning Cypher query to generate stats node in Neo4j\n"
 
-# TODO: this is too much stuff to stay here, move it to its own script
+# TODO: this is too much stuff to stay here, move it to its own script in utils/
 
 # TODO: this is wrong, you're hardwiring the Neo version and location
 # and that's useless anyway, since you already have $NEO4J_HOME.
