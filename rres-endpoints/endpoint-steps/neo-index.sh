@@ -31,7 +31,7 @@ cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
 printf "\n\n  Creating Neo indexing (full-text and semantic motifs)\n\n"
 
 # Comment this to skip the traverser. BE CAREFUL
-# neo_motifs_flag='--neo-motifs'
+neo_motifs_flag='--neo-motifs'
 "$KNET_INITIALIZER_HOME/knet-init.sh" \
 -c "$knet_cfg/config/config-etl.yml" --neo-index=config:// $neo_motifs_flag --in "$oxl_src"
 
