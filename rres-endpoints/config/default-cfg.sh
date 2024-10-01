@@ -50,7 +50,7 @@ export KETL_NEOEXPORT_HOME=''
 # ===> Override this in config/datasets/name-ver.sh, so that we can keep track
 # of the version that was used for a given dataset
 #
-export KETL_NEO_VERSION='5.20.0'
+export KETL_NEO_VERSION='5.23.0'
 
 # The KnetMiner codebase
 export KNET_WEBAPP=''

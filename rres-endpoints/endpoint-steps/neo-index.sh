@@ -29,28 +29,14 @@ cp -R -v "$KETL_HOME/config/knet-init"/* "$knet_cfg/config"
 # --neo-motifs is provisional, we need it until we can replace it with the new traverser.
 #
 printf "\n\n  Creating Neo indexing (full-text and semantic motifs)\n\n"
+
+# Comment this to skip the traverser. BE CAREFUL
+neo_motifs_flag='--neo-motifs'
 "$KNET_INITIALIZER_HOME/knet-init.sh" \
--c "$knet_cfg/config/config-etl.yml" --neo-index=config:// --neo-motifs --in "$oxl_src"
+-c "$knet_cfg/config/config-etl.yml" --neo-index=config:// $neo_motifs_flag --in "$oxl_src"
 
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
-printf "\nRunning Cypher query to generate stats node in Neo4j\n"
-
-export PATH=$PATH:$KNET_SOFTWARE/neo4j-community-5.20.0-etl/bin
-running_host=bolt://`cat "$KETL_OUT/tmp/neo4j-slurm.host"`:7687
-
-current_date=$(date +%Y-%m-%d)
-
-query="MATCH (n)-[r]-()
-WITH count(distinct n) AS nodeCount, count(distinct r) AS edgeCount
-CREATE (s:Metadata { 
-    nodeCount: toString(nodeCount),
-    edgeCount: toString(edgeCount),
-    version: \"${KETL_DATASET_VERSION}\",
-    fileLocation: \"s3://knet-data-store/${KETL_DATASET_ID}/v${KETL_DATASET_VERSION}-RC1/neo4j-5.20.0.dump\",
-    date: \"${current_date}\"
-})"
-
-cypher-shell -a "$running_host" -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
+source "$KETL_HOME/utils/neo4j/neo-stats.sh"
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"
 echo `date` >"$out_flag"
