@@ -38,8 +38,6 @@ neo_motifs_flag='--neo-motifs'
 "$KNET_INITIALIZER_HOME/knet-init.sh" \
 -c "$knet_cfg/config/config-etl.yml" --neo-index=config:// $neo_motifs_flag --in "$oxl_src"
 
--c "$knet_cfg/config/config-etl.yml" --neo-index=config:// $neo_motifs_flag --in "$oxl_src"
-
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
 source "$KETL_HOME/utils/neo4j/neo-stats.sh"
 

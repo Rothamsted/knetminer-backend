@@ -1,23 +1,23 @@
 # /home/data/knetminer/etl-test/solanaceae/58/generic/knowledge-network.oxl
 
 # Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
-oxl_home="$KNET_HOME/etl-test/solanaceae/$KETL_DATASET_VERSION"
+oxl_home="$KNET_HOME/etl-test/vegetables-premium/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
-export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
+export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC2"
 
 ## Neo 
 #
 export KETL_HAS_NEO4J=true
-export KETL_NEO_VERSION='5.20.0'
+export KETL_NEO_VERSION='5.23.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 
 ## Knet Initialiser
 #
 # The name within the code base, which identifies the config dir to be
 # used for the KnetMiner initialiser
-export KNET_INIT_DATASET_ID="solanaceae"
+export KNET_INIT_DATASET_ID="vegetables-premium"
 
 
 ##### Values for server-sync.sh
