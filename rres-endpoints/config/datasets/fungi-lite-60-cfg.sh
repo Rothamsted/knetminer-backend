@@ -20,7 +20,6 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 # used for the KnetMiner initialiser
 export KNET_INIT_DATASET_ID="fungi-lite"
 
-
 ##### Values for server-sync.sh
 #
 
