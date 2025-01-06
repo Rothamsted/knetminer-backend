@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
-
 set -e
+
+cd $(dirname "$0")/..
+
+# We need KNET_WEBAPP to present the next message
+echo "Loading Environment config"
+. config/environments/rres-env.sh
+
 
 cat <<EOT 
 
 
-Trying to update the KnetMiner web code base (including the initialiser), if something fails, probably you've to merge uncommitted changes in the 
-code base clone at "$KNET_WEBAPP"
+Trying to update the KnetMiner web code base (including the initialiser), if something fails,
+probably you've to merge uncommitted changes in the code base clone at:
+  
+"\"$KNET_WEBAPP\""
 
 EOT
  
 
-cd $(dirname "$0")/..
-
-echo "Loading Environment config"
-. config/environments/rres-env.sh
 unset JAVA_TOOL_OPTIONS # Not needed here
 
 echo "---  git status\n"
