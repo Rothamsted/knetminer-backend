@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-cd $(dirname "$0")/..
+#cd $(dirname "$0")/..
+cd ..
+TOP_DIR=/home/data/knetminer
+export PATH=${TOP_DIR}/software/apache-maven-3.8.2/bin:${PATH}
+. config/environments/rres-conda-init.sh
 
 # We need KNET_WEBAPP to present the next message
 echo "Loading Environment config"

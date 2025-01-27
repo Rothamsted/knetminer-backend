@@ -20,7 +20,8 @@ cd "$KETL_HOME"
 # 
 . config/default-cfg.sh
 
-snakemake --cores --until all \
+snakemake --cluster "sbatch --partition largemem --mem 128GB"\
+  --cores --until all \
   --snakefile build-endpoint.snakefile \
   --config dataset_id="$KETL_DATASET_ID" dataset_version="$KETL_DATASET_VERSION"\
   $KETL_SNAKE_OPTS
