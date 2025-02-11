@@ -1,0 +1,115 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	add_uris
+	1
+Select jobs to execute...
+
+[Thu Feb  6 21:22:29 2025]
+rule add_uris:
+    input: /home/data/knetminer/etl-test/ascomycota-premium/60/generic/knowledge-network.oxl
+    output: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/knowledge-graph-uris.oxl
+    jobid: 0
+
+
+
+Adding URIs to '/home/data/knetminer/etl-test/ascomycota-premium/60/generic/knowledge-network.oxl' and saving to '/home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/knowledge-graph-uris.oxl'
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+
+21:22:32.836 [INFO ]: Loading '/home/data/knetminer/etl-test/ascomycota-premium/60/generic/knowledge-network.oxl'
+21:22:32.924 [INFO ]: Starting OXL parsing... [OXL Parser]
+21:22:42.351 [INFO ]: concept parsed 100,000 elements 
+21:22:52.579 [INFO ]: concept parsed 200,000 elements 
+21:22:56.530 [INFO ]: concept parsed 300,000 elements 
+21:23:04.411 [INFO ]: concept parsed 400,000 elements 
+21:23:10.092 [INFO ]: concept parsed 500,000 elements 
+21:23:12.884 [INFO ]: concept parsed 600,000 elements 
+21:23:20.631 [INFO ]: relation parsed 100,000 elements 
+21:23:27.403 [INFO ]: relation parsed 200,000 elements 
+21:23:29.297 [INFO ]: relation parsed 300,000 elements 
+21:23:31.596 [INFO ]: relation parsed 400,000 elements 
+21:23:36.918 [INFO ]: relation parsed 500,000 elements 
+21:23:38.488 [INFO ]: relation parsed 600,000 elements 
+21:23:39.945 [INFO ]: relation parsed 700,000 elements 
+21:23:45.257 [INFO ]: relation parsed 800,000 elements 
+21:23:47.152 [INFO ]: relation parsed 900,000 elements 
+21:23:49.099 [INFO ]: relation parsed 1,000,000 elements 
+21:24:04.534 [INFO ]: relation parsed 1,100,000 elements 
+21:24:06.606 [INFO ]: relation parsed 1,200,000 elements 
+21:24:08.405 [INFO ]: relation parsed 1,300,000 elements 
+21:24:10.226 [INFO ]: relation parsed 1,400,000 elements 
+21:24:11.838 [INFO ]: relation parsed 1,500,000 elements 
+21:24:19.432 [INFO ]: relation parsed 1,600,000 elements 
+21:24:20.560 [INFO ]: relation parsed 1,700,000 elements 
+21:24:22.109 [INFO ]: relation parsed 1,800,000 elements 
+21:24:23.894 [INFO ]: relation parsed 1,900,000 elements 
+21:24:26.004 [INFO ]: relation parsed 2,000,000 elements 
+21:24:33.717 [INFO ]: relation parsed 2,100,000 elements 
+21:24:35.557 [INFO ]: relation parsed 2,200,000 elements 
+21:24:37.246 [INFO ]: OXL parsing finished. [OXL Parser]
+21:24:37.246 [INFO ]: Graph Loaded, now processing it
+21:24:37.246 [INFO ]: Adding URIs to 624863 concept(s) and 2299768 relation(s)
+21:24:37.246 [INFO ]: Start processing concepts
+21:24:37.803 [INFO ]: 10% of concepts done
+21:24:37.945 [INFO ]: 20% of concepts done
+21:24:38.222 [INFO ]: 30% of concepts done
+21:24:38.507 [INFO ]: 40% of concepts done
+21:24:38.867 [INFO ]: 50% of concepts done
+21:24:39.081 [INFO ]: 60% of concepts done
+21:24:39.297 [INFO ]: 70% of concepts done
+21:24:39.419 [INFO ]: 80% of concepts done
+21:24:39.496 [INFO ]: 90% of concepts done
+21:24:39.562 [INFO ]: 100% of concepts done
+21:24:39.567 [INFO ]: Start processing relations
+21:24:50.010 [INFO ]: 10% of relations done
+21:25:18.376 [INFO ]: 20% of relations done
+21:25:22.641 [INFO ]: 30% of relations done
+21:25:29.146 [INFO ]: 40% of relations done
+21:25:33.895 [INFO ]: 50% of relations done
+21:25:40.293 [INFO ]: 60% of relations done
+21:25:44.279 [INFO ]: 70% of relations done
+21:25:48.496 [INFO ]: 80% of relations done
+21:25:55.204 [INFO ]: 90% of relations done
+21:25:59.621 [INFO ]: 100% of relations done
+Total concepts to export: 624,863
+100,000 concepts written (16.00%).
+200,000 concepts written (32.01%).
+300,000 concepts written (48.01%).
+400,000 concepts written (64.01%).
+500,000 concepts written (80.02%).
+600,000 concepts written (96.02%).
+
+Total relations to export: 2,299,768
+100,000 relations written (4.35%).
+200,000 relations written (8.70%).
+300,000 relations written (13.04%).
+400,000 relations written (17.39%).
+500,000 relations written (21.74%).
+600,000 relations written (26.09%).
+700,000 relations written (30.44%).
+800,000 relations written (34.79%).
+900,000 relations written (39.13%).
+1,000,000 relations written (43.48%).
+1,100,000 relations written (47.83%).
+1,200,000 relations written (52.18%).
+1,300,000 relations written (56.53%).
+1,400,000 relations written (60.88%).
+1,500,000 relations written (65.22%).
+1,600,000 relations written (69.57%).
+1,700,000 relations written (73.92%).
+1,800,000 relations written (78.27%).
+1,900,000 relations written (82.62%).
+2,000,000 relations written (86.97%).
+2,100,000 relations written (91.31%).
+2,200,000 relations written (95.66%).
+
+21:27:44.936 [INFO ]: URI addition finished.
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+[Thu Feb  6 21:27:45 2025]
+Finished job 0.
+1 of 1 steps (100%) done

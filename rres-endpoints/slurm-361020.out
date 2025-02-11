@@ -1,0 +1,384 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	neo_export
+	1
+Select jobs to execute...
+
+[Thu Feb  6 22:01:58 2025]
+rule neo_export:
+    input: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/tdb
+    output: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/neo-export.flag
+    jobid: 0
+
+
+Clearing Neo4j at '/home/data/knetminer/software/neo4j-community-5.26.0-etl'
+
+	Stopping Neo4j
+
+
+No JOB ID file, possibly clean stuff like /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/neo4j-slurm.*
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+Changed password for user 'neo4j'. IMPORTANT: this change will only take effect if performed before the database is started for the first time.
+
+	Starting Neo4j on SLURM
+
+
+Neo4j server job submitted to host rothhpc402, ID:361022
+
+
+	Starting neo4j-export
+
+
+
+  rdf2neo.sh
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G -Dneo4j.boltUrl='bolt://rothhpc402:7687' -Dneo4j.user='neo4j' -Dneo4j.password='testTest' -Dfile.encoding=UTF-8
+22:02:35.447 [INFO ]: Getting maker configuration from Spring XML file 'file:///home/data/knetminer/software/ondex-mini/tools/neo4j-exporter/ondex_config/config.xml'
+22:02:36.767 [INFO ]: Getting maker configuration from Spring Context
+22:02:36.775 [INFO ]: Using MultiConfigNeo4jLoader PG maker
+22:02:40.692 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+22:02:40.696 [INFO ]: Starting PG nodes making
+22:03:58.903 [INFO ]: processNodeIris(): 100000 SPARQL tuples read from RDF
+22:05:08.211 [INFO ]: processNodeIris(): 200000 SPARQL tuples read from RDF
+22:06:10.671 [INFO ]: processNodeIris(): 300000 SPARQL tuples read from RDF
+22:07:06.442 [INFO ]: processNodeIris(): 400000 SPARQL tuples read from RDF
+22:07:46.165 [INFO ]: processNodeIris(): 500000 SPARQL tuples read from RDF
+22:08:40.475 [INFO ]: processNodeIris(): 600000 SPARQL tuples read from RDF
+22:08:49.510 [INFO ]: Waiting for the batch processor to finish
+22:08:52.510 [INFO ]: 250/250 batch jobs completed
+22:08:52.510 [INFO ]: Waiting for the batch processor to finish
+22:08:52.511 [INFO ]: Batch processor finished
+22:08:52.511 [INFO ]: PG nodes making ended
+22:08:52.511 [INFO ]: [Concepts] RDF-PG conversion finished
+22:08:52.536 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+22:08:52.536 [INFO ]: Starting PG nodes making
+22:09:05.567 [INFO ]: processNodeIris(): 100000 SPARQL tuples read from RDF
+22:09:17.119 [INFO ]: processNodeIris(): 200000 SPARQL tuples read from RDF
+22:09:29.192 [INFO ]: processNodeIris(): 300000 SPARQL tuples read from RDF
+22:09:40.635 [INFO ]: processNodeIris(): 400000 SPARQL tuples read from RDF
+22:09:51.651 [INFO ]: processNodeIris(): 500000 SPARQL tuples read from RDF
+22:10:04.352 [INFO ]: processNodeIris(): 600000 SPARQL tuples read from RDF
+22:10:09.594 [INFO ]: Waiting for the batch processor to finish
+22:10:10.104 [INFO ]: 258/258 batch jobs completed
+22:10:10.104 [INFO ]: Waiting for the batch processor to finish
+22:10:10.104 [INFO ]: Batch processor finished
+22:10:10.104 [INFO ]: PG nodes making ended
+22:10:10.104 [INFO ]: [Accessions] RDF-PG conversion finished
+22:10:10.129 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+22:10:10.129 [INFO ]: Starting PG nodes making
+22:10:10.138 [INFO ]: Waiting for the batch processor to finish
+22:10:10.344 [INFO ]: 1/1 batch jobs completed
+22:10:10.345 [INFO ]: Waiting for the batch processor to finish
+22:10:10.345 [INFO ]: Batch processor finished
+22:10:10.345 [INFO ]: PG nodes making ended
+22:10:10.345 [INFO ]: [Metadata] RDF-PG conversion finished
+22:10:10.362 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+22:10:10.362 [INFO ]: Starting PG nodes making
+22:10:10.362 [INFO ]: Waiting for the batch processor to finish
+22:10:10.363 [INFO ]: 1/1 batch jobs completed
+22:10:10.363 [INFO ]: Waiting for the batch processor to finish
+22:10:10.363 [INFO ]: Batch processor finished
+22:10:10.363 [INFO ]: PG nodes making ended
+22:10:10.363 [INFO ]: [Reified Relations] RDF-PG conversion finished
+22:10:10.377 [INFO ]: [Indices] RDF source has about 0 triple(s)
+22:10:10.377 [INFO ]: Starting PG nodes making
+22:10:10.378 [INFO ]: Waiting for the batch processor to finish
+22:10:10.378 [INFO ]: 1/1 batch jobs completed
+22:10:10.378 [INFO ]: Waiting for the batch processor to finish
+22:10:10.378 [INFO ]: Batch processor finished
+22:10:10.378 [INFO ]: PG nodes making ended
+22:10:10.378 [INFO ]: [Indices] RDF-PG conversion finished
+22:10:10.396 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+22:10:10.396 [INFO ]: Starting PG relations making
+22:10:19.503 [INFO ]: processRelationIris(): 100000 SPARQL tuples read from RDF
+22:10:28.711 [INFO ]: processRelationIris(): 200000 SPARQL tuples read from RDF
+22:10:36.743 [INFO ]: processRelationIris(): 300000 SPARQL tuples read from RDF
+22:10:46.042 [INFO ]: processRelationIris(): 400000 SPARQL tuples read from RDF
+22:10:53.238 [INFO ]: processRelationIris(): 500000 SPARQL tuples read from RDF
+22:11:05.437 [INFO ]: processRelationIris(): 600000 SPARQL tuples read from RDF
+22:11:12.480 [INFO ]: processRelationIris(): 700000 SPARQL tuples read from RDF
+22:11:19.545 [INFO ]: processRelationIris(): 800000 SPARQL tuples read from RDF
+22:11:25.345 [INFO ]: processRelationIris(): 900000 SPARQL tuples read from RDF
+22:11:31.649 [INFO ]: processRelationIris(): 1000000 SPARQL tuples read from RDF
+22:11:37.993 [INFO ]: processRelationIris(): 1100000 SPARQL tuples read from RDF
+22:11:51.451 [INFO ]: processRelationIris(): 1200000 SPARQL tuples read from RDF
+22:11:58.145 [INFO ]: processRelationIris(): 1300000 SPARQL tuples read from RDF
+22:12:04.391 [INFO ]: processRelationIris(): 1400000 SPARQL tuples read from RDF
+22:12:10.041 [INFO ]: processRelationIris(): 1500000 SPARQL tuples read from RDF
+22:12:17.731 [INFO ]: processRelationIris(): 1600000 SPARQL tuples read from RDF
+22:12:23.755 [INFO ]: processRelationIris(): 1700000 SPARQL tuples read from RDF
+22:12:30.271 [INFO ]: processRelationIris(): 1800000 SPARQL tuples read from RDF
+22:12:36.754 [INFO ]: processRelationIris(): 1900000 SPARQL tuples read from RDF
+22:12:39.051 [INFO ]: Waiting for the batch processor to finish
+22:12:39.143 [INFO ]: 763/763 batch jobs completed
+22:12:39.143 [INFO ]: Waiting for the batch processor to finish
+22:12:39.143 [INFO ]: Batch processor finished
+22:12:39.143 [INFO ]: PG relations making ended
+22:12:39.143 [INFO ]: [Concepts] RDF-PG conversion finished
+22:12:39.164 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+22:12:39.164 [INFO ]: Starting PG relations making
+22:12:45.147 [INFO ]: processRelationIris(): 100000 SPARQL tuples read from RDF
+22:12:51.224 [INFO ]: processRelationIris(): 200000 SPARQL tuples read from RDF
+22:12:57.315 [INFO ]: processRelationIris(): 300000 SPARQL tuples read from RDF
+22:13:04.637 [INFO ]: processRelationIris(): 400000 SPARQL tuples read from RDF
+22:13:10.764 [INFO ]: processRelationIris(): 500000 SPARQL tuples read from RDF
+22:13:17.590 [INFO ]: processRelationIris(): 600000 SPARQL tuples read from RDF
+22:13:20.027 [INFO ]: Waiting for the batch processor to finish
+22:13:20.384 [INFO ]: 258/258 batch jobs completed
+22:13:20.384 [INFO ]: Waiting for the batch processor to finish
+22:13:20.384 [INFO ]: Batch processor finished
+22:13:20.385 [INFO ]: PG relations making ended
+22:13:20.385 [INFO ]: [Accessions] RDF-PG conversion finished
+22:13:20.419 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+22:13:20.419 [INFO ]: Starting PG relations making
+22:13:20.419 [INFO ]: Waiting for the batch processor to finish
+22:13:20.420 [INFO ]: 1/1 batch jobs completed
+22:13:20.420 [INFO ]: Waiting for the batch processor to finish
+22:13:20.420 [INFO ]: Batch processor finished
+22:13:20.420 [INFO ]: PG relations making ended
+22:13:20.420 [INFO ]: [Metadata] RDF-PG conversion finished
+22:13:20.439 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+22:13:20.439 [INFO ]: Starting PG relations making
+22:14:03.983 [INFO ]: processRelationIris(): 100000 SPARQL tuples read from RDF
+22:14:39.263 [INFO ]: processRelationIris(): 200000 SPARQL tuples read from RDF
+22:15:20.332 [INFO ]: processRelationIris(): 300000 SPARQL tuples read from RDF
+22:15:59.777 [INFO ]: processRelationIris(): 400000 SPARQL tuples read from RDF
+22:16:37.275 [INFO ]: processRelationIris(): 500000 SPARQL tuples read from RDF
+22:17:12.520 [INFO ]: processRelationIris(): 600000 SPARQL tuples read from RDF
+22:17:47.929 [INFO ]: processRelationIris(): 700000 SPARQL tuples read from RDF
+22:18:27.315 [INFO ]: processRelationIris(): 800000 SPARQL tuples read from RDF
+22:19:04.926 [INFO ]: processRelationIris(): 900000 SPARQL tuples read from RDF
+22:19:43.531 [INFO ]: processRelationIris(): 1000000 SPARQL tuples read from RDF
+22:20:23.000 [INFO ]: processRelationIris(): 1100000 SPARQL tuples read from RDF
+22:21:05.692 [INFO ]: processRelationIris(): 1200000 SPARQL tuples read from RDF
+22:21:43.034 [INFO ]: processRelationIris(): 1300000 SPARQL tuples read from RDF
+22:22:19.538 [INFO ]: processRelationIris(): 1400000 SPARQL tuples read from RDF
+22:22:53.446 [INFO ]: processRelationIris(): 1500000 SPARQL tuples read from RDF
+22:23:27.826 [INFO ]: processRelationIris(): 1600000 SPARQL tuples read from RDF
+22:24:02.697 [INFO ]: processRelationIris(): 1700000 SPARQL tuples read from RDF
+22:24:37.698 [INFO ]: processRelationIris(): 1800000 SPARQL tuples read from RDF
+22:25:14.211 [INFO ]: processRelationIris(): 1900000 SPARQL tuples read from RDF
+22:25:54.118 [INFO ]: processRelationIris(): 2000000 SPARQL tuples read from RDF
+22:26:34.706 [INFO ]: processRelationIris(): 2100000 SPARQL tuples read from RDF
+22:27:13.532 [INFO ]: processRelationIris(): 2200000 SPARQL tuples read from RDF
+22:27:48.814 [INFO ]: Waiting for the batch processor to finish
+22:27:51.076 [INFO ]: 920/920 batch jobs completed
+22:27:51.077 [INFO ]: Waiting for the batch processor to finish
+22:27:51.077 [INFO ]: Batch processor finished
+22:27:51.077 [INFO ]: PG relations making ended
+22:27:51.077 [INFO ]: [Reified Relations] RDF-PG conversion finished
+22:27:51.105 [INFO ]: [Indices] RDF source has about 0 triple(s)
+22:27:51.105 [INFO ]: Starting PG relations making
+22:27:51.105 [INFO ]: Waiting for the batch processor to finish
+22:27:51.106 [INFO ]: 1/1 batch jobs completed
+22:27:51.106 [INFO ]: Waiting for the batch processor to finish
+22:27:51.106 [INFO ]: Batch processor finished
+22:27:51.106 [INFO ]: PG relations making ended
+22:27:51.106 [INFO ]: [Indices] RDF-PG conversion finished
+22:27:51.122 [INFO ]: [Concepts] RDF source has about 0 triple(s)
+22:27:51.122 [WARN ]: [Concepts] No Cypher index definitions found, no Cypher index will be created
+22:27:51.122 [INFO ]: [Concepts] RDF-PG conversion finished
+22:27:51.135 [INFO ]: [Accessions] RDF source has about 0 triple(s)
+22:27:51.135 [WARN ]: [Accessions] No Cypher index definitions found, no Cypher index will be created
+22:27:51.135 [INFO ]: [Accessions] RDF-PG conversion finished
+22:27:51.149 [INFO ]: [Metadata] RDF source has about 0 triple(s)
+22:27:51.149 [WARN ]: [Metadata] No Cypher index definitions found, no Cypher index will be created
+22:27:51.149 [INFO ]: [Metadata] RDF-PG conversion finished
+22:27:51.162 [INFO ]: [Reified Relations] RDF source has about 0 triple(s)
+22:27:51.162 [WARN ]: [Reified Relations] No Cypher index definitions found, no Cypher index will be created
+22:27:51.162 [INFO ]: [Reified Relations] RDF-PG conversion finished
+22:27:51.179 [INFO ]: [Indices] RDF source has about 0 triple(s)
+22:27:51.179 [INFO ]: [Indices] Loading Index definitions
+22:28:55.121 [INFO ]: [Indices] Index definitions loaded, returning 24 row(s)
+22:28:55.126 [INFO ]: [Indices] Starting Cypher Indexing
+22:28:55.315 [INFO ]: Indexing on node 'Concept'.'identifier'
+22:28:55.326 [INFO ]: Indexing on node 'Publication'.'identifier'
+22:28:55.332 [INFO ]: Indexing on node 'Resource'.'identifier'
+22:28:55.337 [INFO ]: Indexing on node 'Gene'.'identifier'
+22:28:55.342 [INFO ]: Indexing on node 'ProtDomain'.'identifier'
+22:28:55.353 [INFO ]: Indexing on node 'CelComp'.'identifier'
+22:28:55.359 [INFO ]: Indexing on node 'BioProc'.'identifier'
+22:28:55.365 [INFO ]: Indexing on node 'MolFunc'.'identifier'
+22:28:55.370 [INFO ]: Indexing on node 'EC'.'identifier'
+22:28:55.382 [INFO ]: Indexing on node 'Protein'.'identifier'
+22:28:55.396 [INFO ]: Indexing on node 'SpeciesSet'.'identifier'
+22:28:55.403 [INFO ]: Indexing on node 'Phenotype'.'identifier'
+22:28:55.408 [INFO ]: Indexing on node 'Species'.'identifier'
+22:28:55.414 [INFO ]: Indexing on node 'Trait'.'identifier'
+22:28:55.420 [INFO ]: Indexing on node 'Accession'.'identifier'
+22:28:55.427 [INFO ]: Indexing on node 'DataSource'.'identifier'
+22:28:55.433 [INFO ]: Indexing on node 'EvidenceType'.'identifier'
+22:28:55.439 [INFO ]: Indexing on node 'Concept'.'prefName'
+22:28:55.456 [INFO ]: Indexing on node 'Publication'.'prefName'
+22:28:55.463 [INFO ]: Indexing on node 'Resource'.'prefName'
+22:28:55.470 [INFO ]: Indexing on node 'Gene'.'prefName'
+22:28:55.477 [INFO ]: Indexing on node 'ProtDomain'.'prefName'
+22:28:55.482 [INFO ]: Indexing on node 'CelComp'.'prefName'
+22:28:55.488 [INFO ]: Indexing on node 'BioProc'.'prefName'
+22:28:55.494 [INFO ]: Indexing on node 'MolFunc'.'prefName'
+22:28:55.499 [INFO ]: Indexing on node 'EC'.'prefName'
+22:28:55.505 [INFO ]: Indexing on node 'Protein'.'prefName'
+22:28:55.510 [INFO ]: Indexing on node 'SpeciesSet'.'prefName'
+22:28:55.516 [INFO ]: Indexing on node 'Phenotype'.'prefName'
+22:28:55.522 [INFO ]: Indexing on node 'Species'.'prefName'
+22:28:55.527 [INFO ]: Indexing on node 'Trait'.'prefName'
+22:28:55.532 [INFO ]: Indexing on node 'Accession'.'prefName'
+22:28:55.539 [INFO ]: Indexing on node 'DataSource'.'prefName'
+22:28:55.546 [INFO ]: Indexing on node 'EvidenceType'.'prefName'
+22:28:55.553 [INFO ]: Indexing on node 'Concept'.'altName'
+22:28:55.558 [INFO ]: Indexing on node 'Publication'.'altName'
+22:28:55.564 [INFO ]: Indexing on node 'Resource'.'altName'
+22:28:55.569 [INFO ]: Indexing on node 'Gene'.'altName'
+22:28:55.574 [INFO ]: Indexing on node 'ProtDomain'.'altName'
+22:28:55.580 [INFO ]: Indexing on node 'CelComp'.'altName'
+22:28:55.585 [INFO ]: Indexing on node 'BioProc'.'altName'
+22:28:55.591 [INFO ]: Indexing on node 'MolFunc'.'altName'
+22:28:55.596 [INFO ]: Indexing on node 'EC'.'altName'
+22:28:55.601 [INFO ]: Indexing on node 'Protein'.'altName'
+22:28:55.605 [INFO ]: Indexing on node 'SpeciesSet'.'altName'
+22:28:55.610 [INFO ]: Indexing on node 'Phenotype'.'altName'
+22:28:55.615 [INFO ]: Indexing on node 'Species'.'altName'
+22:28:55.620 [INFO ]: Indexing on node 'Trait'.'altName'
+22:28:55.625 [INFO ]: Indexing on node 'Accession'.'altName'
+22:28:55.630 [INFO ]: Indexing on node 'DataSource'.'altName'
+22:28:55.635 [INFO ]: Indexing on node 'EvidenceType'.'altName'
+22:28:55.640 [INFO ]: Indexing on node 'Concept'.'label'
+22:28:55.645 [INFO ]: Indexing on node 'Publication'.'label'
+22:28:55.650 [INFO ]: Indexing on node 'Resource'.'label'
+22:28:55.655 [INFO ]: Indexing on node 'Gene'.'label'
+22:28:55.660 [INFO ]: Indexing on node 'ProtDomain'.'label'
+22:28:55.665 [INFO ]: Indexing on node 'CelComp'.'label'
+22:28:55.670 [INFO ]: Indexing on node 'BioProc'.'label'
+22:28:55.675 [INFO ]: Indexing on node 'MolFunc'.'label'
+22:28:55.680 [INFO ]: Indexing on node 'EC'.'label'
+22:28:55.685 [INFO ]: Indexing on node 'Protein'.'label'
+22:28:55.690 [INFO ]: Indexing on node 'SpeciesSet'.'label'
+22:28:55.695 [INFO ]: Indexing on node 'Phenotype'.'label'
+22:28:55.701 [INFO ]: Indexing on node 'Species'.'label'
+22:28:55.706 [INFO ]: Indexing on node 'Trait'.'label'
+22:28:55.711 [INFO ]: Indexing on node 'Accession'.'label'
+22:28:55.716 [INFO ]: Indexing on node 'DataSource'.'label'
+22:28:55.721 [INFO ]: Indexing on node 'EvidenceType'.'label'
+22:28:55.749 [INFO ]: Indexing on relation 'identifier'.'label'
+22:28:55.756 [INFO ]: Indexing on relation 'dataSource'.'label'
+22:28:55.762 [INFO ]: Indexing on relation 'evidence'.'label'
+22:28:55.767 [INFO ]: Indexing on relation 'xref'.'label'
+22:28:55.774 [INFO ]: Indexing on relation 'has_domain'.'label'
+22:28:55.779 [INFO ]: Indexing on relation 'ortho'.'label'
+22:28:55.786 [INFO ]: Indexing on relation 'has_phenotype'.'label'
+22:28:55.792 [INFO ]: Indexing on relation 'cooc_wi'.'label'
+22:28:55.797 [INFO ]: Indexing on relation 'participates_in'.'label'
+22:28:55.803 [INFO ]: Indexing on relation 'testProp'.'label'
+22:28:55.810 [INFO ]: Indexing on relation 'h_s_s'.'label'
+22:28:55.820 [INFO ]: Indexing on relation 'has_function'.'label'
+22:28:55.826 [INFO ]: Indexing on relation 'located_in'.'label'
+22:28:55.847 [INFO ]: Indexing on relation 'cat_c'.'label'
+22:28:55.853 [INFO ]: Indexing on relation 'pub_in'.'label'
+22:28:55.859 [INFO ]: Indexing on relation 'enc'.'label'
+22:28:55.866 [INFO ]: Indexing on relation 'is_a'.'label'
+22:28:55.871 [INFO ]: Indexing on relation 'occ_in'.'label'
+22:28:55.877 [INFO ]: Indexing on relation 'part_of'.'label'
+22:28:55.882 [INFO ]: Indexing on relation 'genetic'.'label'
+22:28:55.887 [INFO ]: Indexing on relation 'pos_reg'.'label'
+22:28:55.892 [INFO ]: Indexing on relation 'neg_reg'.'label'
+22:28:55.897 [INFO ]: Indexing on relation 'regulates'.'label'
+22:28:55.902 [INFO ]: Indexing on relation 'physical'.'label'
+22:28:55.907 [INFO ]: Indexing on relation 'identifier'.'evidence'
+22:28:55.912 [INFO ]: Indexing on relation 'dataSource'.'evidence'
+22:28:55.926 [INFO ]: Indexing on relation 'evidence'.'evidence'
+22:28:55.932 [INFO ]: Indexing on relation 'xref'.'evidence'
+22:28:55.937 [INFO ]: Indexing on relation 'has_domain'.'evidence'
+22:28:55.943 [INFO ]: Indexing on relation 'ortho'.'evidence'
+22:28:55.950 [INFO ]: Indexing on relation 'has_phenotype'.'evidence'
+22:28:55.955 [INFO ]: Indexing on relation 'cooc_wi'.'evidence'
+22:28:55.960 [INFO ]: Indexing on relation 'participates_in'.'evidence'
+22:28:55.965 [INFO ]: Indexing on relation 'testProp'.'evidence'
+22:28:55.971 [INFO ]: Indexing on relation 'h_s_s'.'evidence'
+22:28:55.976 [INFO ]: Indexing on relation 'has_function'.'evidence'
+22:28:55.981 [INFO ]: Indexing on relation 'located_in'.'evidence'
+22:28:55.986 [INFO ]: Indexing on relation 'cat_c'.'evidence'
+22:28:55.991 [INFO ]: Indexing on relation 'pub_in'.'evidence'
+22:28:55.996 [INFO ]: Indexing on relation 'enc'.'evidence'
+22:28:56.001 [INFO ]: Indexing on relation 'is_a'.'evidence'
+22:28:56.006 [INFO ]: Indexing on relation 'occ_in'.'evidence'
+22:28:56.011 [INFO ]: Indexing on relation 'part_of'.'evidence'
+22:28:56.017 [INFO ]: Indexing on relation 'genetic'.'evidence'
+22:28:56.022 [INFO ]: Indexing on relation 'pos_reg'.'evidence'
+22:28:56.027 [INFO ]: Indexing on relation 'neg_reg'.'evidence'
+22:28:56.033 [INFO ]: Indexing on relation 'regulates'.'evidence'
+22:28:56.038 [INFO ]: Indexing on relation 'physical'.'evidence'
+22:28:56.043 [INFO ]: Indexing on node 'Concept'.'ondexId'
+22:28:56.049 [INFO ]: Indexing on node 'Publication'.'ondexId'
+22:28:56.054 [INFO ]: Indexing on node 'Resource'.'ondexId'
+22:28:56.059 [INFO ]: Indexing on node 'Gene'.'ondexId'
+22:28:56.064 [INFO ]: Indexing on node 'ProtDomain'.'ondexId'
+22:28:56.074 [INFO ]: Indexing on node 'CelComp'.'ondexId'
+22:28:56.080 [INFO ]: Indexing on node 'BioProc'.'ondexId'
+22:28:56.085 [INFO ]: Indexing on node 'MolFunc'.'ondexId'
+22:28:56.090 [INFO ]: Indexing on node 'EC'.'ondexId'
+22:28:56.096 [INFO ]: Indexing on node 'Protein'.'ondexId'
+22:28:56.101 [INFO ]: Indexing on node 'SpeciesSet'.'ondexId'
+22:28:56.112 [INFO ]: Indexing on node 'Phenotype'.'ondexId'
+22:28:56.117 [INFO ]: Indexing on node 'Species'.'ondexId'
+22:28:56.122 [INFO ]: Indexing on node 'Trait'.'ondexId'
+22:28:56.127 [INFO ]: Indexing on node 'Accession'.'ondexId'
+22:28:56.132 [INFO ]: Indexing on node 'DataSource'.'ondexId'
+22:28:56.138 [INFO ]: Indexing on node 'EvidenceType'.'ondexId'
+22:28:56.143 [INFO ]: Indexing on relation 'identifier'.'ondexId'
+22:28:56.148 [INFO ]: Indexing on relation 'dataSource'.'ondexId'
+22:28:56.153 [INFO ]: Indexing on relation 'evidence'.'ondexId'
+22:28:56.158 [INFO ]: Indexing on relation 'xref'.'ondexId'
+22:28:56.163 [INFO ]: Indexing on relation 'has_domain'.'ondexId'
+22:28:56.168 [INFO ]: Indexing on relation 'ortho'.'ondexId'
+22:28:56.173 [INFO ]: Indexing on relation 'has_phenotype'.'ondexId'
+22:28:56.178 [INFO ]: Indexing on relation 'cooc_wi'.'ondexId'
+22:28:56.183 [INFO ]: Indexing on relation 'participates_in'.'ondexId'
+22:28:56.188 [INFO ]: Indexing on relation 'testProp'.'ondexId'
+22:28:56.193 [INFO ]: Indexing on relation 'h_s_s'.'ondexId'
+22:28:56.199 [INFO ]: Indexing on relation 'has_function'.'ondexId'
+22:28:56.204 [INFO ]: Indexing on relation 'located_in'.'ondexId'
+22:28:56.209 [INFO ]: Indexing on relation 'cat_c'.'ondexId'
+22:28:56.214 [INFO ]: Indexing on relation 'pub_in'.'ondexId'
+22:28:56.219 [INFO ]: Indexing on relation 'enc'.'ondexId'
+22:28:56.224 [INFO ]: Indexing on relation 'is_a'.'ondexId'
+22:28:56.230 [INFO ]: Indexing on relation 'occ_in'.'ondexId'
+22:28:56.235 [INFO ]: Indexing on relation 'part_of'.'ondexId'
+22:28:56.240 [INFO ]: Indexing on relation 'genetic'.'ondexId'
+22:28:56.245 [INFO ]: Indexing on relation 'pos_reg'.'ondexId'
+22:28:56.251 [INFO ]: Indexing on relation 'neg_reg'.'ondexId'
+22:28:56.256 [INFO ]: Indexing on relation 'regulates'.'ondexId'
+22:28:56.262 [INFO ]: Indexing on relation 'physical'.'ondexId'
+22:28:56.267 [INFO ]: Indexing on node labels
+22:28:56.335 [INFO ]: Indexing on relation types
+22:28:56.341 [INFO ]: Indexing on node 'Publication'.'Abstract'
+22:28:56.363 [INFO ]: Indexing on node 'Publication'.'AbstractHeader'
+22:28:56.369 [INFO ]: Indexing on node 'Phenotype'.'Phenotype'
+22:28:56.378 [INFO ]: Indexing on node 'Relation'.'Chemical'
+22:28:56.409 [INFO ]: Indexing on node 'Publication'.'Chemical'
+22:28:56.415 [INFO ]: Indexing on relation 'has_phenotype'.'Chemical'
+22:28:56.422 [INFO ]: Indexing on node 'Publication'.'MeSH'
+22:28:56.429 [INFO ]: Indexing on node 'Publication'.'AbstractHeader_2'
+22:28:56.436 [INFO ]: Indexing on node 'Publication'.'Abstract_2'
+22:28:56.442 [INFO ]: Indexing on node 'Publication'.'AbstractHeader_1'
+22:28:56.448 [INFO ]: Indexing on node 'Publication'.'MeSH_1'
+22:28:56.454 [INFO ]: Indexing on node 'Publication'.'Abstract_1'
+22:28:56.468 [INFO ]: Indexing on node 'Protein'.'Pheno'
+22:28:56.474 [INFO ]: Indexing on node 'Publication'.'Chemical_1'
+22:28:56.481 [INFO ]: [Indices] Cypher Indexing Ended
+22:28:56.481 [INFO ]: [Indices] RDF-PG conversion finished
+22:28:56.482 [INFO ]: The end
+
+Java Finished, quitting the shell too.
+
+
+
+  ondex2neo.sh finished
+[Thu Feb  6 22:28:57 2025]
+Finished job 0.
+1 of 1 steps (100%) done

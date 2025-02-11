@@ -1,0 +1,94 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	rdf_export
+	1
+Select jobs to execute...
+
+[Thu Feb  6 21:27:58 2025]
+rule rdf_export:
+    input: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/knowledge-graph-uris.oxl
+    output: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/rdf/knowledge-graph.ttl.bz2
+    jobid: 0
+
+
+
+RDF Exporting '/home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/knowledge-graph-uris.oxl' to '/home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/rdf/knowledge-graph.ttl.bz2'
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+
+21:28:00.566 [INFO ]: Loading '/home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/knowledge-graph-uris.oxl'
+21:28:00.698 [INFO ]: Starting OXL parsing... [OXL Parser]
+21:28:08.930 [INFO ]: concept parsed 100,000 elements 
+21:28:20.152 [INFO ]: concept parsed 200,000 elements 
+21:28:24.078 [INFO ]: concept parsed 300,000 elements 
+21:28:33.279 [INFO ]: concept parsed 400,000 elements 
+21:28:39.173 [INFO ]: concept parsed 500,000 elements 
+21:28:43.925 [INFO ]: concept parsed 600,000 elements 
+21:28:55.500 [INFO ]: relation parsed 100,000 elements 
+21:29:01.940 [INFO ]: relation parsed 200,000 elements 
+21:29:05.322 [INFO ]: relation parsed 300,000 elements 
+21:29:11.374 [INFO ]: relation parsed 400,000 elements 
+21:29:14.700 [INFO ]: relation parsed 500,000 elements 
+21:29:20.330 [INFO ]: relation parsed 600,000 elements 
+21:29:23.258 [INFO ]: relation parsed 700,000 elements 
+21:29:39.795 [INFO ]: relation parsed 800,000 elements 
+21:29:43.219 [INFO ]: relation parsed 900,000 elements 
+21:29:46.746 [INFO ]: relation parsed 1,000,000 elements 
+21:29:56.690 [INFO ]: relation parsed 1,100,000 elements 
+21:30:00.196 [INFO ]: relation parsed 1,200,000 elements 
+21:30:03.477 [INFO ]: relation parsed 1,300,000 elements 
+21:30:06.616 [INFO ]: relation parsed 1,400,000 elements 
+21:30:14.449 [INFO ]: relation parsed 1,500,000 elements 
+21:30:17.266 [INFO ]: relation parsed 1,600,000 elements 
+21:30:19.847 [INFO ]: relation parsed 1,700,000 elements 
+21:30:22.935 [INFO ]: relation parsed 1,800,000 elements 
+21:30:31.742 [INFO ]: relation parsed 1,900,000 elements 
+21:30:35.369 [INFO ]: relation parsed 2,000,000 elements 
+21:30:39.034 [INFO ]: relation parsed 2,100,000 elements 
+21:30:42.356 [INFO ]: relation parsed 2,200,000 elements 
+21:31:15.006 [INFO ]: OXL parsing finished. [OXL Parser]
+21:31:15.007 [INFO ]: Graph Loaded, now exporting to RDF
+21:31:15.030 [INFO ]: Exporting to '/tmp/rdf-export.fifo'
+21:31:15.075 [INFO ]: Exporting graph meta-entities
+21:31:16.689 [INFO ]: Exporting 624863 concept(s)
+21:31:29.674 [INFO ]: 10% of concepts exported
+21:31:53.227 [INFO ]: 20% of concepts exported
+21:32:17.500 [INFO ]: 30% of concepts exported
+21:32:33.720 [INFO ]: 40% of concepts exported
+21:32:44.862 [INFO ]: 50% of concepts exported
+21:33:02.180 [INFO ]: 60% of concepts exported
+21:33:20.362 [INFO ]: 70% of concepts exported
+21:33:32.895 [INFO ]: 80% of concepts exported
+21:33:46.694 [INFO ]: 90% of concepts exported
+21:33:57.959 [INFO ]: 100% of concepts exported
+21:33:58.853 [INFO ]: Waiting for the batch processor to finish
+21:33:59.425 [INFO ]: 191/191 batch jobs completed
+21:33:59.426 [INFO ]: Waiting for the batch processor to finish
+21:33:59.426 [INFO ]: Batch processor finished
+21:33:59.427 [INFO ]: Exporting 2299768 relation(s)
+21:34:34.955 [INFO ]: 10% of relations exported
+21:35:14.952 [INFO ]: 20% of relations exported
+21:35:51.716 [INFO ]: 30% of relations exported
+21:36:30.794 [INFO ]: 40% of relations exported
+21:37:11.680 [INFO ]: 50% of relations exported
+21:37:50.807 [INFO ]: 60% of relations exported
+21:38:25.922 [INFO ]: 70% of relations exported
+21:39:01.488 [INFO ]: 80% of relations exported
+21:39:42.511 [INFO ]: 90% of relations exported
+21:40:22.067 [INFO ]: 100% of relations exported
+21:40:24.128 [INFO ]: Waiting for the batch processor to finish
+21:40:25.021 [INFO ]: 703/703 batch jobs completed
+21:40:25.023 [INFO ]: Waiting for the batch processor to finish
+21:40:25.023 [INFO ]: Batch processor finished
+21:40:25.023 [INFO ]: RDF export finished, a total of 2924631 concepts+relations exported, 35067889 triples created
+
+21:40:25.025 [INFO ]: Conversion finished.
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+[Thu Feb  6 21:40:25 2025]
+Finished job 0.
+1 of 1 steps (100%) done

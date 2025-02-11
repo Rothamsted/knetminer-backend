@@ -1,0 +1,89 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	dataset_metadata
+	1
+
+[Wed Feb  5 16:53:38 2025]
+rule dataset_metadata:
+    input: /home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/tmp/knowledge-graph-uris.oxl
+    output: /home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/knowledge-graph-annotated.oxl, /home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/rdf/knowledge-graph-metadata.ttl
+    jobid: 0
+
+
+
+RDF Generating dataset descriptor into:
+  '/home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/knowledge-graph-annotated.oxl'
+  '/home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/rdf/knowledge-graph-metadata.ttl'
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+16:53:40.994 [INFO ]: Loading the OXL: '/home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/tmp/knowledge-graph-uris.oxl'
+16:53:41.121 [INFO ]: Starting OXL parsing... [OXL Parser]
+16:53:47.563 [INFO ]: concept parsed 100,000 elements 
+16:53:51.087 [INFO ]: concept parsed 200,000 elements 
+16:53:54.250 [INFO ]: concept parsed 300,000 elements 
+16:53:57.770 [INFO ]: concept parsed 400,000 elements 
+16:54:04.945 [INFO ]: concept parsed 500,000 elements 
+16:54:10.076 [INFO ]: relation parsed 100,000 elements 
+16:54:14.558 [INFO ]: relation parsed 200,000 elements 
+16:54:18.783 [INFO ]: relation parsed 300,000 elements 
+16:54:21.512 [INFO ]: relation parsed 400,000 elements 
+16:54:31.649 [INFO ]: relation parsed 500,000 elements 
+16:54:34.175 [INFO ]: relation parsed 600,000 elements 
+16:54:40.463 [INFO ]: relation parsed 700,000 elements 
+16:54:43.053 [INFO ]: relation parsed 800,000 elements 
+16:54:45.593 [INFO ]: relation parsed 900,000 elements 
+16:54:51.110 [INFO ]: relation parsed 1,000,000 elements 
+16:54:53.823 [INFO ]: relation parsed 1,100,000 elements 
+16:54:56.542 [INFO ]: relation parsed 1,200,000 elements 
+16:55:14.250 [INFO ]: relation parsed 1,300,000 elements 
+16:55:16.884 [INFO ]: relation parsed 1,400,000 elements 
+16:55:19.599 [INFO ]: relation parsed 1,500,000 elements 
+16:55:22.646 [INFO ]: relation parsed 1,600,000 elements 
+16:55:31.129 [INFO ]: relation parsed 1,700,000 elements 
+16:55:33.836 [INFO ]: relation parsed 1,800,000 elements 
+16:55:36.630 [INFO ]: relation parsed 1,900,000 elements 
+16:55:38.360 [INFO ]: OXL parsing finished. [OXL Parser]
+16:55:38.374 [INFO ]: Loading graph descriptor properties from '/home/data/knetminer/software/knetminer-backend/rres-endpoints/config/datasets/test-arabidopsis-60-metadata-descriptor.properties'
+16:55:38.382 [INFO ]: Loading graph descriptor template from '/home/data/knetminer/software/rdf-export-2-cli/knetminer-descriptors/knetminer-metadata-template.ttl'
+16:55:38.391 [INFO ]: Creating Graph Descriptor
+16:56:00.840 [INFO ]: Adding metadata about graph description
+16:56:00.991 [INFO ]: graph description metadata added to the graph itself
+16:56:00.992 [INFO ]: Exporting OXL descriptor to '/home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/rdf/knowledge-graph-metadata.ttl'
+16:56:01.007 [INFO ]: Descriptor exported
+16:56:01.008 [INFO ]: Exporting the new OXL to '/home/data/knetminer/pub/endpoints/test-arabidopsis/v60-RC1/knowledge-graph-annotated.oxl'
+Total concepts to export: 512,729
+100,000 concepts written (19.50%).
+200,000 concepts written (39.01%).
+300,000 concepts written (58.51%).
+400,000 concepts written (78.01%).
+500,000 concepts written (97.52%).
+
+Total relations to export: 1,959,361
+100,000 relations written (5.10%).
+200,000 relations written (10.21%).
+300,000 relations written (15.31%).
+400,000 relations written (20.41%).
+500,000 relations written (25.52%).
+600,000 relations written (30.62%).
+700,000 relations written (35.73%).
+800,000 relations written (40.83%).
+900,000 relations written (45.93%).
+1,000,000 relations written (51.04%).
+1,100,000 relations written (56.14%).
+1,200,000 relations written (61.24%).
+1,300,000 relations written (66.35%).
+1,400,000 relations written (71.45%).
+1,500,000 relations written (76.56%).
+1,600,000 relations written (81.66%).
+1,700,000 relations written (86.76%).
+1,800,000 relations written (91.87%).
+1,900,000 relations written (96.97%).
+OXL attribute compressor shut down
+Java Finished. Quitting the Shell Too.
+
+[Wed Feb  5 16:56:56 2025]
+Finished job 0.
+1 of 1 steps (100%) done

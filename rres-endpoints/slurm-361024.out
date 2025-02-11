@@ -1,0 +1,448 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	neo_dump
+	1
+Select jobs to execute...
+
+[Fri Feb  7 03:40:59 2025]
+rule neo_dump:
+    input: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/tmp/neo-index.flag
+    output: /home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/neo4j-5.26.0.dump
+    jobid: 0
+
+
+
+  Waiting before stopping Neo4j
+
+
+	Stopping Neo4j
+
+
+  *** IMPORTANT ****
+  
+  We're using Neo4j through SLURM and it seems Neo4j needs
+  one more restart with a long pause before the final shutdown, 
+  to complete transactions.
+  
+  So, now we will wait 20m before stopping Neo again.
+  
+  If you see problems with the dump command, restart Neo manually,
+  check "/home/data/knetminer/software/neo4j-community-5.26.0-etl/logs/debug.log" 
+  to ensure the server actually restarted, then run the ETL workflow 
+  again, to have this hereby script re-running. 
+
+
+	Starting Neo4j on SLURM
+
+
+Neo4j server job submitted to host rothhpc402, ID:361025
+
+
+	Stopping Neo4j
+
+
+  Neo4j Dump to '/home/data/knetminer/pub/endpoints/ascomycota-premium/v60-RC4/neo4j-5.26.0.dump'
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+Picked up JAVA_TOOL_OPTIONS: -Xmx310G
+2025-02-07 04:01:43.556+0000 INFO  [o.n.c.d.DumpCommand] Starting dump of database 'neo4j'
+
+Files: 1/286, data:  0.0%
+Files: 1/286, data:  0.0%
+Files: 2/286, data:  0.0%
+Files: 3/286, data:  1.0%
+Files: 3/286, data:  2.0%
+Files: 3/286, data:  3.0%
+Files: 3/286, data:  4.0%
+Files: 3/286, data:  5.0%
+Files: 3/286, data:  6.0%
+Files: 3/286, data:  7.0%
+Files: 3/286, data:  8.0%
+Files: 3/286, data:  9.0%
+Files: 3/286, data: 10.0%
+Files: 3/286, data: 11.0%
+Files: 3/286, data: 12.0%
+Files: 3/286, data: 13.0%
+Files: 3/286, data: 14.0%
+Files: 3/286, data: 15.0%
+Files: 3/286, data: 16.0%
+Files: 3/286, data: 17.0%
+Files: 3/286, data: 18.0%
+Files: 3/286, data: 19.0%
+Files: 3/286, data: 20.0%
+Files: 3/286, data: 21.0%
+Files: 3/286, data: 22.0%
+Files: 3/286, data: 23.0%
+Files: 3/286, data: 24.0%
+Files: 3/286, data: 25.0%
+Files: 3/286, data: 26.0%
+Files: 3/286, data: 27.0%
+Files: 4/286, data: 27.0%
+Files: 5/286, data: 27.0%
+Files: 6/286, data: 27.0%
+Files: 7/286, data: 27.0%
+Files: 8/286, data: 27.0%
+Files: 9/286, data: 27.0%
+Files: 9/286, data: 28.0%
+Files: 9/286, data: 29.0%
+Files: 9/286, data: 29.1%
+Files: 10/286, data: 29.1%
+Files: 11/286, data: 29.1%
+Files: 12/286, data: 29.3%
+Files: 13/286, data: 29.3%
+Files: 14/286, data: 30.0%
+Files: 15/286, data: 30.0%
+Files: 16/286, data: 30.0%
+Files: 17/286, data: 30.0%
+Files: 17/286, data: 30.1%
+Files: 18/286, data: 30.1%
+Files: 19/286, data: 30.1%
+Files: 20/286, data: 30.1%
+Files: 21/286, data: 30.1%
+Files: 22/286, data: 30.1%
+Files: 23/286, data: 30.1%
+Files: 24/286, data: 30.1%
+Files: 25/286, data: 30.1%
+Files: 26/286, data: 30.3%
+Files: 27/286, data: 30.3%
+Files: 28/286, data: 30.3%
+Files: 29/286, data: 30.3%
+Files: 30/286, data: 30.3%
+Files: 31/286, data: 30.3%
+Files: 32/286, data: 31.0%
+Files: 32/286, data: 31.2%
+Files: 33/286, data: 31.2%
+Files: 34/286, data: 31.2%
+Files: 35/286, data: 31.7%
+Files: 36/286, data: 31.7%
+Files: 37/286, data: 31.7%
+Files: 38/286, data: 31.7%
+Files: 39/286, data: 31.7%
+Files: 40/286, data: 31.7%
+Files: 41/286, data: 31.7%
+Files: 42/286, data: 31.7%
+Files: 43/286, data: 31.7%
+Files: 44/286, data: 31.7%
+Files: 45/286, data: 32.0%
+Files: 45/286, data: 32.0%
+Files: 46/286, data: 32.1%
+Files: 47/286, data: 33.0%
+Files: 47/286, data: 33.1%
+Files: 48/286, data: 33.1%
+Files: 49/286, data: 33.1%
+Files: 50/286, data: 33.1%
+Files: 51/286, data: 33.1%
+Files: 52/286, data: 33.1%
+Files: 53/286, data: 33.3%
+Files: 54/286, data: 33.3%
+Files: 55/286, data: 34.0%
+Files: 55/286, data: 34.4%
+Files: 56/286, data: 34.7%
+Files: 57/286, data: 34.7%
+Files: 58/286, data: 34.7%
+Files: 59/286, data: 34.7%
+Files: 60/286, data: 34.7%
+Files: 61/286, data: 34.7%
+Files: 62/286, data: 34.7%
+Files: 63/286, data: 34.7%
+Files: 64/286, data: 34.8%
+Files: 65/286, data: 34.8%
+Files: 66/286, data: 34.8%
+Files: 67/286, data: 34.8%
+Files: 68/286, data: 34.9%
+Files: 69/286, data: 34.9%
+Files: 70/286, data: 35.0%
+Files: 70/286, data: 35.6%
+Files: 71/286, data: 35.6%
+Files: 72/286, data: 35.8%
+Files: 73/286, data: 35.8%
+Files: 74/286, data: 35.8%
+Files: 75/286, data: 35.8%
+Files: 76/286, data: 36.0%
+Files: 76/286, data: 36.5%
+Files: 77/286, data: 36.5%
+Files: 78/286, data: 36.6%
+Files: 79/286, data: 36.6%
+Files: 80/286, data: 36.8%
+Files: 81/286, data: 36.8%
+Files: 82/286, data: 37.0%
+Files: 83/286, data: 37.0%
+Files: 84/286, data: 37.0%
+Files: 85/286, data: 37.0%
+Files: 86/286, data: 37.0%
+Files: 86/286, data: 38.0%
+Files: 86/286, data: 38.0%
+Files: 87/286, data: 38.0%
+Files: 88/286, data: 38.0%
+Files: 89/286, data: 38.0%
+Files: 90/286, data: 38.0%
+Files: 91/286, data: 38.1%
+Files: 92/286, data: 38.1%
+Files: 93/286, data: 38.1%
+Files: 94/286, data: 38.1%
+Files: 95/286, data: 38.1%
+Files: 96/286, data: 38.1%
+Files: 97/286, data: 38.1%
+Files: 98/286, data: 38.1%
+Files: 99/286, data: 38.1%
+Files: 100/286, data: 38.1%
+Files: 101/286, data: 38.1%
+Files: 102/286, data: 38.1%
+Files: 103/286, data: 38.1%
+Files: 104/286, data: 38.2%
+Files: 105/286, data: 38.2%
+Files: 106/286, data: 38.3%
+Files: 107/286, data: 38.3%
+Files: 108/286, data: 38.4%
+Files: 109/286, data: 38.4%
+Files: 110/286, data: 38.4%
+Files: 111/286, data: 38.4%
+Files: 112/286, data: 38.5%
+Files: 113/286, data: 38.5%
+Files: 114/286, data: 38.5%
+Files: 115/286, data: 38.5%
+Files: 116/286, data: 38.5%
+Files: 117/286, data: 38.6%
+Files: 118/286, data: 38.6%
+Files: 119/286, data: 38.6%
+Files: 120/286, data: 38.6%
+Files: 121/286, data: 38.6%
+Files: 122/286, data: 38.7%
+Files: 123/286, data: 38.7%
+Files: 124/286, data: 39.0%
+Files: 124/286, data: 39.7%
+Files: 125/286, data: 40.0%
+Files: 125/286, data: 41.0%
+Files: 125/286, data: 41.5%
+Files: 126/286, data: 41.5%
+Files: 127/286, data: 41.5%
+Files: 128/286, data: 41.5%
+Files: 129/286, data: 41.5%
+Files: 130/286, data: 42.0%
+Files: 130/286, data: 42.3%
+Files: 131/286, data: 42.4%
+Files: 132/286, data: 42.5%
+Files: 133/286, data: 43.0%
+Files: 133/286, data: 43.6%
+Files: 134/286, data: 43.9%
+Files: 135/286, data: 43.9%
+Files: 136/286, data: 43.9%
+Files: 137/286, data: 43.9%
+Files: 138/286, data: 43.9%
+Files: 139/286, data: 43.9%
+Files: 140/286, data: 44.0%
+Files: 140/286, data: 44.0%
+Files: 141/286, data: 44.1%
+Files: 142/286, data: 44.1%
+Files: 143/286, data: 44.1%
+Files: 144/286, data: 44.1%
+Files: 145/286, data: 44.1%
+Files: 146/286, data: 44.1%
+Files: 147/286, data: 44.1%
+Files: 148/286, data: 44.1%
+Files: 149/286, data: 44.1%
+Files: 150/286, data: 44.1%
+Files: 151/286, data: 44.2%
+Files: 152/286, data: 44.2%
+Files: 153/286, data: 44.2%
+Files: 154/286, data: 45.0%
+Files: 154/286, data: 45.2%
+Files: 155/286, data: 45.2%
+Files: 156/286, data: 45.3%
+Files: 157/286, data: 45.4%
+Files: 158/286, data: 45.4%
+Files: 159/286, data: 45.4%
+Files: 160/286, data: 45.4%
+Files: 161/286, data: 45.4%
+Files: 162/286, data: 45.4%
+Files: 163/286, data: 45.5%
+Files: 164/286, data: 46.0%
+Files: 164/286, data: 47.0%
+Files: 164/286, data: 47.2%
+Files: 165/286, data: 47.2%
+Files: 166/286, data: 47.2%
+Files: 167/286, data: 47.3%
+Files: 168/286, data: 48.0%
+Files: 169/286, data: 48.0%
+Files: 170/286, data: 48.0%
+Files: 171/286, data: 48.0%
+Files: 172/286, data: 48.0%
+Files: 173/286, data: 48.0%
+Files: 174/286, data: 48.0%
+Files: 175/286, data: 48.0%
+Files: 175/286, data: 48.0%
+Files: 176/286, data: 48.0%
+Files: 177/286, data: 48.2%
+Files: 178/286, data: 48.2%
+Files: 179/286, data: 48.2%
+Files: 180/286, data: 48.2%
+Files: 181/286, data: 48.2%
+Files: 182/286, data: 48.2%
+Files: 183/286, data: 48.3%
+Files: 184/286, data: 48.3%
+Files: 185/286, data: 48.6%
+Files: 186/286, data: 48.6%
+Files: 187/286, data: 48.6%
+Files: 188/286, data: 48.9%
+Files: 189/286, data: 48.9%
+Files: 190/286, data: 48.9%
+Files: 191/286, data: 48.9%
+Files: 192/286, data: 48.9%
+Files: 193/286, data: 49.0%
+Files: 193/286, data: 49.2%
+Files: 194/286, data: 49.2%
+Files: 195/286, data: 49.2%
+Files: 196/286, data: 50.0%
+Files: 196/286, data: 50.2%
+Files: 197/286, data: 50.2%
+Files: 198/286, data: 50.2%
+Files: 199/286, data: 50.2%
+Files: 200/286, data: 50.2%
+Files: 201/286, data: 50.5%
+Files: 202/286, data: 50.5%
+Files: 203/286, data: 50.5%
+Files: 204/286, data: 50.5%
+Files: 205/286, data: 50.5%
+Files: 206/286, data: 50.8%
+Files: 207/286, data: 50.8%
+Files: 208/286, data: 51.0%
+Files: 208/286, data: 51.1%
+Files: 209/286, data: 51.4%
+Files: 210/286, data: 51.4%
+Files: 211/286, data: 51.4%
+Files: 212/286, data: 51.5%
+Files: 213/286, data: 51.6%
+Files: 214/286, data: 51.6%
+Files: 215/286, data: 51.6%
+Files: 216/286, data: 51.6%
+Files: 217/286, data: 51.7%
+Files: 218/286, data: 51.8%
+Files: 219/286, data: 51.8%
+Files: 220/286, data: 51.8%
+Files: 221/286, data: 51.8%
+Files: 222/286, data: 51.8%
+Files: 223/286, data: 51.8%
+Files: 224/286, data: 51.8%
+Files: 225/286, data: 52.0%
+Files: 225/286, data: 52.1%
+Files: 226/286, data: 52.3%
+Files: 227/286, data: 52.3%
+Files: 228/286, data: 52.3%
+Files: 229/286, data: 52.3%
+Files: 230/286, data: 52.3%
+Files: 231/286, data: 52.3%
+Files: 232/286, data: 52.4%
+Files: 233/286, data: 52.4%
+Files: 234/286, data: 52.4%
+Files: 235/286, data: 53.0%
+Files: 235/286, data: 53.4%
+Files: 236/286, data: 53.4%
+Files: 237/286, data: 53.7%
+Files: 238/286, data: 53.7%
+Files: 239/286, data: 53.7%
+Files: 240/286, data: 53.7%
+Files: 241/286, data: 53.7%
+Files: 242/286, data: 54.0%
+Files: 242/286, data: 54.0%
+Files: 243/286, data: 54.0%
+Files: 244/286, data: 54.0%
+Files: 245/286, data: 54.0%
+Files: 246/286, data: 54.0%
+Files: 247/286, data: 54.1%
+Files: 248/286, data: 54.1%
+Files: 249/286, data: 54.1%
+Files: 250/286, data: 54.1%
+Files: 251/286, data: 54.1%
+Files: 252/286, data: 54.1%
+Files: 253/286, data: 54.1%
+Files: 254/286, data: 54.2%
+Files: 255/286, data: 54.4%
+Files: 256/286, data: 54.4%
+Files: 257/286, data: 54.5%
+Files: 258/286, data: 54.5%
+Files: 259/286, data: 54.5%
+Files: 260/286, data: 54.6%
+Files: 261/286, data: 54.6%
+Files: 262/286, data: 55.0%
+Files: 263/286, data: 55.0%
+Files: 264/286, data: 55.0%
+Files: 265/286, data: 55.0%
+Files: 265/286, data: 55.0%
+Files: 266/286, data: 55.0%
+Files: 267/286, data: 55.0%
+Files: 268/286, data: 55.0%
+Files: 269/286, data: 55.0%
+Files: 270/286, data: 55.0%
+Files: 271/286, data: 55.0%
+Files: 272/286, data: 55.0%
+Files: 273/286, data: 55.0%
+Files: 274/286, data: 55.0%
+Files: 275/286, data: 55.0%
+Files: 276/286, data: 55.3%
+Files: 277/286, data: 55.3%
+Files: 278/286, data: 56.0%
+Files: 278/286, data: 57.0%
+Files: 278/286, data: 58.0%
+Files: 278/286, data: 59.0%
+Files: 278/286, data: 60.0%
+Files: 278/286, data: 61.0%
+Files: 278/286, data: 62.0%
+Files: 278/286, data: 63.0%
+Files: 278/286, data: 64.0%
+Files: 278/286, data: 65.0%
+Files: 278/286, data: 66.0%
+Files: 278/286, data: 67.0%
+Files: 278/286, data: 68.0%
+Files: 278/286, data: 69.0%
+Files: 278/286, data: 70.0%
+Files: 278/286, data: 71.0%
+Files: 278/286, data: 72.0%
+Files: 278/286, data: 73.0%
+Files: 278/286, data: 74.0%
+Files: 278/286, data: 75.0%
+Files: 278/286, data: 75.1%
+Files: 279/286, data: 75.1%
+Files: 280/286, data: 75.1%
+Files: 281/286, data: 75.1%
+Files: 282/286, data: 76.0%
+Files: 282/286, data: 77.0%
+Files: 282/286, data: 78.0%
+Files: 282/286, data: 79.0%
+Files: 282/286, data: 80.0%
+Files: 282/286, data: 81.0%
+Files: 282/286, data: 82.0%
+Files: 282/286, data: 83.0%
+Files: 282/286, data: 84.0%
+Files: 282/286, data: 85.0%
+Files: 282/286, data: 86.0%
+Files: 282/286, data: 87.0%
+Files: 282/286, data: 88.0%
+Files: 282/286, data: 89.0%
+Files: 282/286, data: 90.0%
+Files: 282/286, data: 91.0%
+Files: 282/286, data: 92.0%
+Files: 282/286, data: 93.0%
+Files: 282/286, data: 94.0%
+Files: 282/286, data: 95.0%
+Files: 282/286, data: 96.0%
+Files: 282/286, data: 97.0%
+Files: 282/286, data: 97.1%
+Files: 283/286, data: 97.1%
+Files: 284/286, data: 97.1%
+Files: 285/286, data: 97.2%
+Files: 286/286, data: 98.0%
+Files: 286/286, data: 99.0%
+Files: 286/286, data: 100.0%
+Files: 286/286, data: 100.0%
+Done: 286 files, 8.806GiB processed in 67.707 seconds.
+2025-02-07 04:02:59.682+0000 INFO  [o.n.c.d.DumpCommand] Dump completed successfully
+
+  Neo4j Dump done
+
+[Fri Feb  7 04:02:59 2025]
+Finished job 0.
+1 of 1 steps (100%) done
