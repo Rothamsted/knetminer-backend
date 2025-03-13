@@ -5,7 +5,7 @@ oxl_home="$KNET_HOME/etl-test/vegetables-premium/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
-export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC1"
+export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC3"
 
 ## Neo 
 #

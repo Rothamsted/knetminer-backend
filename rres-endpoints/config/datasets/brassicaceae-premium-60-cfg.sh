@@ -5,12 +5,12 @@ oxl_home="$KNET_HOME/etl-test/brassicaceae-premium/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
-export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC2"
+export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC1"
 
 ## Neo 
 #
 export KETL_HAS_NEO4J=true
-export KETL_NEO_VERSION='5.23.0'
+export KETL_NEO_VERSION='5.26.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 
 ## Knet Initialiser
