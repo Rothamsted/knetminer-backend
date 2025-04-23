@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 36 of /home/data/knetminer/software/knetminer-backend/rres-endpoints/build-endpoint.snakefile:
-Missing input files for rule add_uris:
-/home/data/knetminer/etl-test/poaceae/1/generic/knowledge-network-free.oxl
