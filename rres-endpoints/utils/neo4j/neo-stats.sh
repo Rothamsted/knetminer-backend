@@ -11,7 +11,7 @@ CREATE (s:Metadata {
     nodeCount: nodeCount,
     edgeCount: edgeCount,
     version: \"${KETL_DATASET_VERSION}\",
-    fileLocation: \"s3://knet-data-store/${KETL_DATASET_ID}/v${KETL_DATASET_VERSION}-RC1\",
+    fileLocation: \"s3://knet-data-store/${KETL_DATASET_ID}/v${KETL_DATASET_VERSION}-RC3\",
     date: \"${current_date}\"
 });
 
