@@ -5,12 +5,12 @@
 	<parent>
 	  <groupId>uk.ac.rothamsted.knetminer</groupId>
 	  <artifactId>knetminer-common</artifactId>
- 		<version>5.0.1-SNAPSHOT</version>
+ 		<version>6.0</version>
 	</parent>  
 
   <groupId>uk.ac.rothamsted.knetminer.backend</groupId>
   <artifactId>backend-pom</artifactId>
-  <version>4.0.2-SNAPSHOT</version>
+  <version>5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>backend-pom -- Knetminer Backend, Top POM</name>
@@ -32,7 +32,7 @@
 		<!-- update-sources.sh needs to override this -->
 		<neo4j.server.deleteDb>false</neo4j.server.deleteDb>
 		<neo4j.server.serverReadyAttempts>120</neo4j.server.serverReadyAttempts>
-					
+							
   </properties>
 
 
@@ -201,5 +201,22 @@
 		  <snapshots><enabled>true</enabled></snapshots>
 	  </repository>	  
 
+		<repository>
+			<id>knetminer-nova-public</id>
+			<name>KnetMiner Nova Public Components Repo</name>
+			<url>https://artifactory.knetminer.com/public</url>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
+
   </repositories>
+  
+  <pluginRepositories>
+  	
+  	<pluginRepository>
+  		<id>rres-public</id>
+  		<url>https://knetminer.rothamsted.ac.uk/artifactory/repository/maven-public</url>
+  	</pluginRepository>
+  
+  </pluginRepositories>
+  
 </project>
