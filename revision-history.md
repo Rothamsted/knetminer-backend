@@ -1,12 +1,26 @@
 # Revision History
 
-*This file was last reviewed on 2025-05-02*. **Please, keep this note updated**.
+*This file was last reviewed on 2025-05-19*. **Please, keep this note updated**.
 
 ## 5.0-SNAPSHOT
-* Current snapshot
+* New ETL in rres-endpoint, which runs the new Nova Initialiser.
 
 ## 4.0.2 Last release before the new KnetMiner Nova Initialiser
-* TODO
+
+*We should have issued a 5.0 release, but we didn't by mistake.*
+
+* Documentation added, including walk-through doc.
+
+### `rres-endpoints/`
+* major revision and simplification of the ETL.
+* Configs for new datasets added/updated:
+  * cereals-premium
+  * Brassica
+  * Tropicana
+  * Solanaceae
+  * Plants Lite
+  * Fungi Lite
+
 
 ## 4.0.1
 * Old/outdated vavr library removed.

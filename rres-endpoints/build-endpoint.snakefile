@@ -95,7 +95,7 @@ rule neo_index:
 	output:
 		f"{KETL_OUT}/tmp/neo-index.flag"		
 	shell:
-		'./endpoint-steps/neo-index.sh "{input.oxl}" "{output}"'
+		'./endpoint-steps/neo-index.sh "{output}"'
 
 
 rule neo_dump:

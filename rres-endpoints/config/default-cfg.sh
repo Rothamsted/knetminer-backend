@@ -54,11 +54,14 @@ export KETL_NEO_VERSION='5.26.0'
 
 # The KnetMiner codebase
 export KNET_WEBAPP=''
-# Eg, export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
-export KNET_INITIALIZER_HOME='' 
-# Used by $KNET_WEBAPP/docker/dataset-init.sh, it's one of the dirs in 
-# $KNET_WEBAPP/datasets. It might be different from the default, since multiple
-# datasets might have the same config
+# This is the home of the new Nova initialiser.
+export KNET_INITIALIZER_HOME=''
+ 
+# This is the resource Id, used by the Nova initialiser. It's usually the same as the 
+# KnetSpace resource ID and the same as KETL_DATASET_ID.
+#
+# See endpoint-steps/neo-index.sh for details
+# 
 export KNET_INIT_DATASET_ID="$KETL_DATASET_ID"
 
 

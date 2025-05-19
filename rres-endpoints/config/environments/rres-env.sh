@@ -33,7 +33,8 @@ export KETL_NEOEXPORT_HOME="$KNET_SOFTWARE/ondex-mini/tools/neo4j-exporter"
 
 # WARNING: this is not auto-updated, cd in this dir and do 'git pull'
 export KNET_WEBAPP="$KNET_SOFTWARE/knetminer"
-export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
+
+export KNET_INITIALIZER_HOME="$KNET_SOFTWARE/knetminer-nova/knetminer-initializer"
 
 if [[ -z "$JAVA_HOME" ]]; then
   # This is usually a symbolic link, pointing at the last/current version
