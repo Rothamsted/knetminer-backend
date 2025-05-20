@@ -65,6 +65,12 @@ function ketl_get_neo_url ()
 export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start-slurm.sh" 
 export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop-slurm.sh" 
 
+# Before dumping large databases, Neo4j needs to be restarted, paused for this time and
+# then stopped again. 
+# This is used in neo-dump.sh It's unset by default (ie, no 2nd restart/pause done)
+#
+export KETL_NEO_IDX_PAUSE_TIME='20m' # Needs at least 17min for cereals-premium
+
 
 ###### Servers-sync options
 

@@ -90,6 +90,12 @@ export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop.sh"
 # Empty/init the dataset's DB, see the default file for details
 export KETL_NEO_INIT="$KETL_HOME/utils/neo4j/neo-init.sh" 
 
+# Before dumping large databases, Neo4j needs to be restarted, paused for this time and
+# then stopped again. 
+# This is used in neo-dump.sh It's unset by default (ie, no 2nd restart/pause done)
+#
+export KETL_NEO_IDX_PAUSE_TIME='' # Needs at least 17min for cereals-premium
+
 # The credentials for the server where you want upload the OXL export.
 # Note that usually this IS NOT a production server.
 export KETL_NEO_USR='neo4j'

@@ -22,4 +22,4 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 # work locally and against the Community Neo4j
 export KNET_INIT_DATASET_ID="plants-lite"
 
-# TODO: more to be added.
+export KETL_NEO_IDX_PAUSE_TIME=5m # Not much needed with this small DB

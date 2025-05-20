@@ -9,9 +9,7 @@ echo -e "\n\n  Waiting before stopping Neo4j\n"
 sleep 30
 "$KETL_NEO_STOP"
 
-if [[ "$KETL_ENVIRONMENT" == "rres" ]]; then
-
-	sleep_time=20m  # Needs to be at least 17min for cereals-premium
+if [[ ! -z "$KETL_NEO_IDX_PAUSE_TIME" ]]; then
 
 	cat <<EOT
 
@@ -21,7 +19,7 @@ if [[ "$KETL_ENVIRONMENT" == "rres" ]]; then
   one more restart with a long pause before the final shutdown, 
   to complete transactions.
   
-  So, now we will wait $sleep_time before stopping Neo again.
+  So, now we will wait $KETL_NEO_IDX_PAUSE_TIME before stopping Neo again.
   
   If you see problems with the dump command, restart Neo manually,
   check "$NEO4J_HOME/logs/debug.log" 
@@ -32,7 +30,7 @@ EOT
   
   "$KETL_NEO_START"
 
-  sleep $sleep_time
+  sleep $KETL_NEO_IDX_PAUSE_TIME
   "$KETL_NEO_STOP"
 fi
 
