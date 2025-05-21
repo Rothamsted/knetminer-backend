@@ -133,6 +133,8 @@ MERGE (m:Summary)
 SET m.bioProcs = apoc.convert.toJson(jsonResult);
 "
 
+neo_url=$(ketl_get_neo_url)
+
 $NEO4J_HOME/bin/cypher-shell -a "$neo_url" -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"

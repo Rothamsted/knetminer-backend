@@ -7,7 +7,7 @@ set -e
 
 out_flag="$1" # Creates this file to signal that the step was successfully completed
 
-neo_url=`ketl_get_neo_url`
+neo_url=$(ketl_get_neo_url)
 
 
 printf "\n\n  Running the Neo4j Nova Initialiser\n\n"
@@ -29,9 +29,10 @@ export KNET_NEO_PWD="$KETL_NEO_PWD"
 
 
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
-# TODO: Why 'source'?!
 # TODO: Likely, it needs review and upgrades to Nova, so for now it's disabled
-#source "$KETL_HOME/utils/neo4j/neo-stats.sh"
+# TODO: 'source' was removed, likely, it was only used to get neo_url, but the proper way
+# to get this is $(ketl_get_neo_url) (see the script).
+"$KETL_HOME/utils/neo4j/neo-stats.sh"
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"
 echo `date` >"$out_flag"
