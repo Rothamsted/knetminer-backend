@@ -23,3 +23,6 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl-test"
 export KNET_INIT_DATASET_ID="plants-lite"
 
 export KETL_NEO_IDX_PAUSE_TIME=5m # Not much needed with this small DB
+
+export JAVA_TOOL_OPTIONS="-Xmx20G" # Default is huge, we don't need it here
+
