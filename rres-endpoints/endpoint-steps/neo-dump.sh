@@ -24,7 +24,10 @@ if [[ ! -z "$KETL_NEO_IDX_PAUSE_TIME" ]]; then
   If you see problems with the dump command, restart Neo manually,
   check "$NEO4J_HOME/logs/debug.log" 
   to ensure the server actually restarted, then run the ETL workflow 
-  again, to have this hereby script re-running. 
+  again, to have this hereby script re-running.
+  
+  This is controlled by KETL_NEO_IDX_PAUSE_TIME, which you can set in your
+  environment or dataset file (default = '' = no pause).
 
 EOT
   
