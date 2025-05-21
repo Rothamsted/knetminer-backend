@@ -90,8 +90,7 @@ rule neo_export:
 
 rule neo_index:
 	input:
-		f"{KETL_OUT}/tmp/neo-export.flag",
-		oxl = f"{KETL_OUT}/knowledge-graph-annotated.oxl"
+		f"{KETL_OUT}/tmp/neo-export.flag"
 	output:
 		f"{KETL_OUT}/tmp/neo-index.flag"		
 	shell:
