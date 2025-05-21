@@ -6,6 +6,10 @@ oxl_home="$KNET_HOME/etl-test/ascomycota-premium/$KETL_DATASET_VERSION"
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
 # Sam 20240909 - New versioning convention
+#
+# TODO: this is quite inconsistent, RC1 should have ascomycota-premium-60RC1.sh, which
+# could load this hereby ascomycota-premium-60.sh and then make minimal changes.
+# See ascomycota-premium-60TEST.sh for an example.
 export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC1"
 
 ## Neo 
@@ -18,6 +22,8 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 #
 # The name within the code base, which identifies the config dir to be
 # used for the KnetMiner initialiser
+
+# TODO: comment it. This is not needed when it's == KETL_DATASET_ID
 export KNET_INIT_DATASET_ID="ascomycota-premium"
 
 
