@@ -35,4 +35,4 @@ export KNET_NEO_PWD="$KETL_NEO_PWD"
 "$KETL_HOME/utils/neo4j/neo-stats.sh"
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"
-echo `date` >"$out_flag"
+echo $(date) >"$out_flag"
