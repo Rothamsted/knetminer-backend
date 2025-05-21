@@ -15,7 +15,7 @@ export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 #
 export KETL_HAS_NEO4J=true
 export KETL_NEO_VERSION='5.26.0'
-export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
+export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl-test"
 
 # the new KnetMiner Nova Initialiser
 # We fit this into the Plants Lite resource, which is rather arbitrary, just to make the initialiser
