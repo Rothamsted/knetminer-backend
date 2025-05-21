@@ -11,7 +11,7 @@ neo_url=$(ketl_get_neo_url)
 
 
 printf "\n\n  Running the Neo4j Nova Initialiser\n\n"
-printf "\n  ====> MAKE SURE $KNET_INITIALIZER_HOME IS UPDATED!!!\n\n"
+printf "\n  You may want to check that $KNET_INITIALIZER_HOME is updated (usually done automatically by the API CI build)\n\n"
 
 cd "$KNET_INITIALIZER_HOME"
 
