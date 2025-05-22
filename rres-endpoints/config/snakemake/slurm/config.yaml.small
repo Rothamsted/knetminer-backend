@@ -1,0 +1,2 @@
+jobs: 16
+cluster: "sbatch --chdir=/home/usern/brandizim/tmp/knetminer-backend/rres-endpoints --partition=standard --mem=16g --cpus-per-task=4 --time=1-0:0:0  -o .snakemake/log/slurm-{rule}.out -e .snakemake/log/slurm-{rule}.out"
