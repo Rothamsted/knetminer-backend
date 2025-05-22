@@ -1,6 +1,6 @@
 # Used to test a real dataset without interfering with actual output
 
-version_no=60
+version_no="$(echo "$KETL_DATASET_VERSION" | sed -E s/'^([0-9]+).*'/'\1'/)"
 
 . "$KETL_HOME/config/datasets/fungi-lite-${version_no}-cfg.sh"
 
