@@ -2,7 +2,7 @@
 
 version_no=60
 
-. "$KETL_HOME/config/datasets/$fungi-lite-${version_no}-cfg.sh"
+. "$KETL_HOME/config/datasets/fungi-lite-${version_no}-cfg.sh"
 
 # /home/data/knetminer/etl-test/fungi-lite/60/generic/knowledge-network.oxl
 # Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
