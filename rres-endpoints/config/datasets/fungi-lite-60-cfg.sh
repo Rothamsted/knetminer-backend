@@ -12,6 +12,7 @@ export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 # - from that file, load ('source') $KETL_HOME/config/datasets/fungi-lite-60-cfg.sh 
 #   (or a fungi-lite-common.sh, depends on how much you share across versions)
 # - from the same file, override the few things that you need.
+# - Duplicate fungi-lite-60-metadata.descriptor.properties into fungi-lite-60RC1-metadata.descriptor.properties
 #
 # See fungi-lite-60TEST-cfg.sh for an example. The idea is that '60RC1' is the version, so 
 # you should not need to tweak it further.
