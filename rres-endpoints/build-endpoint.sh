@@ -1,8 +1,18 @@
 # Start the pipeline with this.
 # 
-# Remember, this requires that you bash-source an environment, for the RRes infrastructure, use 
-# <home>/config/environments/rres-env.sh, add <your-own>-env.sh environment for your PC or testing
-# infrastructure.
+# Remember, as per config/default-cfg.sh below, this should be executed as:
+#
+#   build-end-point.sh <dataset_id> <ver_id> [env_id]
+# 
+# and it will search for:
+# 
+# - config/datasets/$dataset_id-$ver_id-cfg.sh
+# - config/environments/$env_id.sh
+#
+# if you omit env_id, you should bash-source manually before running me
+#
+# Use: config/environments/rres-env.sh for RRes environment
+# Add <your-own>-env.sh environment to the same directory for your PC/testing environment
 # 
 set -e
 
