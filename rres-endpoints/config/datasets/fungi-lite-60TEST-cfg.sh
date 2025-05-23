@@ -16,3 +16,5 @@ export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 export KETL_HAS_NEO4J=true
 export KETL_NEO_VERSION='5.26.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl-test"
+
+export JAVA_TOOL_OPTIONS="-Xmx64G" # Default is huge, we don't need it here
