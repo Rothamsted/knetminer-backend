@@ -1,7 +1,15 @@
-printf "\nRunning Cypher query to generate medata and summary nodes in Neo4j\n"
+set -e
+
+printf "\n\n  Running Cypher query to generate medata and summary nodes in Neo4j\n\n"
 current_date=$(date +%Y-%m-%d)
 
 # TODO: to be reviewed against https://schema.org/Dataset ?
+# TODO: v${KETL_DATASET_VERSION}-RC3 is totally wrong, see notes in fungi-lite-60-cfg.sh
+#   'RC3' is part of KETL_DATASET_VERSION, the scripts are written so that they DO NOT NEED
+#   to be changed just because the version, or part of it changed. Moreover, 'v' is redundantly
+#   and inconsistent with much of the rest.
+#
+
 query="
 MATCH (n:Metadata) DETACH DELETE n;
 
@@ -133,7 +141,13 @@ MERGE (m:Summary)
 SET m.bioProcs = apoc.convert.toJson(jsonResult);
 "
 
+neo_url=$(ketl_get_neo_url)
+
 $NEO4J_HOME/bin/cypher-shell -a "$neo_url" -u "$KETL_NEO_USR" -p "$KETL_NEO_PWD" --format plain "$query"
 
-echo -e "\nAll Neo4j indexing and stats generation done\n"
-echo `date` >"$out_flag"
+printf "\n\n All Neo4j Stats Generation done\n\n"
+
+# DO NOT do this here. This is for scripts that are directly invoked by a SnakeMake step and
+# to tell SnakeMake the output for the step is completed. Sub-calls MUST NOT concern of setting
+# this flag, they must only take care to exiting with an error if needed (ie, USE set -e) 
+# echo `date` >"$out_flag"

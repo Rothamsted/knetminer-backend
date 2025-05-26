@@ -18,6 +18,8 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 #
 # The name within the code base, which identifies the config dir to be
 # used for the KnetMiner initialiser
+
+# TODO: comment it. This is not needed when it's == KETL_DATASET_ID
 export KNET_INIT_DATASET_ID="ascomycota-premium"
 
 

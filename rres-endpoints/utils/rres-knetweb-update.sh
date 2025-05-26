@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
+cat <<EOT
+
+  DO NOT USE ME!
+  
+This script used to git-update the old KnetMiner Web code, which was partially used by the old
+data initialiser.
+
+Now this is superseded by the Nova initialiser and we redeploy it automatically at: 
+
+  '$KNET_INITIALIZER_HOME' 
+
+TODO: this is actually still TO BE DONE!
+
+EOT
+
+exit 1
+
 #cd $(dirname "$0")/..
 cd ..
 TOP_DIR=/home/data/knetminer

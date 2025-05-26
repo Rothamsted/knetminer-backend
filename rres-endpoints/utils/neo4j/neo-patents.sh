@@ -1,3 +1,9 @@
+set -e
+
+# TODO: What is this? Add comments
+# TODO: Where is it called from? Does the documentation need to be updated? Is it still experimental?
+#
+
 printf "\nRunning Cypher query to generate patent nodes in Neo4j\n"
 current_date=$(date +%Y-%m-%d)
 export PATNETS_FILE="$KNET_HOME/etl-test/knet-pipelines/experiment/Patent/processed_file.csv" 

@@ -33,14 +33,15 @@ export KETL_NEOEXPORT_HOME="$KNET_SOFTWARE/ondex-mini/tools/neo4j-exporter"
 
 # WARNING: this is not auto-updated, cd in this dir and do 'git pull'
 export KNET_WEBAPP="$KNET_SOFTWARE/knetminer"
-export KNET_INITIALIZER_HOME="$KNET_WEBAPP/knetminer-initializer-cli/target/knetminer-initializer-cli-5.7-SNAPSHOT"
+
+export KNET_INITIALIZER_HOME="$KNET_SOFTWARE/knetminer-nova/knetminer-initializer"
 
 if [[ -z "$JAVA_HOME" ]]; then
   # This is usually a symbolic link, pointing at the last/current version
-  export JAVA_HOME="$KNET_SOFTWARE/jdk"
+  # TODO: migrate all to 21
+  export JAVA_HOME="$KNET_SOFTWARE/jdk21"
   export PATH="$JAVA_HOME/bin:$PATH"
 fi
-
 
 # WARNING: this must be compatible with SLURM limits set in config/snakemake/slurm
 export JAVA_TOOL_OPTIONS="-Xmx310G"
@@ -63,6 +64,12 @@ function ketl_get_neo_url ()
 
 export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start-slurm.sh" 
 export KETL_NEO_STOP="$KETL_HOME/utils/neo4j/neo-stop-slurm.sh" 
+
+# Before dumping large databases, Neo4j needs to be restarted, paused for this time and
+# then stopped again. 
+# This is used in neo-dump.sh It's unset by default (ie, no 2nd restart/pause done)
+#
+export KETL_NEO_IDX_PAUSE_TIME='20m' # Needs at least 17min for cereals-premium
 
 
 ###### Servers-sync options

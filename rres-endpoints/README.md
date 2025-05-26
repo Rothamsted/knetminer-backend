@@ -57,6 +57,12 @@ Any of the above steps can be omitted, if a dataset doesn't need them. This is c
 
 ### Diagram
 
+**Note**: `neo-index.sh` used to depend on `knowledge-graph-annotated.oxl` too (ie, the KG annotated with dataset metadata), in the sense that this dependency was specified in the SnakeMake file and this was the OXL that was passed to the old KnetMiner initialiser. However, the latter didn't use it, we passed such file to the old initialiser just in case of future use.
+
+The new KnetMiner Nova-based initialiser doesn't use any OXL directly, only the Neo4j database and a bunch of config files. For this reason, we have removed the OXL dependency from this SnakeMake step.
+
+This means that currently, the Ondex-computed metadata are only exported in the RDF files and similar metadata are computed in other ways, eg, see [this script invoked by index.sh](utils/neo4j/neo-stats.sh).
+
 <img src = "doc/server-sync.png" />
 
 
