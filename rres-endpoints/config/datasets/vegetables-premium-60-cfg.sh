@@ -5,7 +5,7 @@ oxl_home="$KNET_HOME/etl-test/vegetables-premium/$KETL_DATASET_VERSION"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
-export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/v$KETL_DATASET_VERSION-RC4"
+export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 
 ## Neo 
 #
@@ -17,15 +17,15 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 #
 # The name within the code base, which identifies the config dir to be
 # used for the KnetMiner initialiser
-export KNET_INIT_DATASET_ID="vegetables-premium"
+#export KNET_INIT_DATASET_ID="vegetables-premium"
 
 
 ##### Values for server-sync.sh
 #
 
 ## RRes Neo server
-export KNET_NEO_SSH=neo4j@babvs65.rothamsted.ac.uk
-export KNET_NEO_DATA=/opt/data
+#export KNET_NEO_SSH=neo4j@babvs65.rothamsted.ac.uk
+#export KNET_NEO_DATA=/opt/data
 
 
 ## RRes Test instances for Knetminer

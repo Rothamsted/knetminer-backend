@@ -9,6 +9,7 @@
 
 set -e
 
+version_no="$(echo "$KETL_DATASET_VERSION" | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
 in_oxl="$1"
 out_oxl="$2" # Annotated OXL
 out_rdf="$3" # Metadata RDF
@@ -20,5 +21,5 @@ mkdir -p \
 echo -e "\n\nRDF Generating dataset descriptor into:\n  '$out_oxl'\n  '$out_rdf'"
 "$KETL_RDFEXP_HOME/oxl-descriptor.sh" \
   --template "$KETL_RDFEXP_HOME/knetminer-descriptors/knetminer-metadata-template.ttl" \
-  --config "$KETL_HOME/config/datasets/${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-metadata-descriptor.properties" \
+  --config "$KETL_HOME/config/datasets/${KETL_DATASET_ID}-${version_no}-metadata-descriptor.properties" \
   --export "$out_rdf" "$in_oxl" "$out_oxl"

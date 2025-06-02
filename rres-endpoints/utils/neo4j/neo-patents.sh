@@ -1,8 +1,7 @@
 set -e
 
-# TODO: What is this? Add comments
-# TODO: Where is it called from? Does the documentation need to be updated? Is it still experimental?
-#
+# This is an experimental script to generate patent nodes in Neo4j.
+# It will be called from neo-index.sh after being fully tested.
 
 printf "\nRunning Cypher query to generate patent nodes in Neo4j\n"
 current_date=$(date +%Y-%m-%d)
