@@ -7,7 +7,7 @@
 # 
 # If you have a -common.sh file, VERSIONED files like the hereby load the common and then
 # override/extend definitions that are shared between version numbers.
-# NOT VICE VERSA
+# NOT VICE VERSA.
 #
 
 # Unfortunately, there isn't consistence, so we need the following
