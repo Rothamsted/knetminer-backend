@@ -1,13 +1,19 @@
 # Used as an example for the walkthrough example at 
 # /pipeline-walkthrough.md
 
-# /home/data/knetminer/etl-test/cereals-dummy/cereals-dummy-1.oxl
+# PLEASE NOTE: this override ALL of the variables that were defined in cereals-dummy-common.sh
+# hence, the -common.sh file IS NOT NEEDED in a case like this and you can stick with the old
+# pattern of having this versioned files only.
+# 
+# If you have a -common.sh file, VERSIONED files like the hereby load the common and then
+# override/extend definitions that are shared between version numbers.
+# NOT VICE VERSA
+#
 
 # Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
 oxl_home="$KNET_HOME/etl-test/cereals-dummy"
 
 export KETL_SRC_OXL="$oxl_home/$KETL_DATASET_ID-$KETL_DATASET_VERSION.oxl"
-
 export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 
 ## Neo

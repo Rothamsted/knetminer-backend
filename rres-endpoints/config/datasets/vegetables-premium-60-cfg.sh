@@ -13,12 +13,6 @@ export KETL_HAS_NEO4J=true
 export KETL_NEO_VERSION='5.26.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 
-## Knet Initialiser
-#
-# The name within the code base, which identifies the config dir to be
-# used for the KnetMiner initialiser
-#export KNET_INIT_DATASET_ID="vegetables-premium"
-
 
 ##### Values for server-sync.sh
 #

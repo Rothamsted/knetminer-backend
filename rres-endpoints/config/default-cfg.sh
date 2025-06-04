@@ -144,4 +144,14 @@ fi
 
 ## Dataset-specific config.
 #
-. "${KETL_HOME}/config/datasets/${KETL_DATASET_ID}-common.sh"
+. "${KETL_HOME}/config/datasets/${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-cfg.sh"
+
+# DO NOT DO THIS! The flow is supposed to be:
+# ${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-cfg.sh
+#   which is self contained or POSSIBLY calls something like
+#   ${KETL_DATASET_ID}-common.sh
+#  
+# The use of xxx-common.sh IS NOT MANDATORY, since, for simpler cases, we can just redefine a couple
+# of things in the versioned file.
+# 
+# . "${KETL_HOME}/config/datasets/${KETL_DATASET_ID}-common.sh"
