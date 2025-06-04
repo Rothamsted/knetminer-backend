@@ -64,7 +64,7 @@ function ketl_get_neo_url ()
 		echo ''
 		return
 	fi
-  neo_host="$cat "$host_file")
+  neo_host="$(cat "$host_file")"
   echo "bolt://$neo_host:7687"
 }
 
