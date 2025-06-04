@@ -16,7 +16,7 @@ out_flag="$2" # Creates this file to signal that the step was successfully comp
 "$KETL_NEO_INIT"
 
 rdf_target="$KETL_OUT/rdf"
-neo_url=$(ketl_get_neo_url)
+neo_url="$(ketl_get_neo_url)"
 
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.boltUrl='$neo_url'"
 export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dneo4j.user='$KETL_NEO_USR'"

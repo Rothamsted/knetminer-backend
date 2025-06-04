@@ -10,7 +10,7 @@
 #SBATCH --time=1-0:0:0
 #SBATCH --cpus-per-task=8
 
-# The synch command is used, because this is invoked from the sbatch command, which is going to 
+# The console command is used, because this is invoked from the sbatch command, which is going to 
 # be asynchronous for the top invoker.
 export JAVA_TOOL_OPTIONS="-Xmx12G"
 "$NEO4J_HOME/bin/neo4j" console
