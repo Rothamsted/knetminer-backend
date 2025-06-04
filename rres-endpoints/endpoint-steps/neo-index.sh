@@ -9,6 +9,11 @@ out_flag="$1" # Creates this file to signal that the step was successfully comp
 
 neo_url=$(ketl_get_neo_url)
 
+if [[ -z "$neo_url" ]]; then
+  # This happens when you restart a partially completed pipeline from here.
+  printf "Neo4j server is down, restarting it\n"
+  "$KETL_NEO_START"
+fi
 
 printf "\n\n  Running the Neo4j Nova Initialiser\n\n"
 printf "\n  You may want to check that $KNET_INITIALIZER_HOME is updated (usually done automatically by the API CI build)\n\n"

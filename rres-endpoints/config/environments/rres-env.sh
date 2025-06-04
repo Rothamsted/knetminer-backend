@@ -58,7 +58,13 @@ export KETL_SNAKE_OPTS="--profile config/snakemake/slurm"
 
 function ketl_get_neo_url ()
 {
-  neo_host=`cat "$KETL_OUT/tmp/neo4j-slurm.host"`
+	host_file="$KETL_OUT/tmp/neo4j-slurm.host"
+	if [[ ! -f "$host_file" ]]; then
+		# it's probably down, we signal it this way
+		echo ''
+		return
+	fi
+  neo_host="$cat "$host_file")
   echo "bolt://$neo_host:7687"
 }
 
