@@ -7,9 +7,14 @@ if [[ $# -le 2 ]]; then
 fi
 
 # The dataset ID and version point to the processed dataset and its details
+#
 export KETL_DATASET_ID="$1"
 export KETL_DATASET_VERSION="$2"
 export KETL_ENVIRONMENT="$3"
+
+
+# The version number, without postfixes like -RC 
+export KETL_DATASET_VERSION_NUM="$(echo "$KETL_DATASET_VERSION" | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
 
 
 ########## General variables

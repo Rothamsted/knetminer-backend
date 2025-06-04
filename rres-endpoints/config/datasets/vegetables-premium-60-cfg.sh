@@ -1,7 +1,8 @@
-# /home/data/knetminer/etl-test/solanaceae/58/generic/knowledge-network.oxl
+# The OXL is somewhere like:
+#   /home/data/knetminer/etl-test/vegetables-premium/60/generic/knowledge-network.oxl
+# Unfortunately, there isn't consistence, so we need the following
 
-# Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
-oxl_home="$KNET_HOME/etl-test/vegetables-premium/$KETL_DATASET_VERSION"
+oxl_home="$KNET_HOME/etl-test/vegetables-premium/$KETL_DATASET_VERSION_NUM"
 
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 
@@ -13,6 +14,8 @@ export KETL_HAS_NEO4J=true
 export KETL_NEO_VERSION='5.26.0'
 export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 
+
+# TODO: to be remove, we don't deploy on RRes anymore
 
 ##### Values for server-sync.sh
 #
@@ -26,7 +29,7 @@ export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
 #
 
 # Test servers like babvs73
-export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/vegetables-premium
+#export KNET_TESTINST_DATA_PATH=/opt/data/knetminer-datasets/vegetables-premium
 # babvs73: based on old Traverser, available at knetminer.com/ci-test
 # babvs72: based on Neo4j+OXL Traverser, available at knetminer.com/ci-test-cypher
-export KNET_TESTINST_SSH="brandizim@babvs73.rothamsted.ac.uk brandizim@babvs72.rothamsted.ac.uk"
+#export KNET_TESTINST_SSH="brandizim@babvs73.rothamsted.ac.uk brandizim@babvs72.rothamsted.ac.uk"

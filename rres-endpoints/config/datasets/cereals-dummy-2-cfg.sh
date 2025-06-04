@@ -10,8 +10,8 @@
 # NOT VICE VERSA
 #
 
-# Unfortunately, there isn't consistence, so we can use KETL_DATASET_ID here
-oxl_home="$KNET_HOME/etl-test/cereals-dummy"
+# Unfortunately, there isn't consistence, so we need the following
+oxl_home="$KNET_HOME/etl-test/cereals-dummy/$KETL_DATASET_VERSION_NUM"
 
 export KETL_SRC_OXL="$oxl_home/$KETL_DATASET_ID-$KETL_DATASET_VERSION.oxl"
 export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
