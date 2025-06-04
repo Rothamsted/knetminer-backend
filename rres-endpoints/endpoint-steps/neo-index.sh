@@ -13,6 +13,7 @@ if [[ -z "$neo_url" ]]; then
   # This happens when you restart a partially completed pipeline from here.
   printf "Neo4j server is down, restarting it\n"
   "$KETL_NEO_START"
+  neo_url=$(ketl_get_neo_url)
 fi
 
 printf "\n\n  Running the Neo4j Nova Initialiser\n\n"
