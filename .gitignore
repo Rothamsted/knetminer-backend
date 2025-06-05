@@ -6,3 +6,5 @@ target/
 ._*
 *.out
 .snakemake/
+# Created by RRes NFS
+.nfs*
