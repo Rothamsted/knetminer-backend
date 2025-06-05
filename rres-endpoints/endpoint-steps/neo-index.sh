@@ -30,8 +30,9 @@ export KNET_NEO_URI="$neo_url"
 export KNET_NEO_USER="$KETL_NEO_USR"
 export KNET_NEO_PWD="$KETL_NEO_PWD"
 
+# --java-opts '' disables the default -Xmx2G and let it to use JAVA_TOOL_OPTIONS 
 ./init-dataset.sh --config-dir configs/knetminer --config-file classpath:/api-etl-writer.yml \
-  --resource "$KNET_INIT_DATASET_ID" 
+  --java-opts '' --resource "$KNET_INIT_DATASET_ID" 
 
 
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
