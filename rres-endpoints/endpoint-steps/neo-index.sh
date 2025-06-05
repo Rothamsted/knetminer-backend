@@ -14,6 +14,10 @@ if [[ -z "$neo_url" ]]; then
   printf "Neo4j server is down, restarting it\n"
   "$KETL_NEO_START"
   neo_url=$(ketl_get_neo_url)
+  
+  # We noticed unability to connect straight after this startup, so let's hope for the best
+  # with yeat another pause (the startup script waits to see the job in squeue)
+  sleep 30s
 fi
 
 printf "\n\n  Running the Neo4j Nova Initialiser\n\n"
