@@ -13,8 +13,10 @@ export KETL_DATASET_VERSION="$2"
 export KETL_ENVIRONMENT="$3"
 
 
-# The version number, without postfixes like -RC 
-export KETL_DATASET_VERSION_NUM="$(echo "$KETL_DATASET_VERSION" | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
+# The version number, without postfixes like -RC
+# Should you have a non-numbered version (eg, foo-TEST-cfg.sh, not recommended), this will be empty
+#
+export KETL_DATASET_VERSION_NUM="$(echo "$KETL_DATASET_VERSION" | sed -E --quiet 's/[^0-9]*([0-9]+).*/\1/p')"
 
 
 ########## General variables
