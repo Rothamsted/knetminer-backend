@@ -44,4 +44,4 @@ echo -e "\n\tLoading RDF into '$tdb' \n"
 # -l option does the trick of just loading the TDB and not running the whole thing
 # "$KETL_NEOEXPORT_HOME/ondex2neo.sh" --rdf-load --tdb "$tdb" $rdf_files
 
-"$JENA_HOME/bin/tdb2.xloader --loc "$tdb" $rdf_files
+"$JENA_HOME/bin/tdb2.xloader" --loc "$tdb" $rdf_files
