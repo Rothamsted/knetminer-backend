@@ -39,5 +39,9 @@ fi
 
 echo -e "\n\tLoading RDF into '$tdb' \n"
 
+# We had to reintroduce Jena CLI tools, sinche the rdf2pg loading (based on Java calls) was taking
+# huge time for the tdb_load step.
 # -l option does the trick of just loading the TDB and not running the whole thing
-"$KETL_NEOEXPORT_HOME/ondex2neo.sh" --rdf-load --tdb "$tdb" $rdf_files
+# "$KETL_NEOEXPORT_HOME/ondex2neo.sh" --rdf-load --tdb "$tdb" $rdf_files
+
+"$JENA_HOME/bin/tdb2.xloader --loc "$tdb" $rdf_files

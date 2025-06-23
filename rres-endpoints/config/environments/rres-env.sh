@@ -28,6 +28,9 @@ export KETL_OUT_HOME="$KNET_HOME/pub/endpoints"
 # The Ondex RDF exporter
 export KETL_RDFEXP_HOME="$KNET_SOFTWARE/rdf-export-2-cli"
 
+# Needed in tdb_load, see comments in there
+export JENA_HOME="$KNET_SOFTWARE/jena"
+
 # The Ondex flavour of the rdf2neo converter
 export KETL_NEOEXPORT_HOME="$KNET_SOFTWARE/ondex-mini/tools/neo4j-exporter"
 

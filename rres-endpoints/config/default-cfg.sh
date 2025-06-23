@@ -48,6 +48,10 @@ export KETL_SNAKE_OPTS=''
 # The Ondex RDF exporter
 export KETL_RDFEXP_HOME=''
 
+# We had to reintroduce Jena CLI tools, sinche the rdf2pg loading (based on Java calls) was taking
+# huge time for the tdb_load step.
+export JENA_HOME='' 
+
 # The Ondex flavour of the rdf2neo converter
 export KETL_NEOEXPORT_HOME=''
 
