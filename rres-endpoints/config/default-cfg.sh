@@ -157,6 +157,12 @@ fi
 #
 . "${KETL_HOME}/config/datasets/${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-cfg.sh"
 
+
+# TODO: Sometimes we see out-of-space errors in SLURM, maybe because some node runs out of space
+# with /tmp. We might try this to see if it sorts out.
+# export TMPDIR="${KETL_OUT}/tmp"
+
+
 # DO NOT DO THIS! The flow is supposed to be:
 # ${KETL_DATASET_ID}-${KETL_DATASET_VERSION}-cfg.sh
 #   which is self contained or POSSIBLY calls something like
