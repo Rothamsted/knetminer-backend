@@ -46,6 +46,9 @@ if [[ -z "$JAVA_HOME" ]]; then
   export PATH="$JAVA_HOME/bin:$PATH"
 fi
 
+## Various Unix utils, needed by the ETL
+export PATH="$KNET_SOFTWARE/bin:$PATH"
+
 # WARNING: this must be compatible with SLURM limits set in config/snakemake/slurm
 export JAVA_TOOL_OPTIONS="-Xmx310G"
 
