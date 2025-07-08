@@ -10,6 +10,10 @@
 #
 set -e
 
+# printf "\n\nDEBUG: local node disk space\n"
+# df -h
+# printf "\n"
+
 tdb="$1"
 out_flag="$2" # Creates this file to signal that the step was successfully completed
 
