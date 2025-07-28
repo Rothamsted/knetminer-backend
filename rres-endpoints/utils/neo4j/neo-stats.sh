@@ -15,7 +15,8 @@ CREATE (s:Metadata {
     edgeCount: edgeCount,
     version: \"${KETL_DATASET_VERSION}\",
     fileLocation: \"s3://knet-data-store/${KETL_DATASET_ID}/${KETL_DATASET_VERSION}\",
-    date: \"${current_date}\"
+    date: \"${current_date}\",
+    releaseNotes: \"${KETL_REL_NOTES}\"
 });
 
 MATCH (n:Summary) DETACH DELETE n;
