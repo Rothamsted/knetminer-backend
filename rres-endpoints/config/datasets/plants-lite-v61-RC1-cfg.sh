@@ -1,6 +1,6 @@
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
-Version v61-RC1 04-08-2025:\n\
+Version ${KETL_DATASET_VERSION} 04-08-2025:\n\
 \n\
 - New semantic motif categories. Read more: https://github.com/KnetMiner/knetminer-schemas/tree/main/semantic-motif-taxonomy/knet-motif-categories-doc\n\
 - Removed redundant alternative names for Arabidopsis Thaliana (Thale Cress).\n\
