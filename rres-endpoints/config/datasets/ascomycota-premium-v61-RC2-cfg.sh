@@ -1,6 +1,6 @@
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
-Version ${KETL_DATASET_VERSION} 21-10-2025:\n\
+Version ${KETL_DATASET_VERSION} 03-11-2025:\n\
 \n\
 - Fixed missing Gene-enc-Protein relationships for Fusarium Graminarium.\n\
 ---------------------------\n\
