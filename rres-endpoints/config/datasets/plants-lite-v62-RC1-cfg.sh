@@ -3,7 +3,7 @@ export KETL_REL_NOTES="\n\
 Version ${KETL_DATASET_VERSION} 20-01-2026:\n\
 \n\
 - New Arabidopsis Thaliana (Thale Cress) pangenome nodes with gene presence/absence variation (PAV) data.\n\
-- New gene-trait associations extracted with LLM from recent publications.\n\
+- New gene-trait association extracted with LLM from recent publications.\n\
 ---------------------------\n\
 Version v61-RC1 04-08-2025:\n\
 \n\
