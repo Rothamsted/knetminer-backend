@@ -41,8 +41,7 @@ export KNET_INITIALIZER_HOME="$KNET_SOFTWARE/knetminer-nova/knetminer-initialize
 
 if [[ -z "$JAVA_HOME" ]]; then
   # This is usually a symbolic link, pointing at the last/current version
-  # TODO: migrate all to 21
-  export JAVA_HOME="$KNET_SOFTWARE/jdk21"
+  export JAVA_HOME="$KNET_SOFTWARE/jdk"
   export PATH="$JAVA_HOME/bin:$PATH"
 fi
 
