@@ -70,7 +70,7 @@ function ketl_get_neo_url ()
 		return
 	fi
   neo_host="$(cat "$host_file")"
-  echo "bolt://$neo_host:7687"
+  echo "bolt://$neo_host:7688"
 }
 
 export KETL_NEO_START="$KETL_HOME/utils/neo4j/neo-start-slurm.sh" 
