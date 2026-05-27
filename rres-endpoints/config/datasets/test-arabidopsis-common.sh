@@ -1,4 +1,4 @@
-oxl_home="$KNET_HOME/etl-test/$KETL_DATASET_ID/$KETL_DATASET_VERSION_NUM"
+oxl_home="$KNET_HOME/etl-test/arabidopsis/$KETL_DATASET_VERSION_NUM"
 export KETL_SRC_OXL="$oxl_home/generic/knowledge-network.oxl"
 export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 
