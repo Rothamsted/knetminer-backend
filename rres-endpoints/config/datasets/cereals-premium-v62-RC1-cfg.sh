@@ -1,13 +1,14 @@
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
-Version ${KETL_DATASET_VERSION} 14-05-2026:\n\
+Version ${KETL_DATASET_VERSION} 05-06-2026:\n\
 \n\
-- Avena Sativa (Oat) variety updated to ot_3098.\n\
+- Arabidopsis Thaliana (Thale Cress) genome updated to TAIR12 release.\n\
 - Triticum Aestivum (Bread Wheat) genome upgraded to RefSeq v2.1.\n\
 - New HomologyTree node type and part_of relation to it from proteins, extracted from OMA. Read more: https://github.com/KnetMiner/knetminer-etl/issues/1\n\
-- Protein fasta, CDS fasta, GFF and species data now come from Ensembl Beta website.
 - New Arabidopsis Thaliana (Thale Cress) and Oryza sativa (Rice) pangenome nodes with gene presence/absence variation (PAV) data.\n\
 - New gene-phenotype association extracted with LLM from recent publications.\n\
+- Protein fasta, CDS fasta, GFF and species data now come from Ensembl Beta website.\n\
+- Avena Sativa (Oat) removed temporarily.\n\
 ---------------------------\n\
 Version v61-RC1 01-08-2025:\n\
 \n\
