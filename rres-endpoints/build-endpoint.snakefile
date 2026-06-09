@@ -94,6 +94,7 @@ rule neo_index:
 	output:
 		f"{KETL_OUT}/tmp/neo-index.flag"		
 	shell:
+		#'echo SKIPPING INDEX; touch "{output}"'
 		'./endpoint-steps/neo-index.sh "{output}"'
 
 
