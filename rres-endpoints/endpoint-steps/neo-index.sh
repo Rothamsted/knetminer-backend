@@ -41,9 +41,14 @@ export KNET_NEO_PWD="$KETL_NEO_PWD"
 
 # Sam 2024/09/13: Run the Cypher query to generate stats node in Neo4j
 # TODO: Likely, it needs review and upgrades to Nova, so for now it's disabled
-# TODO: 'source' was removed, likely, it was only used to get neo_url, but the proper way
-# to get this is $(ketl_get_neo_url) (see the script).
-"$KETL_HOME/utils/neo4j/neo-stats.sh"
+# Run stats fail-soft: it's the final cosmetic step (builds :Metadata/:Summary nodes
+# only), so a failure here must NOT discard the hours of indexing done above. The graph
+# and semantic-motif data are already in place; the flag is still written so Snakemake
+# does not re-run the whole (very expensive) neo_index rule.
+if ! "$KETL_HOME/utils/neo4j/neo-stats.sh"; then
+  echo -e "\n\n  WARNING: neo-stats.sh failed - :Metadata/:Summary nodes may be missing/stale." >&2
+  echo -e "  The graph and semantic-motif data are unaffected; re-run neo-stats.sh once fixed.\n\n" >&2
+fi
 
 echo -e "\nAll Neo4j indexing and stats generation done\n"
 echo $(date) >"$out_flag"
