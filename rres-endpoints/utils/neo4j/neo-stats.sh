@@ -8,9 +8,11 @@ current_date=$(date +%Y-%m-%d)
 query="
 MATCH (n:Metadata) DETACH DELETE n;
 
-MATCH (n)-[r]-()
-WITH count(distinct n) AS nodeCount, count(distinct r) AS edgeCount
-CREATE (s:Metadata { 
+MATCH (n)
+WITH count(n) AS nodeCount
+MATCH ()-[r]->()
+WITH nodeCount, count(r) AS edgeCount
+CREATE (s:Metadata {
     nodeCount: nodeCount,
     edgeCount: edgeCount,
     version: \"${KETL_DATASET_VERSION}\",
