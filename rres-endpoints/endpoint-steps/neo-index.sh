@@ -7,6 +7,23 @@ set -e
 
 out_flag="$1" # Creates this file to signal that the step was successfully completed
 
+# ROGER port: the knetminer-initializer is compiled for Java 25 (upstream Ondex tools need Java <=21,
+# so JAVA_HOME/PATH stay Java 21 for the rest of the pipeline) -- put Java 25 first on PATH for this
+# step only. Also ensure Neo4j is up: on a cached resume neo_export did not re-run, so the DB server
+# may be stopped (the local ketl_get_neo_url returns a URL unconditionally, so its restart branch
+# never triggers). Guarded to roger so rothhpc4 is unaffected.
+if [[ "$KETL_ENVIRONMENT" == "roger" ]]; then
+  export PATH="/home/data/knetminer/software/jdk/bin:$PATH"
+  if ! curl -s --max-time 3 "http://localhost:7474" >/dev/null 2>&1; then
+    echo "[roger] Neo4j not responding on :7474 -- starting it"
+    "$KETL_NEO_START"
+    for i in $(seq 1 36); do   # up to 3 min for a loaded DB to accept connections
+      curl -s --max-time 3 "http://localhost:7474" >/dev/null 2>&1 && { echo "[roger] Neo4j up after ${i}x5s"; break; }
+      sleep 5
+    done
+  fi
+fi
+
 neo_url=$(ketl_get_neo_url)
 
 if [[ -z "$neo_url" ]]; then
