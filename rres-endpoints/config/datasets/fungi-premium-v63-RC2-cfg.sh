@@ -1,9 +1,17 @@
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
-Version ${KETL_DATASET_VERSION} 2026-08:\n\
+Version ${KETL_DATASET_VERSION} 2026-08-27:\n\
 \n\
-- Fusarium oxysporum Fo47 genome upgraded from GCA_000271705.2 (2014 Broad Institute scaffold draft, no chromosome pseudomolecule) to GCA_013085055.1 (2020 Xi'an Jiaotong University, 12-chromosome complete genome) -- fixes missing Map View / Genome Region Search for this organism.\n\
+- PHI-base provenance now stamped directly on organism protein/gene nodes (a PHIBASE-namespace\n\
+  accession carrying the matched PHI-base target's UniProtKB ID, >=80% BLAST identity), not just\n\
+  on a separate linked node reachable only via an h_s_s edge. Makes PHI-base-derived genes\n\
+  identifiable without a graph traversal (knet-pipelines#35).\n\
 - Chromosome density bands added to all basemaps (50 bins per chromosome, gene counts per bin).\n\
+\n\
+Note: an earlier build under this same version tag also included a Fusarium oxysporum Fo47\n\
+genome upgrade (GCA_000271705.2 -> GCA_013085055.1). That upgrade was rolled back on 2026-08-20\n\
+(breaks the fuseff extension) before ever reaching a real deploy, and is NOT part of this build --\n\
+Fo47 remains on GCA_000271705.2, matching v63-RC1.\n\
 ---------------------------\n\
 Version v63-RC1 2026-07-15:\n\
 \n\
