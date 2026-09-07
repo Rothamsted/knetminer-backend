@@ -1,18 +1,13 @@
 ####################################################################################################
-# ⚠️  The v63-RC2 artefact built 2026-09-03 and currently in S3 does NOT match these notes.
+# Fo47 is PINNED to GCA_000271705.2 in config/genomes/fungi-premium.tsv. Do NOT upgrade it without
+# regenerating Erika Kroll's fuseff extension inputs (RootHOGs_prefix.tsv + kg-data/*.tsv) and
+# clearing it with Keywan/Erika first -- the 2020 assembly renames every Fo47 gene FOZG_* ->
+# FOBCDRAFT_*, which breaks the accession-based merge fuseff depends on. That upgrade was built,
+# deployed and rolled back once already (2026-08-20), then silently reappeared in the 2026-09-03
+# build because only the deployed dump was reverted, not the ETL build tree.
 #
-# That build silently re-included the Fusarium oxysporum Fo47 genome upgrade (GCA_000271705.2 ->
-# GCA_013085055.1) which was rolled back on 2026-08-20 for breaking Erika Kroll's fuseff extension.
-# The rollback had only ever been applied to the deployed Neo4j dump and the KnetSpace records --
-# the ETL build tree was never reverted, so the PHI-base rebuild picked the new assembly back up.
-# Verified in the OXL, not inferred: 16,497 FOBCDRAFT_ gene ids.
-#
-# Fo47 was reverted to GCA_000271705.2 in the build tree on 2026-09-07 (18,191 genes / 102 scaffolds,
-# matching v63-RC1) and fungi-premium is being rebuilt to overwrite that S3 artefact. These notes
-# describe the REBUILD. Delete this header once the replacement dump is in S3.
-#
-# Fo47 is now PINNED in config/genomes/fungi-premium.tsv -- do not upgrade it without regenerating
-# fuseff's inputs and clearing it with Keywan/Erika first.
+# The v63-RC2 dump in S3 was replaced 2026-09-07 19:36 (6,316,645,436 bytes) with a build verified
+# at FOZG_ 18,191 / FOBCDRAFT_ 0. See knet-pipelines docs/session-handover.md, 2026-09-07.
 ####################################################################################################
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
