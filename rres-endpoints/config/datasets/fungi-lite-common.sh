@@ -11,8 +11,8 @@ export KETL_OUT="$KETL_OUT_HOME/$KETL_DATASET_ID/$KETL_DATASET_VERSION"
 ## Neo 
 #
 export KETL_HAS_NEO4J=true
-export KETL_NEO_VERSION='5.26.0'
-export NEO4J_HOME="$KNET_SOFTWARE/neo4j-community-$KETL_NEO_VERSION-etl"
+export KETL_NEO_VERSION='2026.05.0'
+export NEO4J_HOME="${KETL_NEO_HOME_OVERRIDE:-$KNET_HOME/etl-test/temp/neo4j-roger/neo4j-community-$KETL_NEO_VERSION}"
 
 ##### Values for server-sync.sh
 #
