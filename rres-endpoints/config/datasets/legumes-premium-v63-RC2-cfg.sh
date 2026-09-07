@@ -1,6 +1,11 @@
 export KETL_REL_NOTES="\n\
 ---------------------------\n\
-Version ${KETL_DATASET_VERSION} 2026-07-29:\n\
+Version ${KETL_DATASET_VERSION} 2026-09-07:\n\
+\n\
+- Shortened gene display names. Genes with no curated symbol previously displayed their full assembly-prefixed accession (for example arahy.Tifrunner.gnm2.ann2.AH04G462800); they now display the informative part alone (AH04G462800). Affects Arachis hypogaea and Vicia faba.\n\
+- Gene identifiers and accessions are unchanged: this affects the displayed label only, so existing links, searches and saved queries by gene ID continue to work.\n\
+---------------------------\n\
+Version v63-RC1 2026-07-29:\n\
 \n\
 - Added 2 species: Medicago truncatula (model legume) and Cicer arietinum (chickpea), taking the bundle to 7.\n\
 - Upgraded Glycine max to Glycine_max_v4.0 (Wm82.a4) and Phaseolus vulgaris to v2.0, both sourced from NCBI/JGI.\n\
